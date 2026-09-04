@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RakshitPlus - Doctor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-emerald-50/30 p-8 font-['Inter']">
+    <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl border border-emerald-100 p-10">
+        <div class="flex justify-between items-center mb-8 border-b pb-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-emerald-900 mb-2">My Patient Queue</h1>
+                <p class="text-emerald-600 font-medium">Live updates synchronized with the tracking system.</p>
+            </div>
+            <a href="index.html" class="text-sm font-bold text-slate-500 hover:text-emerald-700">← Back Home</a>
+        </div>
+        
+        <div class="overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+            <table class="w-full text-left">
+                <thead class="bg-emerald-600 text-white">
+                    <tr><th class="p-4">ID</th><th class="p-4">Patient Name</th><th class="p-4">AI Triage Symptoms</th><th class="p-4">Action</th></tr>
+                </thead>
+                <tbody id="queueBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadQueue() {
+            const res = await fetch('/api/doctor/queue', { headers: { 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` } });
+            if (!res.ok) return document.body.innerHTML = "<h2 class='text-center mt-20 text-red-600 font-bold text-2xl'>Access Denied.</h2>";
+            const data = await res.json();
+            const tbody = document.getElementById('queueBody');
+            tbody.innerHTML = data.length ? data.map(row => `
+                <tr class="hover:bg-slate-50 border-b">
+                    <td class="p-4 font-bold text-slate-400">#${row.id}</td>
+                    <td class="p-4 font-bold text-slate-900">${row.name}</td>
+                    <td class="p-4 text-sm text-slate-600">${row.symptoms}</td>
+                    <td class="p-4"><button onclick="checkPatient(${row.id})" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-blue-700 transition">🩺 Check & Call Next</button></td>
+                </tr>`).join('') : `<tr><td colspan="4" class="p-6 text-center text-slate-400 font-medium">Queue empty. Good job!</td></tr>`;
+        }
+        async function checkPatient(id) {
+            await fetch(`/api/doctor/appointments/${id}/complete`, { method: 'PUT', headers: { 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` } });
+            loadQueue();
+        }
+        loadQueue(); setInterval(loadQueue, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RakshitPlus - Find Specialists</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-50 font-['Inter']">
+    <nav class="bg-white border-b px-8 py-5 flex justify-between items-center sticky top-0 z-50">
+        <a href="index.html" class="text-2xl font-bold text-blue-900 flex items-center gap-2"><div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white">+</div> RakshitPlus</a>
+        <div class="space-x-8 font-medium text-slate-600">
+            <a href="index.html" class="hover:text-blue-600">Home</a>
+            <a href="doctors.html" class="text-blue-600 font-bold">Find Doctors</a>
+            <a href="contact.html" class="hover:text-blue-600">Contact Us</a>
+        </div>
+    </nav>
+    <div class="max-w-6xl mx-auto py-16 px-6">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-extrabold text-slate-900 mb-4">Meet Our Top Specialists</h1>
+            <p class="text-slate-500">Highly qualified professionals ready to serve you.</p>
+        </div>
+        <div id="doctorsGrid" class="grid md:grid-cols-3 gap-8"></div>
+    </div>
+    <script>
+        async function loadDoctors() {
+            const res = await fetch('/api/doctors'); const doctors = await res.json();
+            const grid = document.getElementById('doctorsGrid');
+            if (doctors.length === 0) return grid.innerHTML = `<div class="col-span-3 text-center text-slate-500">No doctors added yet. Admin needs to add them.</div>`;
+            grid.innerHTML = doctors.map(doc => `
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg border hover:-translate-y-2 transition transform duration-300">
+                    <img src="${doc.image_url}" class="w-full h-64 object-cover">
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold text-slate-900">${doc.name}</h3>
+                        <p class="text-blue-600 font-semibold mt-1">${doc.specialization}</p>
+                        <button onclick="window.location.href='index.html#booking-section'" class="mt-6 w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition">Book Appointment</button>
+                    </div>
+                </div>`).join('');
+        }
+        loadDoctors();
+    </script>
+</body>
+</html>

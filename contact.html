@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RakshitPlus - Contact Us</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-blue-50/50 h-screen flex flex-col font-['Inter']">
+    <nav class="bg-white border-b px-8 py-5 flex justify-between items-center">
+        <a href="index.html" class="text-2xl font-bold text-blue-900 flex items-center gap-2"><div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white">+</div> RakshitPlus</a>
+        <div class="space-x-8 font-medium text-slate-600">
+            <a href="index.html" class="hover:text-blue-600">Home</a>
+            <a href="doctors.html" class="hover:text-blue-600">Find Doctors</a>
+            <a href="contact.html" class="text-blue-600 font-bold">Contact Us</a>
+        </div>
+    </nav>
+    <div class="flex-1 flex items-center justify-center p-8">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-5xl w-full grid md:grid-cols-2">
+            <div class="bg-slate-900 text-white p-12 flex flex-col justify-center">
+                <h2 class="text-4xl font-bold mb-4">Get in touch</h2>
+                <p class="text-slate-400 mb-8">Whether you have a medical inquiry or need technical support, our team is here for you 24/7.</p>
+                <div class="space-y-6">
+                    <p class="flex items-center gap-4">📍 123 Health Avenue, Tech Park, New Delhi</p>
+                    <p class="flex items-center gap-4">📞 +91 98765 43210</p>
+                    <p class="flex items-center gap-4">✉️ support@rakshitplus.com</p>
+                </div>
+            </div>
+            <div class="p-12">
+                <form id="contactForm" class="space-y-5">
+                    <input type="text" id="c-name" required placeholder="Your Name" class="w-full border-b-2 p-3 outline-none focus:border-blue-600 bg-transparent">
+                    <input type="email" id="c-email" required placeholder="Email Address" class="w-full border-b-2 p-3 outline-none focus:border-blue-600 bg-transparent">
+                    <textarea id="c-msg" required rows="4" placeholder="How can we help?" class="w-full border-b-2 p-3 outline-none focus:border-blue-600 bg-transparent"></textarea>
+                    <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 shadow-lg mt-4 transition">Send Message</button>
+                </form>
+                <div id="statusMsg" class="mt-4 text-center font-bold hidden"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await fetch('/api/contact', { method: 'POST', headers:{'Content-Type': 'application/json'}, body: JSON.stringify({name: document.getElementById('c-name').value, email: document.getElementById('c-email').value, message: document.getElementById('c-msg').value}) });
+            const msg = document.getElementById('statusMsg'); msg.classList.remove('hidden');
+            if(res.ok) { msg.className = "mt-4 text-center text-green-600"; msg.innerText = "Message Sent Successfully!"; e.target.reset(); } else { msg.className = "mt-4 text-center text-red-600"; msg.innerText = "Failed."; }
+        });
+    </script>
+</body>
+</html>

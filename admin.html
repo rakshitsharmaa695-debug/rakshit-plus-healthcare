@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RakshitPlus - Master Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; background: #f1f5f9; }</style>
+</head>
+<body class="flex h-screen overflow-hidden">
+    <aside class="w-64 bg-slate-900 text-white flex flex-col">
+        <div class="h-20 flex items-center px-8 border-b border-slate-800">
+            <div class="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center font-bold mr-3">+</div>
+            <h1 class="text-xl font-bold">RakshitPlus</h1>
+        </div>
+        <nav class="flex-1 px-4 py-8 space-y-2">
+            <a href="#" class="flex items-center px-4 py-3 bg-blue-600/20 text-blue-400 rounded-xl font-bold">📊 Dashboard</a>
+            <a href="index.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 rounded-xl font-medium">🌍 Back to Portal</a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-y-auto">
+        <header class="h-20 bg-white border-b flex items-center justify-between px-10">
+            <h2 class="text-2xl font-extrabold text-slate-800">System Overview</h2>
+            <span class="bg-purple-100 text-purple-700 px-4 py-1.5 rounded-full text-sm font-bold">Root Access</span>
+        </header>
+
+        <div class="p-10 max-w-7xl mx-auto w-full space-y-8">
+            <div class="grid grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center justify-between">
+                    <div><p class="text-sm font-bold text-slate-400 uppercase">Patients</p><p class="text-4xl font-extrabold text-blue-600" id="stat-patients">0</p></div>
+                    <div class="text-2xl">👥</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center justify-between">
+                    <div><p class="text-sm font-bold text-slate-400 uppercase">Doctors</p><p class="text-4xl font-extrabold text-emerald-600" id="stat-doctors">0</p></div>
+                    <div class="text-2xl">🩺</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center justify-between">
+                    <div><p class="text-sm font-bold text-slate-400 uppercase">Appts</p><p class="text-4xl font-extrabold text-purple-600" id="stat-appts">0</p></div>
+                    <div class="text-2xl">📅</div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-2xl shadow-sm border p-8 h-fit">
+                    <h3 class="text-lg font-bold text-slate-900 mb-6">➕ Onboard New Doctor</h3>
+                    <form id="addDoctorForm" class="space-y-4">
+                        <input type="text" id="doc-name" required placeholder="Dr. Name" class="w-full border p-3 rounded-xl outline-none">
+                        <input type="email" id="doc-email" required placeholder="Email" class="w-full border p-3 rounded-xl outline-none">
+                        <input type="password" id="doc-password" required placeholder="Temporary Password" class="w-full border p-3 rounded-xl outline-none">
+                        <input type="url" id="doc-image" placeholder="Photo URL (Optional)" class="w-full border p-3 rounded-xl outline-none">
+                        <select id="doc-spec" class="w-full border p-3 rounded-xl outline-none">
+                            <option value="Cardiology">Cardiology</option> <option value="Orthopedics">Orthopedics</option>
+                            <option value="Neurology">Neurology</option> <option value="General Medicine">General Medicine</option>
+                        </select>
+                        <button type="submit" class="w-full bg-slate-900 text-white p-3.5 rounded-xl font-bold">Save Doctor</button>
+                    </form>
+                    <div id="adminMsg" class="mt-4 text-center font-bold hidden text-sm"></div>
+                </div>
+
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <div class="p-6 border-b bg-slate-50"><h3 class="text-lg font-bold">📋 Active Staff Directory</h3></div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-white border-b">
+                                <tr><th class="p-4 text-xs font-bold text-slate-400 uppercase">Doctor</th><th class="p-4 text-xs font-bold text-slate-400 uppercase">Spec</th><th class="p-4 text-xs font-bold text-slate-400 uppercase">ID</th><th class="p-4 text-center">Action</th></tr>
+                            </thead>
+                            <tbody id="doctorsTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('rakshitplus_jwt');
+        if(!token) window.location.href = 'index.html';
+
+        async function loadStats() {
+            const res = await fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            document.getElementById('stat-patients').innerText = data.patients || 0;
+            document.getElementById('stat-doctors').innerText = data.doctors || 0;
+            document.getElementById('stat-appts').innerText = data.appointments || 0;
+        }
+
+        async function loadDoctorsList() {
+            const res = await fetch('/api/doctors');
+            const doctors = await res.json();
+            const tbody = document.getElementById('doctorsTableBody');
+            if(doctors.length === 0) return tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400">No doctors onboarded.</td></tr>`;
+            tbody.innerHTML = doctors.map(doc => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-4 font-bold flex items-center gap-3"><img src="${doc.image_url}" class="w-8 h-8 rounded-full object-cover">${doc.name}</td>
+                    <td class="p-4"><span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">${doc.specialization}</span></td>
+                    <td class="p-4 text-sm text-slate-500">${doc.email}</td>
+                    <td class="p-4 text-center"><button onclick="deleteDoctor(${doc.id})" class="text-rose-500 bg-rose-50 px-3 py-1.5 rounded-lg text-xs font-bold">Remove</button></td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('addDoctorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await fetch('/api/admin/doctors', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ name: document.getElementById('doc-name').value, email: document.getElementById('doc-email').value, password: document.getElementById('doc-password').value, specialization: document.getElementById('doc-spec').value, image_url: document.getElementById('doc-image').value })
+            });
+            const data = await res.json();
+            if(res.ok) { e.target.reset(); loadStats(); loadDoctorsList(); } else alert(data.error);
+        });
+
+        async function deleteDoctor(id) {
+            if(!confirm("Remove doctor?")) return;
+            await fetch(`/api/admin/doctors/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            loadStats(); loadDoctorsList();
+        }
+
+        loadStats(); loadDoctorsList();
+    </script>
+</body>
+</html>
