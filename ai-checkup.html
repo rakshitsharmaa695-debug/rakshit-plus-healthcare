@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rakshit AI - Virtual Doctor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Scrollbar for Chat */
+        #chatBox::-webkit-scrollbar { width: 6px; }
+        #chatBox::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .typing-dot { animation: typing 1.4s infinite ease-in-out; }
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(-4px); opacity: 1; } }
+    </style>
+</head>
+<body class="bg-slate-50 font-['Inter'] h-screen flex flex-col">
+    
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shrink-0 z-10 shadow-sm">
+        <a href="index.html" class="flex items-center"><img src="1000022082.png" alt="Logo" class="h-12 object-contain"></a>
+        <div class="flex items-center gap-4">
+            <span class="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs font-bold border border-green-200"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> AI Online</span>
+            <a href="dashboard.html" class="text-sm font-bold text-slate-500 hover:text-slate-800 transition">Exit Checkup ✖</a>
+        </div>
+    </nav>
+
+    <!-- Chat Container -->
+    <div class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 flex flex-col h-full overflow-hidden relative">
+        
+        <!-- Messages Area -->
+        <div id="chatBox" class="flex-1 bg-white rounded-3xl shadow-xl border border-slate-100 p-6 flex flex-col space-y-6 overflow-y-auto mb-4 pb-20">
+            <!-- Messages injected here via JS -->
+        </div>
+
+        <!-- Typing Indicator (Hidden by default) -->
+        <div id="typingIndicator" class="hidden absolute bottom-[130px] left-10 flex items-end gap-3 z-20">
+            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-md text-sm shrink-0">🤖</div>
+            <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl rounded-bl-none shadow-sm flex items-center gap-1.5 w-fit">
+                <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
+            </div>
+        </div>
+
+        <!-- Input Area Wrapper -->
+        <div class="shrink-0 bg-white rounded-3xl shadow-2xl border border-slate-200 p-4 relative">
+            <!-- Quick Reply Chips -->
+            <div id="quickReplies" class="hidden flex flex-wrap gap-2 mb-3"></div>
+            
+            <div class="flex gap-3 items-center">
+                <input type="text" id="chatInput" placeholder="Type your symptoms here..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 outline-none focus:border-blue-500 focus:bg-white transition text-slate-700 font-medium disabled:opacity-50" onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button onclick="sendMessage()" id="sendBtn" class="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-2">
+                    Send <span>➤</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chatBox');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const quickRepliesBox = document.getElementById('quickReplies');
+        
+        // Smart Questionnaire Array
+        const questions = [
+            { text: "Hello! I am Rakshit AI 🤖, your virtual medical assistant. To help you properly, what is your primary symptom today?", type: "text" },
+            { text: "I understand. How long have you been experiencing this issue?", type: "options", options: ["Just started today", "1 to 2 days", "3 to 5 days", "More than a week"] },
+            { text: "On a scale from Mild to Severe, how much is this affecting you?", type: "options", options: ["Mild (Manageable)", "Moderate (Painful)", "Severe (Unbearable)"] },
+            { text: "Noted. Finally, do you have any other symptoms? (Like fever, vomiting, dizziness, or type 'None')", type: "text" }
+        ];
+        
+        let currentStep = 0;
+        let collectedData = "";
+
+        function scrollToBottom() { chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' }); }
+
+        function showTyping() { 
+            typingIndicator.classList.remove('hidden'); 
+            scrollToBottom(); 
+        }
+        function hideTyping() { 
+            typingIndicator.classList.add('hidden'); 
+        }
+
+        function addMessage(text, isAI, isHTML = false) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex items-end w-full gap-3 ${isAI ? 'justify-start' : 'justify-end'}`;
+            
+            // Avatar
+            const avatar = document.createElement('div');
+            avatar.className = `w-10 h-10 rounded-full flex items-center justify-center text-white shadow-md text-sm shrink-0 ${isAI ? 'bg-blue-600' : 'bg-slate-800 order-last'}`;
+            avatar.innerText = isAI ? '🤖' : '👤';
+
+            // Bubble
+            const bubble = document.createElement('div');
+            bubble.className = `max-w-[75%] rounded-2xl p-4 text-[15px] font-medium leading-relaxed shadow-sm 
+                ${isAI ? 'bg-blue-50 text-slate-800 border border-blue-100 rounded-bl-none' 
+                       : 'bg-slate-800 text-white rounded-br-none'}`;
+            
+            if(isHTML) bubble.innerHTML = text;
+            else bubble.innerText = text;
+
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(bubble);
+            chatBox.appendChild(wrapper);
+            scrollToBottom();
+        }
+
+        function renderOptions(options) {
+            quickRepliesBox.innerHTML = "";
+            quickRepliesBox.classList.remove('hidden');
+            chatInput.disabled = true;
+            chatInput.placeholder = "Please select an option above ⬆️";
+            sendBtn.disabled = true;
+            sendBtn.classList.add('opacity-50');
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-5 py-2.5 rounded-full text-sm font-bold transition shadow-sm";
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    quickRepliesBox.classList.add('hidden');
+                    chatInput.disabled = false;
+                    sendBtn.disabled = false;
+                    sendBtn.classList.remove('opacity-50');
+                    chatInput.value = opt;
+                    sendMessage();
+                };
+                quickRepliesBox.appendChild(btn);
+            });
+        }
+
+        // Start Chat
+        setTimeout(() => {
+            showTyping();
+            setTimeout(() => {
+                hideTyping();
+                addMessage(questions[0].text, true);
+                chatInput.focus();
+            }, 1200);
+        }, 500);
+
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // Add user message
+            addMessage(text, false);
+            collectedData += " | " + text; // Append data
+            chatInput.value = "";
+            currentStep++;
+            quickRepliesBox.classList.add('hidden');
+
+            if (currentStep < questions.length) {
+                // Next Question Logic
+                chatInput.disabled = true;
+                sendBtn.disabled = true;
+                showTyping();
+                
+                setTimeout(() => {
+                    hideTyping();
+                    const nextQ = questions[currentStep];
+                    addMessage(nextQ.text, true);
+                    
+                    if (nextQ.type === "options") {
+                        renderOptions(nextQ.options);
+                    } else {
+                        chatInput.disabled = false;
+                        sendBtn.disabled = false;
+                        chatInput.placeholder = "Type your symptoms here...";
+                        chatInput.focus();
+                    }
+                }, 1500);
+            } else {
+                // Final Diagnosis API Call
+                chatInput.disabled = true;
+                chatInput.placeholder = "Analyzing your data...";
+                sendBtn.style.display = 'none';
+                
+                showTyping();
+                setTimeout(() => {
+                    hideTyping();
+                    addMessage("Thank you. I am analyzing your symptoms across our medical database now... 🩺", true);
+                    showTyping();
+                    setTimeout(fetchDiagnosis, 2000); // Artificial delay for "processing" feel
+                }, 1000);
+            }
+        }
+
+        async function fetchDiagnosis() {
+            try {
+                const res = await fetch('/api/diagnostics', {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` },
+                    body: JSON.stringify({ symptoms: collectedData })
+                });
+
+                hideTyping();
+
+                if (!res.ok) {
+                    addMessage("<b>Authentication Error:</b> Please login to your account to save and view AI Diagnostics.", true, true);
+                    return;
+                }
+
+                const data = await res.json();
+                
+                let badgeColor = "bg-green-500";
+                if(data.urgency === 'CRITICAL') badgeColor = "bg-red-600 animate-pulse";
+                else if(data.urgency === 'High') badgeColor = "bg-orange-500";
+
+                const reportHTML = `
+                    <div class="mt-2 bg-white border border-slate-200 rounded-xl p-5 shadow-lg w-full max-w-[300px] md:max-w-[400px]">
+                        <div class="flex justify-between items-start border-b pb-3 mb-3">
+                            <h3 class="text-lg font-extrabold text-slate-900">Medical Report</h3>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold text-white ${badgeColor}">${data.urgency} Urgency</span>
+                        </div>
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-2">Predicted Conditions</p>
+                        <ul class="list-disc pl-5 text-slate-700 font-semibold mb-5 text-sm space-y-1">
+                            ${data.conditions.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <p class="text-xs font-bold text-slate-500 uppercase mb-1">Recommended Specialist</p>
+                            <p class="text-xl font-extrabold text-blue-600 mb-4">${data.dept}</p>
+                            <a href="index.html#booking-section" class="inline-block w-full bg-slate-900 text-white px-4 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-blue-600 transition">Book Appointment Now</a>
+                        </div>
+                    </div>
+                `;
+                
+                addMessage(reportHTML, true, true);
+                chatInput.placeholder = "Session Completed. Please exit checkup.";
+
+            } catch (err) {
+                hideTyping();
+                addMessage("Oops! My servers are disconnected. Try restarting the backend.", true, true);
+            }
+        }
+    </script>
+</body>
+</html>

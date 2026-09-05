@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RakshitPlus - My Health Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-50 font-['Inter']">
+    
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+        <a href="index.html" class="flex items-center"><img src="1000022082.png" alt="Logo" class="h-12 object-contain"></a>
+        <div class="flex items-center gap-4">
+            <a href="ai-checkup.html" class="bg-white border-2 border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold hover:border-blue-600 hover:text-blue-600 transition flex items-center gap-2">🤖 AI Checkup</a>
+            <a href="index.html" class="bg-blue-50 text-blue-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-100 transition">Home</a>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto py-10 px-6">
+        
+        <!-- Header & Stats Row -->
+        <div class="mb-10">
+            <h1 class="text-3xl font-extrabold text-slate-900 mb-2">My Health Overview</h1>
+            <p class="text-slate-500 font-medium mb-8">Track your appointments, medical history, and AI diagnoses.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Stat Card 1 -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-5 transition hover:shadow-md">
+                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl font-bold">📅</div>
+                    <div>
+                        <p class="text-slate-400 text-xs font-bold uppercase mb-1">Total Visits</p>
+                        <h3 class="text-3xl font-extrabold text-slate-900" id="stat-total">0</h3>
+                    </div>
+                </div>
+                <!-- Stat Card 2 -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-5 transition hover:shadow-md">
+                    <div class="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-2xl font-bold">✅</div>
+                    <div>
+                        <p class="text-slate-400 text-xs font-bold uppercase mb-1">Completed</p>
+                        <h3 class="text-3xl font-extrabold text-slate-900" id="stat-completed">0</h3>
+                    </div>
+                </div>
+                <!-- Stat Card 3 -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-5 transition hover:shadow-md">
+                    <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl font-bold">⏳</div>
+                    <div>
+                        <p class="text-slate-400 text-xs font-bold uppercase mb-1">Pending Queue</p>
+                        <h3 class="text-3xl font-extrabold text-slate-900" id="stat-pending">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Appointments Grid -->
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-slate-900">Recent Appointments</h2>
+            <a href="index.html#booking-section" class="text-blue-600 text-sm font-bold hover:underline">+ Book New</a>
+        </div>
+        
+        <div id="healthGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Loading State -->
+            <div class="col-span-full text-center py-12 text-slate-400 font-medium animate-pulse">Loading your medical history...</div>
+        </div>
+
+    </div>
+
+    <script>
+        async function loadDashboard() {
+            try {
+                const res = await fetch('/api/patient/dashboard', { headers: { 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` } });
+                
+                if(!res.ok) {
+                    alert("Session expired. Please login again.");
+                    window.location.href = "index.html";
+                    return;
+                }
+                
+                const data = await res.json();
+                const grid = document.getElementById('healthGrid');
+                
+                // Analytics Stats Logic
+                document.getElementById('stat-total').innerText = data.length;
+                document.getElementById('stat-completed').innerText = data.filter(a => a.status === 'Completed').length;
+                document.getElementById('stat-pending').innerText = data.filter(a => a.status === 'Pending').length;
+
+                // Empty State UI
+                if(data.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full bg-white rounded-3xl border border-slate-200 p-12 text-center shadow-sm">
+                            <div class="w-20 h-20 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">📂</div>
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">No History Found</h3>
+                            <p class="text-slate-500 mb-6 max-w-md mx-auto">You haven't booked any appointments yet. Experience our AI-driven booking system today.</p>
+                            <a href="index.html#booking-section" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-blue-700 transition inline-block">Book First Appointment</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Modern Card Rendering
+                grid.innerHTML = data.map(appt => {
+                    const isPending = appt.status === 'Pending';
+                    const badgeClass = isPending ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-green-100 text-green-700 border-green-200';
+                    const icon = isPending ? '⏳' : '✅';
+                    
+                    return `
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 hover:shadow-lg transition relative overflow-hidden group">
+                        <!-- Top Header -->
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-xs font-extrabold text-slate-400 uppercase mb-1">Ticket #${appt.id}</p>
+                                <span class="${badgeClass} border px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 w-fit">
+                                    ${icon} ${appt.status}
+                                </span>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-slate-900">${appt.appointment_date}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Doctor Info -->
+                        <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-100">
+                            <p class="text-xs font-bold text-slate-400 uppercase mb-1">Consulting Specialist</p>
+                            <p class="font-extrabold text-slate-900 truncate">${appt.doctor_name || "Assigning..."}</p>
+                            <p class="text-sm font-semibold text-blue-600">${appt.department}</p>
+                        </div>
+                        
+                        <!-- Symptoms Snippet -->
+                        <div class="mb-5">
+                            <p class="text-xs font-bold text-slate-400 uppercase mb-1">Symptoms Noted</p>
+                            <p class="text-sm text-slate-600 line-clamp-2 font-medium" title="${appt.symptoms}">"${appt.symptoms}"</p>
+                        </div>
+                        
+                        <!-- Actions -->
+                        ${isPending 
+                            ? `<a href="tracking.html?id=${appt.id}" target="_blank" class="block w-full bg-slate-900 text-white text-center py-3 rounded-xl text-sm font-bold shadow-md hover:bg-blue-600 transition group-hover:scale-[1.02]">Open Live Tracker ➤</a>` 
+                            : `<button disabled class="block w-full bg-slate-50 text-slate-400 text-center py-3 rounded-xl text-sm font-bold border border-slate-200">Consultation Done</button>`
+                        }
+                    </div>
+                `}).join('');
+                
+            } catch(e) {
+                console.error("Dashboard Load Error:", e);
+                document.getElementById('healthGrid').innerHTML = `<div class="col-span-full text-center py-12 text-red-500 font-bold">Failed to connect to the server.</div>`;
+            }
+        }
+        
+        loadDashboard();
+    </script>
+</body>
+</html>

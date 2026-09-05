@@ -8,6 +8,9 @@
 </head>
 <body class="bg-slate-50 flex items-center justify-center h-screen font-['Inter'] transition-colors duration-500" id="mainBg">
     <div class="bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl border text-center relative" id="card">
+        <!-- Brand Logo -->
+        <img src="1000022082.png" class="h-16 mx-auto mb-4 object-contain">
+        
         <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-6" id="icon">⏳</div>
         <h1 class="text-3xl font-extrabold text-slate-900 mb-2" id="titleText">Live Queue Tracker</h1>
         <p class="text-slate-500 font-medium mb-8" id="subText">Please wait in the reception area.</p>
@@ -16,12 +19,28 @@
             <p class="text-sm font-bold text-slate-400 uppercase mb-2">Patients Ahead of You</p>
             <p class="text-[5rem] font-extrabold text-blue-600 leading-none" id="queueCount">-</p>
         </div>
+
+        <!-- Mute Button (Turn aane par dikhega) -->
+        <button id="stopAudioBtn" onclick="stopAlarm()" class="hidden mt-6 bg-red-50 text-red-600 border border-red-200 px-6 py-2.5 rounded-xl font-bold shadow-sm mx-auto hover:bg-red-100 transition">
+            🔇 Silence Alarm
+        </button>
     </div>
+
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const appointmentId = urlParams.get('id');
-        const alertSound = new Audio('https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg');
+        
+        // 🚀 UPGRADED LOUD AUDIO SETTINGS
+        const alertSound = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+        alertSound.volume = 1.0; // 100% Volume
+        alertSound.loop = true;  // Keep beeping until patient stops it
         let alerted = false;
+
+        function stopAlarm() {
+            alertSound.pause();
+            alertSound.currentTime = 0; // Reset audio
+            document.getElementById('stopAudioBtn').classList.add('hidden');
+        }
 
         async function fetchQueue() {
             if(!appointmentId) return document.getElementById('titleText').innerText = "Invalid Link";
@@ -29,18 +48,34 @@
             const data = await res.json();
             
             if(data.status === 'Completed') {
-                document.getElementById('icon').innerText = "✅"; document.getElementById('titleText').innerText = "Consultation Complete"; document.getElementById('subText').innerText = "Thank you for visiting RakshitPlus."; document.getElementById('statsBox').classList.add('hidden');
+                document.getElementById('icon').innerText = "✅"; 
+                document.getElementById('titleText').innerText = "Consultation Complete"; 
+                document.getElementById('subText').innerText = "Thank you for visiting RakshitPlus."; 
+                document.getElementById('statsBox').classList.add('hidden');
+                stopAlarm(); // Agar turn check hone ke baad bhi audio chal raha ho, toh automatically rok dega
                 return;
             }
+            
             document.getElementById('queueCount').innerText = data.patientsAhead;
+            
+            // Jab patient ka turn aaye
             if(data.patientsAhead === 0 && !alerted) {
-                alerted = true; alertSound.play().catch(e => console.log('Audio requires user interaction first'));
+                alerted = true; 
+                alertSound.play().catch(e => console.log('Audio requires user interaction first'));
+                
                 document.getElementById('mainBg').className = "bg-green-500 flex items-center justify-center h-screen font-['Inter'] transition-colors duration-500 animate-pulse";
-                document.getElementById('icon').innerText = "🩺"; document.getElementById('titleText').innerText = "IT'S YOUR TURN!"; document.getElementById('subText').innerText = "Please proceed to the doctor's cabin immediately.";
+                document.getElementById('icon').innerText = "🩺"; 
+                document.getElementById('titleText').innerText = "IT'S YOUR TURN!"; 
+                document.getElementById('subText').innerText = "Please proceed to the doctor's cabin immediately.";
                 document.getElementById('queueCount').className = "text-[5rem] font-extrabold text-green-600 leading-none";
+                
+                // Mute button show karein
+                document.getElementById('stopAudioBtn').classList.remove('hidden');
             }
         }
-        fetchQueue(); setInterval(fetchQueue, 3000);
+        
+        fetchQueue(); 
+        setInterval(fetchQueue, 3000);
     </script>
 </body>
 </html>
