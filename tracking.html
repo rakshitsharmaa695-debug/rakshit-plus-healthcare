@@ -7,7 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="bg-slate-50 flex items-center justify-center h-screen font-['Inter'] transition-colors duration-500" id="mainBg">
-    <div class="bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl border text-center relative" id="card">
+    <div class="bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl border text-center relative overflow-hidden" id="card">
+        
+        <!-- Audio Unlock Overlay -->
+        <div id="audioOverlay" class="absolute inset-0 bg-slate-900/95 z-50 flex flex-col items-center justify-center text-white cursor-pointer transition-opacity duration-300" onclick="unlockSound()">
+            <div class="text-5xl mb-4 animate-bounce">👆</div>
+            <h3 class="text-2xl font-extrabold mb-2">Tap to Enable</h3>
+            <p class="text-sm text-slate-300 font-medium px-6">We need your permission to play the alarm when it's your turn.</p>
+            <button class="mt-6 bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg">Start Tracking</button>
+        </div>
+
         <!-- Brand Logo -->
         <img src="1000022082.png" class="h-16 mx-auto mb-4 object-contain">
         
@@ -20,7 +29,6 @@
             <p class="text-[5rem] font-extrabold text-blue-600 leading-none" id="queueCount">-</p>
         </div>
 
-        <!-- Mute Button (Turn aane par dikhega) -->
         <button id="stopAudioBtn" onclick="stopAlarm()" class="hidden mt-6 bg-red-50 text-red-600 border border-red-200 px-6 py-2.5 rounded-xl font-bold shadow-sm mx-auto hover:bg-red-100 transition">
             🔇 Silence Alarm
         </button>
@@ -29,53 +37,103 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const appointmentId = urlParams.get('id');
-        
-        // 🚀 UPGRADED LOUD AUDIO SETTINGS
-        const alertSound = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
-        alertSound.volume = 1.0; // 100% Volume
-        alertSound.loop = true;  // Keep beeping until patient stops it
         let alerted = false;
+        
+        // 🚀 HARDWARE AUDIO SYNTHESIZER (100% works on iPhone & Android)
+        let audioCtx;
+        let alarmInterval;
+
+        function unlockSound() {
+            // Setup Audio Engine on user tap
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            
+            // Play a silent 1ms sound to permanently unlock speaker
+            const osc = audioCtx.createOscillator();
+            osc.connect(audioCtx.destination);
+            osc.start(0);
+            osc.stop(0.01);
+            
+            document.getElementById('audioOverlay').classList.add('hidden');
+            
+            // Start pulling data
+            fetchQueue(); 
+            setInterval(fetchQueue, 3000);
+        }
+
+        // Generate a loud, piercing "Hospital Beep"
+        function playLoudBeep() {
+            if(!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'square'; // Loudest wave type
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime); // High pitch frequency
+            
+            gain.gain.setValueAtTime(1, audioCtx.currentTime); // 100% Volume
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4); // Fade out
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function startAlarm() {
+            if(!alarmInterval) {
+                playLoudBeep(); // Play first beep instantly
+                alarmInterval = setInterval(playLoudBeep, 600); // Repeat every 0.6 seconds
+            }
+        }
 
         function stopAlarm() {
-            alertSound.pause();
-            alertSound.currentTime = 0; // Reset audio
+            if(alarmInterval) clearInterval(alarmInterval);
+            alarmInterval = null;
             document.getElementById('stopAudioBtn').classList.add('hidden');
         }
 
         async function fetchQueue() {
             if(!appointmentId) return document.getElementById('titleText').innerText = "Invalid Link";
-            const res = await fetch(`/api/queue/${appointmentId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` } });
-            const data = await res.json();
             
-            if(data.status === 'Completed') {
-                document.getElementById('icon').innerText = "✅"; 
-                document.getElementById('titleText').innerText = "Consultation Complete"; 
-                document.getElementById('subText').innerText = "Thank you for visiting RakshitPlus."; 
-                document.getElementById('statsBox').classList.add('hidden');
-                stopAlarm(); // Agar turn check hone ke baad bhi audio chal raha ho, toh automatically rok dega
-                return;
-            }
-            
-            document.getElementById('queueCount').innerText = data.patientsAhead;
-            
-            // Jab patient ka turn aaye
-            if(data.patientsAhead === 0 && !alerted) {
-                alerted = true; 
-                alertSound.play().catch(e => console.log('Audio requires user interaction first'));
+            try {
+                const res = await fetch(`/api/queue/${appointmentId}`);
+                const data = await res.json();
                 
-                document.getElementById('mainBg').className = "bg-green-500 flex items-center justify-center h-screen font-['Inter'] transition-colors duration-500 animate-pulse";
-                document.getElementById('icon').innerText = "🩺"; 
-                document.getElementById('titleText').innerText = "IT'S YOUR TURN!"; 
-                document.getElementById('subText').innerText = "Please proceed to the doctor's cabin immediately.";
-                document.getElementById('queueCount').className = "text-[5rem] font-extrabold text-green-600 leading-none";
+                if(data.error) {
+                    document.getElementById('icon').innerText = "❌"; 
+                    document.getElementById('titleText').innerText = "Ticket Not Found"; 
+                    document.getElementById('subText').innerText = "This ticket doesn't exist in the live database."; 
+                    document.getElementById('statsBox').classList.add('hidden');
+                    return;
+                }
+
+                if(data.status === 'Completed') {
+                    document.getElementById('icon').innerText = "✅"; 
+                    document.getElementById('titleText').innerText = "Consultation Complete"; 
+                    document.getElementById('subText').innerText = "Thank you for visiting RakshitPlus."; 
+                    document.getElementById('statsBox').classList.add('hidden');
+                    stopAlarm(); 
+                    return;
+                }
                 
-                // Mute button show karein
-                document.getElementById('stopAudioBtn').classList.remove('hidden');
+                document.getElementById('queueCount').innerText = data.patientsAhead;
+                
+                if(data.patientsAhead === 0 && !alerted) {
+                    alerted = true; 
+                    startAlarm(); // 🔊 Start Hardware Alarm
+                    
+                    document.getElementById('mainBg').className = "bg-green-500 flex items-center justify-center h-screen font-['Inter'] transition-colors duration-500 animate-pulse";
+                    document.getElementById('icon').innerText = "🩺"; 
+                    document.getElementById('titleText').innerText = "IT'S YOUR TURN!"; 
+                    document.getElementById('subText').innerText = "Please proceed to the doctor's cabin immediately.";
+                    document.getElementById('queueCount').className = "text-[5rem] font-extrabold text-green-600 leading-none";
+                    document.getElementById('stopAudioBtn').classList.remove('hidden');
+                }
+            } catch(e) {
+                console.log("Tracking Error", e);
             }
         }
-        
-        fetchQueue(); 
-        setInterval(fetchQueue, 3000);
     </script>
 </body>
 </html>
