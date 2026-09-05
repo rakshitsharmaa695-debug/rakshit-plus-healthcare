@@ -3,152 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RakshitPlus - My Health Dashboard</title>
+    <title>RakshitPlus - Patient Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .hero-pattern { background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; }
+    </style>
 </head>
-<body class="bg-slate-50 font-['Inter']">
-    
-    <!-- Navbar -->
-    <nav class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
-        <a href="index.html" class="flex items-center"><img src="1000022082.png" alt="Logo" class="h-12 object-contain"></a>
-        <div class="flex items-center gap-4">
-            <!-- NEW: Lab Analyzer Button -->
-            <a href="lab-analyzer.html" class="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl text-sm font-bold border border-purple-200 hover:bg-purple-200 transition flex items-center gap-2 shadow-sm">🔬 Lab Analyzer</a>
-            <a href="ai-checkup.html" class="bg-white border-2 border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold hover:border-blue-600 hover:text-blue-600 transition flex items-center gap-2">🤖 AI Checkup</a>
-            <a href="index.html" class="bg-blue-50 text-blue-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-100 transition">Home</a>
+<body class="text-slate-800 pb-20">
+
+    <!-- 🚀 UNIVERSAL NAVBAR -->
+    <nav class="flex justify-between items-center px-4 md:px-8 py-3 md:py-4 max-w-7xl mx-auto bg-white sticky top-0 z-50 border-b border-slate-100 shadow-sm">
+        <a href="index.html" class="flex items-center z-50">
+            <img src="1000022082.png" alt="RakshitPlus Logo" class="h-14 md:h-24 object-contain transition-all duration-300">
+        </a>
+        
+        <div class="hidden md:flex space-x-8 font-medium text-slate-600">
+            <a href="index.html" class="hover:text-blue-600 transition">Home</a>
+            <a href="doctors.html" class="hover:text-blue-600 transition">Find Doctors</a>
+            <a href="booking.html" class="hover:text-blue-600 transition">Book Now</a>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center gap-4">
+                <span class="hidden md:inline-block bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md text-sm font-bold border border-blue-200">Patient Portal</span>
+                <button onclick="logout()" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition border-2 border-rose-100 px-4 py-2 rounded-lg bg-white">Logout</button>
+            </div>
         </div>
     </nav>
 
-    <div class="max-w-6xl mx-auto py-10 px-6">
-        
-        <!-- Header & Stats Row -->
-        <div class="mb-10">
-            <h1 class="text-3xl font-extrabold text-slate-900 mb-2">My Health Overview</h1>
-            <p class="text-slate-500 font-medium mb-8">Track your appointments, medical history, and AI diagnoses.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Stat Card 1 -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-5 transition hover:shadow-md">
-                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl font-bold">📅</div>
-                    <div>
-                        <p class="text-slate-400 text-xs font-bold uppercase mb-1">Total Visits</p>
-                        <h3 class="text-3xl font-extrabold text-slate-900" id="stat-total">0</h3>
-                    </div>
-                </div>
-                <!-- Stat Card 2 -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-5 transition hover:shadow-md">
-                    <div class="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-2xl font-bold">✅</div>
-                    <div>
-                        <p class="text-slate-400 text-xs font-bold uppercase mb-1">Completed</p>
-                        <h3 class="text-3xl font-extrabold text-slate-900" id="stat-completed">0</h3>
-                    </div>
-                </div>
-                <!-- Stat Card 3 -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-5 transition hover:shadow-md">
-                    <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl font-bold">⏳</div>
-                    <div>
-                        <p class="text-slate-400 text-xs font-bold uppercase mb-1">Pending Queue</p>
-                        <h3 class="text-3xl font-extrabold text-slate-900" id="stat-pending">0</h3>
-                    </div>
-                </div>
-            </div>
+    <!-- Dashboard Header -->
+    <header class="bg-slate-900 text-white pt-12 pb-20 px-6 hero-pattern relative">
+        <div class="absolute inset-0 bg-blue-600 opacity-10"></div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-3">My Appointments</h1>
+            <p class="text-slate-400 font-medium text-sm md:text-base">Track your medical history and live queues in real-time.</p>
         </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 md:px-6 -mt-10 relative z-20">
         
-        <!-- Appointments Grid -->
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-slate-900">Recent Appointments</h2>
-            <a href="index.html#booking-section" class="text-blue-600 text-sm font-bold hover:underline">+ Book New</a>
-        </div>
-        
-        <div id="healthGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Loading State -->
-            <div class="col-span-full text-center py-12 text-slate-400 font-medium animate-pulse">Loading your medical history...</div>
+        <div id="loader" class="text-center py-20 bg-white rounded-3xl shadow-lg border border-slate-100">
+            <div class="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-slate-500 font-bold">Verifying secure session...</p>
         </div>
 
-    </div>
+        <div id="appointmentsList" class="hidden grid gap-6">
+            <!-- Appointments will be injected here via JavaScript -->
+        </div>
+
+        <div id="emptyState" class="hidden bg-white rounded-3xl shadow-lg border border-slate-100 p-12 text-center">
+            <div class="text-6xl mb-4">🏥</div>
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">No Appointments Yet</h2>
+            <p class="text-slate-500 mb-6 font-medium">You haven't booked any consultations on RakshitPlus.</p>
+            <a href="booking.html" class="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition">Book Your First Appointment</a>
+        </div>
+
+    </main>
 
     <script>
-        async function loadDashboard() {
-            try {
-                const res = await fetch('/api/patient/dashboard', { headers: { 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` } });
-                
-                if(!res.ok) {
-                    alert("Session expired. Please login again.");
-                    window.location.href = "index.html";
-                    return;
-                }
-                
-                const data = await res.json();
-                const grid = document.getElementById('healthGrid');
-                
-                // Analytics Stats Logic
-                document.getElementById('stat-total').innerText = data.length;
-                document.getElementById('stat-completed').innerText = data.filter(a => a.status === 'Completed').length;
-                document.getElementById('stat-pending').innerText = data.filter(a => a.status === 'Pending').length;
+        function logout() { 
+            localStorage.removeItem('rakshitplus_jwt'); 
+            localStorage.removeItem('rakshitplus_role'); 
+            window.location.href = "index.html"; 
+        }
 
-                // Empty State UI
-                if(data.length === 0) {
-                    grid.innerHTML = `
-                        <div class="col-span-full bg-white rounded-3xl border border-slate-200 p-12 text-center shadow-sm">
-                            <div class="w-20 h-20 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">📂</div>
-                            <h3 class="text-xl font-bold text-slate-900 mb-2">No History Found</h3>
-                            <p class="text-slate-500 mb-6 max-w-md mx-auto">You haven't booked any appointments yet. Experience our AI-driven booking system today.</p>
-                            <a href="index.html#booking-section" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-blue-700 transition inline-block">Book First Appointment</a>
-                        </div>
-                    `;
+        async function fetchDashboard() {
+            const token = localStorage.getItem('rakshitplus_jwt');
+            
+            if (!token) {
+                alert("Session expired. Please log in again.");
+                logout();
+                return;
+            }
+
+            try {
+                // 🚀 Secure request using the JWT token
+                const response = await fetch('/api/patient/dashboard', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    alert("Session expired or invalid. Please log in again.");
+                    logout();
                     return;
                 }
+
+                const data = await response.json();
                 
-                // Modern Card Rendering
-                grid.innerHTML = data.map(appt => {
-                    const isPending = appt.status === 'Pending';
-                    const badgeClass = isPending ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-green-100 text-green-700 border-green-200';
-                    const icon = isPending ? '⏳' : '✅';
+                document.getElementById('loader').classList.add('hidden');
+
+                if (data.length === 0) {
+                    document.getElementById('emptyState').classList.remove('hidden');
+                } else {
+                    const listContainer = document.getElementById('appointmentsList');
+                    listContainer.classList.remove('hidden');
                     
-                    return `
-                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 hover:shadow-lg transition relative overflow-hidden group">
-                        <!-- Top Header -->
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <p class="text-xs font-extrabold text-slate-400 uppercase mb-1">Ticket #${appt.id}</p>
-                                <span class="${badgeClass} border px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 w-fit">
-                                    ${icon} ${appt.status}
-                                </span>
+                    listContainer.innerHTML = data.map(appt => `
+                        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider border border-blue-100">Ticket #${appt.id}</span>
+                                    <span class="px-3 py-1 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider ${appt.status === 'Completed' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">
+                                        ${appt.status}
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-extrabold text-slate-900 mb-1">${appt.doctor_name || 'Assigned by AI'}</h3>
+                                <p class="text-sm font-bold text-slate-500 mb-3">${appt.department} Department</p>
+                                <p class="text-xs font-medium text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100">"${appt.symptoms}"</p>
                             </div>
-                            <div class="text-right">
-                                <p class="text-sm font-bold text-slate-900">${appt.appointment_date}</p>
+                            
+                            <div class="shrink-0 flex flex-col items-start md:items-end gap-3 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6">
+                                <div class="text-left md:text-right">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Appointment Date</p>
+                                    <p class="font-extrabold text-slate-800">${appt.appointment_date}</p>
+                                </div>
+                                
+                                ${appt.status === 'Pending' ? `
+                                    <a href="tracking.html?id=${appt.id}" target="_blank" class="w-full text-center bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-blue-600 transition flex items-center justify-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Live Track
+                                    </a>
+                                ` : `
+                                    <button disabled class="w-full bg-slate-100 text-slate-400 px-5 py-2.5 rounded-xl text-sm font-bold cursor-not-allowed">Consultation Done</button>
+                                `}
                             </div>
                         </div>
-                        
-                        <!-- Doctor Info -->
-                        <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-100">
-                            <p class="text-xs font-bold text-slate-400 uppercase mb-1">Consulting Specialist</p>
-                            <p class="font-extrabold text-slate-900 truncate">${appt.doctor_name || "Assigning..."}</p>
-                            <p class="text-sm font-semibold text-blue-600">${appt.department}</p>
-                        </div>
-                        
-                        <!-- Symptoms Snippet -->
-                        <div class="mb-5">
-                            <p class="text-xs font-bold text-slate-400 uppercase mb-1">Symptoms Noted</p>
-                            <p class="text-sm text-slate-600 line-clamp-2 font-medium" title="${appt.symptoms}">"${appt.symptoms}"</p>
-                        </div>
-                        
-                        <!-- Actions -->
-                        ${isPending 
-                            ? `<a href="tracking.html?id=${appt.id}" target="_blank" class="block w-full bg-slate-900 text-white text-center py-3 rounded-xl text-sm font-bold shadow-md hover:bg-blue-600 transition group-hover:scale-[1.02]">Open Live Tracker ➤</a>` 
-                            : `<button disabled class="block w-full bg-slate-50 text-slate-400 text-center py-3 rounded-xl text-sm font-bold border border-slate-200">Consultation Done</button>`
-                        }
-                    </div>
-                `}).join('');
-                
-            } catch(e) {
-                console.error("Dashboard Load Error:", e);
-                document.getElementById('healthGrid').innerHTML = `<div class="col-span-full text-center py-12 text-red-500 font-bold">Failed to connect to the server.</div>`;
+                    `).join('');
+                }
+            } catch (err) {
+                document.getElementById('loader').innerHTML = `<p class="text-red-500 font-bold">Failed to load dashboard. Network error.</p>`;
             }
         }
-        
-        loadDashboard();
+
+        // Initialize dashboard fetch
+        fetchDashboard();
     </script>
 </body>
 </html>
