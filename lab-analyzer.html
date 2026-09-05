@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rakshit AI - Lab Report Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-50 font-['Inter'] min-h-screen">
+    
+    <nav class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center z-10 shadow-sm sticky top-0">
+        <a href="index.html" class="flex items-center"><img src="1000022082.png" alt="Logo" class="h-12 object-contain"></a>
+        <a href="dashboard.html" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-200 transition">← Back to Dashboard</a>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-10">
+        <div class="text-center mb-10">
+            <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-purple-200">Beta Feature</span>
+            <h1 class="text-4xl font-extrabold text-slate-900 mt-4 mb-2">Smart Lab Report Analyzer</h1>
+            <p class="text-slate-500 font-medium">Upload your PDF lab report or paste the text below for instant AI dietary insights.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            
+            <!-- Left Side: Input Section -->
+            <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100 flex flex-col relative">
+                <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">📄 Provide Report Data</h3>
+                
+                <!-- PDF Upload Zone -->
+                <div class="mb-6 border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:bg-slate-50 hover:border-purple-500 transition relative group cursor-pointer">
+                    <input type="file" id="pdfInput" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(event)">
+                    <div class="w-16 h-16 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-3 group-hover:scale-110 transition">📥</div>
+                    <p class="text-sm font-extrabold text-slate-700" id="fileName">Click or Drag PDF Report Here</p>
+                    <p class="text-xs text-slate-500 mt-1">Our AI will automatically extract biomarkers</p>
+                </div>
+
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="h-px bg-slate-200 flex-1"></div>
+                    <span class="text-xs font-bold text-slate-400 uppercase">OR PASTE TEXT</span>
+                    <div class="h-px bg-slate-200 flex-1"></div>
+                </div>
+
+                <textarea id="reportText" rows="4" class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 outline-none focus:border-purple-500 transition resize-none text-slate-700 font-medium mb-6" placeholder="Paste manual text if you don't have a PDF..."></textarea>
+                
+                <button onclick="analyzeReport()" id="analyzeBtn" class="mt-auto w-full bg-slate-900 text-white p-4 rounded-xl font-bold shadow-lg hover:bg-purple-600 transition flex items-center justify-center gap-2 text-lg">
+                    <span>🔬 Analyze Data</span>
+                </button>
+            </div>
+
+            <!-- Right Side: AI Generated Report Card -->
+            <div id="resultsCard" class="hidden bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-800 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-purple-600 opacity-20 blur-[80px] rounded-full"></div>
+                
+                <h3 class="text-2xl font-extrabold mb-6 flex items-center gap-2 relative z-10">🤖 AI Analysis Report</h3>
+                
+                <!-- Health Score -->
+                <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 mb-6 flex items-center justify-between relative z-10">
+                    <div>
+                        <p class="text-slate-400 font-bold uppercase text-xs mb-1">Overall Health Score</p>
+                        <p class="text-sm text-slate-300">Based on parsed biomarkers</p>
+                    </div>
+                    <div class="w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl font-extrabold" id="scoreCircle">
+                        <span id="scoreText">--</span>
+                    </div>
+                </div>
+
+                <!-- Biomarkers -->
+                <div class="mb-6 relative z-10">
+                    <p class="text-slate-400 font-bold uppercase text-xs mb-4">Extracted Biomarkers</p>
+                    <div id="biomarkersList" class="space-y-4"></div>
+                </div>
+
+                <div class="bg-blue-900/30 border border-blue-800/50 rounded-2xl p-5 mb-4 relative z-10">
+                    <p class="text-blue-300 font-bold uppercase text-xs mb-2">🩺 Medical Insights</p>
+                    <ul id="insightsList" class="list-disc pl-5 text-blue-100 text-sm font-medium space-y-1"></ul>
+                </div>
+
+                <div class="bg-green-900/30 border border-green-800/50 rounded-2xl p-5 relative z-10">
+                    <p class="text-green-300 font-bold uppercase text-xs mb-2">🥗 AI Dietitian</p>
+                    <ul id="dietList" class="list-disc pl-5 text-green-100 text-sm font-medium space-y-1"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+        function handleFileSelect(event) {
+            selectedFile = event.target.files[0];
+            if (selectedFile) {
+                document.getElementById('fileName').innerText = `📄 ${selectedFile.name} Selected!`;
+                document.getElementById('fileName').className = "text-sm font-extrabold text-purple-600";
+                document.getElementById('reportText').value = ""; // Clear text if file selected
+                document.getElementById('reportText').disabled = true;
+            }
+        }
+
+        async function analyzeReport() {
+            const text = document.getElementById('reportText').value.trim();
+            const btn = document.getElementById('analyzeBtn');
+            
+            if(!selectedFile && !text) return alert("Please upload a PDF or paste report text.");
+
+            btn.innerText = "Extracting & Analyzing... ⏳";
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+
+            try {
+                let res;
+                // AI Logic: Route to PDF Parser API or Text API
+                if (selectedFile) {
+                    const formData = new FormData();
+                    formData.append('reportPdf', selectedFile);
+                    res = await fetch('/api/upload-pdf', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` },
+                        body: formData
+                    });
+                } else {
+                    res = await fetch('/api/analyze-report', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` },
+                        body: JSON.stringify({ reportText: text })
+                    });
+                }
+
+                if(!res.ok) {
+                    alert("Session expired. Please login.");
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                const data = await res.json();
+                renderResults(data);
+                
+            } catch(e) {
+                alert("Server Error. Check terminal for details.");
+            } finally {
+                btn.innerHTML = "<span>🔬 Analyze Another Report</span>";
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+            }
+        }
+
+        function renderResults(data) {
+            document.getElementById('resultsCard').classList.remove('hidden');
+            
+            const scoreText = document.getElementById('scoreText');
+            const scoreCircle = document.getElementById('scoreCircle');
+            scoreText.innerText = data.score;
+            
+            if(data.score >= 80) scoreCircle.className = "w-20 h-20 rounded-full border-4 border-green-500 flex items-center justify-center text-3xl font-extrabold text-green-400";
+            else if(data.score >= 50) scoreCircle.className = "w-20 h-20 rounded-full border-4 border-orange-500 flex items-center justify-center text-3xl font-extrabold text-orange-400";
+            else scoreCircle.className = "w-20 h-20 rounded-full border-4 border-red-500 flex items-center justify-center text-3xl font-extrabold text-red-400";
+
+            const bioBox = document.getElementById('biomarkersList');
+            if(data.biomarkers.length === 0) {
+                bioBox.innerHTML = "<p class='text-slate-400 text-sm'>No numeric biomarkers found.</p>";
+            } else {
+                bioBox.innerHTML = data.biomarkers.map(b => {
+                    let colorClass = b.color === 'red' ? 'bg-red-500' : b.color === 'orange' ? 'bg-orange-500' : 'bg-green-500';
+                    let textClass = b.color === 'red' ? 'text-red-400' : b.color === 'orange' ? 'text-orange-400' : 'text-green-400';
+                    return `
+                    <div>
+                        <div class="flex justify-between text-sm font-bold mb-1">
+                            <span class="text-slate-200">${b.name}</span>
+                            <span class="${textClass}">${b.val} (${b.status})</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-2">
+                            <div class="${colorClass} h-2 rounded-full" style="width: ${b.width}"></div>
+                        </div>
+                    </div>
+                `}).join('');
+            }
+            document.getElementById('insightsList').innerHTML = data.insights.map(i => `<li>${i}</li>`).join('');
+            document.getElementById('dietList').innerHTML = data.diet.map(d => `<li>${d}</li>`).join('');
+        }
+    </script>
+</body>
+</html>
