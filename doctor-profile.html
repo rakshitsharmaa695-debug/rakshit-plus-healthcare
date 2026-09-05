@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RakshitPlus - Doctor Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,10 +13,10 @@
 </head>
 <body class="text-slate-800 pb-20">
 
-    <nav class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
-        <a href="index.html" class="flex items-center"><img src="1000022082.png" alt="Logo" class="h-12 object-contain"></a>
-        <a href="doctors.html" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-200 transition flex items-center gap-2">
-            ← Back to Directory
+    <nav class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+        <a href="index.html" class="flex items-center"><img src="1000022082.png" alt="Logo" class="h-12 md:h-16 object-contain"></a>
+        <a href="doctors.html" class="bg-slate-100 text-slate-600 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-slate-200 transition flex items-center gap-2">
+            ← Back
         </a>
     </nav>
 
@@ -26,62 +27,58 @@
 
     <div id="profileContainer" class="hidden">
         
-        <div class="profile-header w-full h-48 md:h-64 relative">
+        <div class="profile-header w-full h-40 md:h-64 relative">
             <div class="absolute inset-0 bg-blue-500 opacity-10 blur-3xl"></div>
         </div>
 
-        <div class="max-w-5xl mx-auto px-6 -mt-24 md:-mt-32 relative z-10">
-            <div class="bg-white rounded-[2rem] shadow-2xl border border-slate-100 p-8 md:p-12">
+        <div class="max-w-5xl mx-auto px-4 md:px-6 -mt-20 md:-mt-32 relative z-10">
+            <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-slate-100 p-6 md:p-12">
                 
-                <div class="flex flex-col md:flex-row gap-8 items-start">
+                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start text-center md:text-left">
                     
-                    <div class="shrink-0 relative mx-auto md:mx-0">
-                        <img id="doc-image" src="" class="w-40 h-40 md:w-56 md:h-56 rounded-[2rem] object-cover shadow-xl border-4 border-white bg-slate-100">
-                        <div class="absolute -bottom-3 -right-3 bg-green-500 text-white w-12 h-12 rounded-full border-4 border-white flex items-center justify-center shadow-lg" title="Available">
-                            ✓
-                        </div>
+                    <div class="shrink-0 relative">
+                        <img id="doc-image" src="" class="w-32 h-32 md:w-56 md:h-56 rounded-[1.5rem] md:rounded-[2rem] object-cover shadow-xl border-4 border-white bg-slate-100">
+                        <div class="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 bg-green-500 text-white w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-white flex items-center justify-center shadow-lg font-bold">✓</div>
                     </div>
 
-                    <div class="flex-1 text-center md:text-left mt-4 md:mt-0">
-                        <div class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-widest border border-blue-200 mb-3" id="doc-spec">
+                    <div class="flex-1 mt-2 md:mt-0 w-full">
+                        <div class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-[10px] md:text-xs font-extrabold uppercase tracking-widest border border-blue-200 mb-3" id="doc-spec">
                             Department
                         </div>
-                        <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 flex items-center justify-center md:justify-start gap-2 mb-2">
+                        <h1 class="text-2xl md:text-5xl font-extrabold text-slate-900 flex items-center justify-center md:justify-start gap-2 mb-2">
                             <span id="doc-name">Doctor Name</span>
-                            <svg class="w-8 h-8 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.9 14.7L5.6 12.2l1.4-1.4 3.1 3.1 6.9-6.9 1.4 1.4-8.3 8.3z"/>
-                            </svg>
                         </h1>
-                        <p class="text-lg font-bold text-slate-500 mb-6" id="doc-qual">Qualifications</p>
+                        <p class="text-sm md:text-lg font-bold text-slate-500 mb-6" id="doc-qual">Qualifications</p>
 
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 border-t border-b border-slate-100 py-6 mb-6 text-left">
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 border-t border-b border-slate-100 py-4 md:py-6 mb-6 text-center md:text-left">
                             <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Experience</p>
-                                <p class="text-xl font-extrabold text-slate-800" id="doc-exp">0 Years</p>
+                                <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase mb-1">Experience</p>
+                                <p class="text-lg md:text-xl font-extrabold text-slate-800" id="doc-exp">0 Years</p>
                             </div>
-                            <div class="border-l border-slate-100 pl-4">
-                                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Consultation Fee</p>
-                                <p class="text-xl font-extrabold text-green-600" id="doc-fee">₹0</p>
+                            <div class="border-l border-slate-100 pl-3 md:pl-4">
+                                <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase mb-1">Fee</p>
+                                <p class="text-lg md:text-xl font-extrabold text-green-600" id="doc-fee">₹0</p>
                             </div>
                             <div class="border-l border-slate-100 pl-4 hidden md:block">
-                                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Patient Rating</p>
+                                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Rating</p>
                                 <p class="text-xl font-extrabold text-amber-500">⭐ 4.9/5</p>
                             </div>
                         </div>
 
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <a id="bookBtn" href="#" class="flex-1 bg-slate-900 text-white py-4 rounded-xl text-lg font-bold shadow-xl hover:bg-blue-600 transition flex items-center justify-center gap-2">
+                        <div class="flex w-full">
+                            <!-- 🚀 BUG FIXED HERE: URL now points to booking.html -->
+                            <a id="bookBtn" href="#" class="w-full bg-slate-900 text-white py-3 md:py-4 rounded-xl text-base md:text-lg font-bold shadow-xl hover:bg-blue-600 transition flex items-center justify-center gap-2">
                                 📅 Book Appointment Now
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-12 bg-slate-50 rounded-2xl p-8 border border-slate-100">
-                    <h3 class="text-xl font-extrabold text-slate-900 mb-4 flex items-center gap-2">
+                <div class="mt-8 md:mt-12 bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-100">
+                    <h3 class="text-lg md:text-xl font-extrabold text-slate-900 mb-3 md:mb-4 flex items-center gap-2">
                         <span>👨‍⚕️</span> About The Doctor
                     </h3>
-                    <p class="text-slate-600 leading-relaxed font-medium text-lg whitespace-pre-wrap" id="doc-about">
+                    <p class="text-slate-600 leading-relaxed font-medium text-sm md:text-lg whitespace-pre-wrap" id="doc-about">
                         Loading biography...
                     </p>
                 </div>
@@ -108,16 +105,17 @@
                 document.getElementById('doc-qual').innerText = doc.qualification || "MBBS, MD";
                 document.getElementById('doc-exp').innerText = doc.experience || "5+ Years";
                 document.getElementById('doc-fee').innerText = `₹${doc.fees || 500}`;
-                document.getElementById('doc-about').innerText = doc.about || "Specialized in providing comprehensive healthcare and advanced medical treatments.";
+                document.getElementById('doc-about').innerText = doc.about || "Specialized in providing comprehensive healthcare.";
                 document.getElementById('doc-image').src = doc.image_url;
                 
-                document.getElementById('bookBtn').href = `index.html?docId=${doc.id}#booking-section`;
+                // 🚀 FIXED: Dynamic URL generation
+                document.getElementById('bookBtn').href = `booking.html?docId=${doc.id}`;
                 
                 document.getElementById('loader').classList.add('hidden');
                 document.getElementById('profileContainer').classList.remove('hidden');
 
             } catch(e) {
-                document.getElementById('loader').innerHTML = `<h2 class="text-2xl font-bold text-red-500">Doctor Profile Not Found</h2>`;
+                document.getElementById('loader').innerHTML = `<h2 class="text-xl md:text-2xl font-bold text-red-500">Doctor Profile Not Found</h2>`;
             }
         }
 
