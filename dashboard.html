@@ -13,18 +13,15 @@
 </head>
 <body class="text-slate-800 pb-20">
 
-    <!-- 🚀 UNIVERSAL NAVBAR -->
     <nav class="flex justify-between items-center px-4 md:px-8 py-3 md:py-4 max-w-7xl mx-auto bg-white sticky top-0 z-50 border-b border-slate-100 shadow-sm">
         <a href="index.html" class="flex items-center z-50">
             <img src="1000022082.png" alt="RakshitPlus Logo" class="h-14 md:h-24 object-contain transition-all duration-300">
         </a>
-        
         <div class="hidden md:flex space-x-8 font-medium text-slate-600">
             <a href="index.html" class="hover:text-blue-600 transition">Home</a>
             <a href="doctors.html" class="hover:text-blue-600 transition">Find Doctors</a>
             <a href="booking.html" class="hover:text-blue-600 transition">Book Now</a>
         </div>
-        
         <div class="flex items-center space-x-4">
             <div class="flex items-center gap-4">
                 <span class="hidden md:inline-block bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md text-sm font-bold border border-blue-200">Patient Portal</span>
@@ -33,7 +30,6 @@
         </div>
     </nav>
 
-    <!-- Dashboard Header -->
     <header class="bg-slate-900 text-white pt-12 pb-20 px-6 hero-pattern relative">
         <div class="absolute inset-0 bg-blue-600 opacity-10"></div>
         <div class="max-w-6xl mx-auto relative z-10">
@@ -42,7 +38,6 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-6xl mx-auto px-4 md:px-6 -mt-10 relative z-20">
         
         <div id="loader" class="text-center py-20 bg-white rounded-3xl shadow-lg border border-slate-100">
@@ -50,15 +45,11 @@
             <p class="text-slate-500 font-bold">Verifying secure session...</p>
         </div>
 
-        <div id="appointmentsList" class="hidden grid gap-6">
-            <!-- Appointments will be injected here via JavaScript -->
-        </div>
+        <div id="appointmentsList" class="hidden grid gap-6"></div>
 
+        <!-- 🚀 UPDATED: Dynamic Empty / Error State (No more basic alerts) -->
         <div id="emptyState" class="hidden bg-white rounded-3xl shadow-lg border border-slate-100 p-12 text-center">
-            <div class="text-6xl mb-4">🏥</div>
-            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">No Appointments Yet</h2>
-            <p class="text-slate-500 mb-6 font-medium">You haven't booked any consultations on RakshitPlus.</p>
-            <a href="booking.html" class="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition">Book Your First Appointment</a>
+            <!-- Handled dynamically by JS below -->
         </div>
 
     </main>
@@ -70,33 +61,45 @@
             window.location.href = "index.html"; 
         }
 
+        function showUIState(icon, title, message, btnText, btnLink) {
+            document.getElementById('loader').classList.add('hidden');
+            const stateBox = document.getElementById('emptyState');
+            stateBox.innerHTML = `
+                <div class="text-6xl mb-4">${icon}</div>
+                <h2 class="text-2xl font-extrabold text-slate-900 mb-2">${title}</h2>
+                <p class="text-slate-500 mb-6 font-medium">${message}</p>
+                <a href="${btnLink}" class="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition">${btnText}</a>
+            `;
+            stateBox.classList.remove('hidden');
+        }
+
         async function fetchDashboard() {
             const token = localStorage.getItem('rakshitplus_jwt');
             
-            if (!token) {
-                alert("Session expired. Please log in again.");
-                logout();
+            // 🚀 Modern, silent token check
+            if (!token || token === 'undefined') {
+                localStorage.removeItem('rakshitplus_jwt');
+                showUIState("🔒", "Session Required", "Please log in securely to access your patient dashboard.", "Go to Login", "index.html");
                 return;
             }
 
             try {
-                // 🚀 Secure request using the JWT token
                 const response = await fetch('/api/patient/dashboard', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
+                // 🚀 If backend rejects token due to DB change/expiration
                 if (response.status === 401 || response.status === 403) {
-                    alert("Session expired or invalid. Please log in again.");
-                    logout();
+                    localStorage.removeItem('rakshitplus_jwt');
+                    showUIState("⏱️", "Session Expired", "For your security, your session has expired. Please log in again.", "Log In Again", "index.html");
                     return;
                 }
 
                 const data = await response.json();
-                
                 document.getElementById('loader').classList.add('hidden');
 
-                if (data.length === 0) {
-                    document.getElementById('emptyState').classList.remove('hidden');
+                if (!data || data.length === 0) {
+                    showUIState("🏥", "No Appointments Yet", "You haven't booked any consultations on RakshitPlus.", "Book Your First Appointment", "booking.html");
                 } else {
                     const listContainer = document.getElementById('appointmentsList');
                     listContainer.classList.remove('hidden');
@@ -133,11 +136,10 @@
                     `).join('');
                 }
             } catch (err) {
-                document.getElementById('loader').innerHTML = `<p class="text-red-500 font-bold">Failed to load dashboard. Network error.</p>`;
+                showUIState("⚠️", "Network Error", "We couldn't reach the secure server. Please check your connection.", "Try Again", "dashboard.html");
             }
         }
 
-        // Initialize dashboard fetch
         fetchDashboard();
     </script>
 </body>

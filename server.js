@@ -33,11 +33,16 @@ const initDB = async () => {
 };
 initDB();
 
+// 🚀 UPDATED MIDDLEWARE: Improved Error Handling (Silent Failure for UI handling)
 const authenticate = (req, res, next) => {
     const token = req.header('Authorization');
     if (!token) return res.status(401).json({ error: "Access Denied." });
-    try { req.user = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET); next(); } 
-    catch (err) { res.status(400).json({ error: "Invalid Token." }); }
+    try { 
+        req.user = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET); 
+        next(); 
+    } catch (err) { 
+        return res.status(401).json({ error: "Session expired or invalid token." }); 
+    }
 };
 
 const upload = multer({ storage: multer.memoryStorage() }); 
