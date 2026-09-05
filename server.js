@@ -113,7 +113,8 @@ app.post('/api/appointments', authenticate, (req, res) => {
     });
 });
 
-app.get('/api/queue/:appointmentId', authenticate, (req, res) => {
+// 🌍 PUBLIC API: QR Tracking (Security lock removed so phones can access it)
+app.get('/api/queue/:appointmentId', (req, res) => {
     db.get(`SELECT doctor_id, appointment_date, status FROM appointments WHERE id = ?`, [req.params.appointmentId], (err, currentAppt) => {
         if (!currentAppt) return res.status(404).json({error: "Not found"});
         db.get(`SELECT COUNT(*) as patientsAhead FROM appointments WHERE doctor_id = ? AND appointment_date = ? AND status = 'Pending' AND id < ?`, 
