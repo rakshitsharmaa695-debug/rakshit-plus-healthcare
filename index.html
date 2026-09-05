@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- 🚀 THE MAGIC WAND FOR MOBILE RESPONSIVENESS -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RakshitPlus - Smart Healthcare Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,15 +14,14 @@
 </head>
 <body class="text-slate-800 bg-white">
 
-    <!-- 🚀 UNIVERSAL RESPONSIVE NAVBAR -->
+    <!-- 🚀 FIXED UNIVERSAL NAVBAR -->
     <nav class="flex justify-between items-center px-4 md:px-8 py-3 md:py-4 max-w-7xl mx-auto bg-white sticky top-0 z-50 border-b border-slate-100">
         
-        <!-- Logo -->
         <a href="index.html" class="flex items-center z-50">
             <img src="1000022082.png" alt="RakshitPlus Logo" class="h-14 md:h-24 object-contain transition-all duration-300">
         </a>
         
-        <!-- Desktop Links (Hidden on Mobile) -->
+        <!-- Desktop Links (FIXED HERE) -->
         <div class="hidden md:flex space-x-8 font-medium text-slate-600">
             <a href="index.html" class="text-blue-600 font-bold">Home</a>
             <a href="doctors.html" class="hover:text-blue-600 transition">Find Doctors</a>
@@ -31,7 +29,7 @@
             <a href="contact.html" class="hover:text-blue-600 transition">Contact Us</a>
         </div>
         
-        <!-- Desktop Auth Buttons (Hidden on Mobile) -->
+        <!-- Desktop Auth Buttons -->
         <div class="hidden md:flex items-center space-x-4">
             <div id="authButtons" class="flex gap-4">
                 <button onclick="openModal('loginModal')" class="font-semibold text-blue-600 border-2 border-blue-600 px-5 py-2 rounded-lg transition hover:bg-blue-50">Login</button>
@@ -52,12 +50,12 @@
         </button>
     </nav>
 
-    <!-- 📱 FULL-SCREEN MOBILE MENU (Slides over) -->
+    <!-- 📱 FULL-SCREEN MOBILE MENU (FIXED HERE TOO) -->
     <div id="mobileMenu" class="fixed inset-0 bg-white z-40 hidden flex-col pt-24 px-6 overflow-y-auto">
-        <a href="index.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 text-blue-600">Home</a>
-        <a href="doctors.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4">Find Doctors</a>
-        <a href="about.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4">About Us</a>
-        <a href="contact.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4">Contact Us</a>
+        <a href="index.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 hover:text-blue-600">Home</a>
+        <a href="doctors.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 hover:text-blue-600">Find Doctors</a>
+        <a href="about.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 hover:text-blue-600">About Us</a>
+        <a href="contact.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 hover:text-blue-600">Contact Us</a>
         
         <!-- Mobile Auth State -->
         <div id="authButtonsMobile" class="mt-8 flex flex-col gap-4 pb-10">
@@ -154,15 +152,12 @@
     </div>
 
     <script>
-        // Hamburger Menu Toggle Function
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             if(menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                menu.classList.add('flex');
+                menu.classList.remove('hidden'); menu.classList.add('flex');
             } else {
-                menu.classList.add('hidden');
-                menu.classList.remove('flex');
+                menu.classList.add('hidden'); menu.classList.remove('flex');
             }
         }
 
@@ -176,7 +171,6 @@
                 const token = localStorage.getItem('rakshitplus_jwt');
                 const role = localStorage.getItem('rakshitplus_role');
                 
-                // Hide all by default
                 toggleUI('adminPortalBtn', false); toggleUI('patientDashboardBtn', false);
                 toggleUI('adminPortalBtnMobile', false); toggleUI('patientDashboardBtnMobile', false);
 
