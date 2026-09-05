@@ -7,26 +7,46 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .modal-bg { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
+    </style>
 </head>
 <body class="bg-slate-50 font-['Inter'] text-slate-800 pb-20">
 
-    <nav class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
-        <a href="index.html" class="flex items-center"><img src="1000022082.png" alt="Logo" class="h-20 md:h-24 object-contain"></a>
-        <a href="index.html" class="text-slate-500 font-bold hover:text-blue-600 transition flex items-center gap-2">← Back to Home</a>
+    <!-- 🚀 UNIVERSAL NAVBAR -->
+    <nav class="flex justify-between items-center px-4 md:px-8 py-3 md:py-4 max-w-7xl mx-auto bg-white sticky top-0 z-50 border-b border-slate-100">
+        <a href="index.html" class="flex items-center z-50">
+            <img src="1000022082.png" alt="RakshitPlus Logo" class="h-14 md:h-24 object-contain transition-all duration-300">
+        </a>
+        
+        <div class="hidden md:flex space-x-8 font-medium text-slate-600">
+            <a href="index.html" class="hover:text-blue-600 transition">Home</a>
+            <a href="doctors.html" class="hover:text-blue-600 transition">Find Doctors</a>
+            <a href="about.html" class="hover:text-blue-600 transition">About Us</a>
+            <a href="contact.html" class="hover:text-blue-600 transition">Contact Us</a>
+        </div>
+        
+        <div class="hidden md:flex items-center space-x-4">
+            <div id="userProfileBtn" class="hidden flex items-center gap-4">
+                <a href="admin.html" id="adminPortalBtn" class="hidden bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md">⚙️ Admin</a>
+                <a href="dashboard.html" id="patientDashboardBtn" class="hidden bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg">🏥 Dashboard</a>
+                <button onclick="logout()" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition">Logout</button>
+            </div>
+        </div>
     </nav>
 
-    <div class="max-w-6xl mx-auto px-6 py-12 flex flex-col lg:flex-row gap-10">
+    <div class="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12 flex flex-col lg:flex-row gap-8 md:gap-10">
         
         <!-- Left: Form Section -->
-        <div class="lg:w-2/3 bg-white rounded-[2rem] shadow-xl border border-slate-100 p-8 md:p-12">
-            <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Book Consultation</h2>
-            <p class="text-slate-500 font-medium mb-8">Fill in the patient details for AI-triage or direct booking.</p>
+        <div class="lg:w-2/3 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 p-6 md:p-12">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2">Book Consultation</h2>
+            <p class="text-slate-500 text-sm md:text-base font-medium mb-8">Fill in the patient details. Our system handles the rest.</p>
 
-            <div id="selectedDoctorBadge" class="mb-6"></div>
+            <!-- 🎯 SPECIFIC DOCTOR BADGE (Yeh tab dikhega jab aap doctor select karke aayenge) -->
+            <div id="selectedDoctorBadge" class="mb-6 empty:hidden"></div>
 
-            <form id="appointmentForm" class="space-y-6">
-                <!-- Personal Details Row -->
-                <div class="grid md:grid-cols-2 gap-6">
+            <form id="appointmentForm" class="space-y-5 md:space-y-6">
+                <div class="grid md:grid-cols-2 gap-5 md:gap-6">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Patient Full Name</label>
                         <input type="text" id="appt-name" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 font-medium">
@@ -37,8 +57,7 @@
                     </div>
                 </div>
 
-                <!-- Demographics Row -->
-                <div class="grid md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-2 gap-5 md:gap-6">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Age</label>
                         <input type="number" id="appt-age" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 font-medium">
@@ -46,12 +65,11 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Gender</label>
                         <select id="appt-gender" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 font-medium text-slate-700">
-                            <option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+                            <option value="">Select</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Medical Row -->
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Detailed Symptoms</label>
                     <textarea id="appt-symptoms" rows="3" required class="w-full border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50 transition resize-none font-medium" placeholder="Describe how the patient is feeling..."></textarea>
@@ -62,18 +80,18 @@
                     <input type="date" id="appt-date" required class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 bg-slate-50 font-medium cursor-pointer">
                 </div>
 
-                <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-slate-900 transition shadow-lg mt-4 text-lg">Confirm Appointment</button>
+                <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-slate-900 transition shadow-lg mt-4 text-base md:text-lg">Confirm Appointment</button>
             </form>
         </div>
         
         <!-- Right: Ticket Section -->
-        <div class="lg:w-1/3 bg-slate-900 rounded-[2rem] p-8 text-center shadow-2xl relative overflow-hidden flex flex-col justify-center min-h-[400px]">
+        <div class="lg:w-1/3 bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 text-center shadow-2xl relative overflow-hidden flex flex-col justify-center min-h-[350px] md:min-h-[400px]">
             <div class="absolute inset-0 bg-blue-500 opacity-10 blur-3xl rounded-full"></div>
             
-            <div id="qrPlaceholder" class="relative z-10 w-full py-12">
-                <div class="w-20 h-20 bg-slate-800 text-slate-400 border border-slate-700 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl shadow-inner">🎫</div>
-                <h3 class="font-extrabold text-white text-xl mb-2">Digital Ticket</h3>
-                <p class="text-slate-400 text-sm">Fill the form to generate your Smart Queue Pass.</p>
+            <div id="qrPlaceholder" class="relative z-10 w-full py-8 md:py-12">
+                <div class="w-16 h-16 md:w-20 md:h-20 bg-slate-800 text-slate-400 border border-slate-700 rounded-full mx-auto mb-6 flex items-center justify-center text-2xl md:text-3xl shadow-inner">🎫</div>
+                <h3 class="font-extrabold text-white text-lg md:text-xl mb-2">Digital Ticket</h3>
+                <p class="text-slate-400 text-xs md:text-sm">Fill the form to generate your Smart Queue Pass.</p>
             </div>
             
             <div id="successResult" class="hidden relative z-10 w-full flex flex-col items-center animate-fade-in text-white">
@@ -81,14 +99,17 @@
                     <span>✓</span> Confirmed
                 </div>
                 <div id="qrcode" class="bg-white p-3 rounded-2xl shadow-lg mb-6"></div>
-                <h4 class="text-xl font-extrabold text-blue-300" id="res-dept"></h4>
-                <p class="text-sm text-slate-400 font-medium mb-4">Assigned Department</p>
+                <h4 class="text-lg md:text-xl font-extrabold text-blue-300" id="res-dept"></h4>
+                <p class="text-xs md:text-sm text-slate-400 font-medium mb-4">Assigned Department</p>
                 <div id="res-id" class="w-full"></div>
             </div>
         </div>
     </div>
 
     <script>
+        function logout() { localStorage.removeItem('rakshitplus_jwt'); localStorage.removeItem('rakshitplus_role'); window.location.href="index.html"; }
+
+        // 🎯 LOGIC: Check if user clicked a specific doctor
         const urlParams = new URLSearchParams(window.location.search);
         const preSelectedDocId = urlParams.get('docId');
 
@@ -97,11 +118,11 @@
                 const doc = docs.find(d => d.id == preSelectedDocId);
                 if(doc) {
                     document.getElementById('selectedDoctorBadge').innerHTML = `
-                        <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl flex items-center gap-4 shadow-sm">
-                            <img src="${doc.image_url}" class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm">
+                        <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 shadow-sm animate-pulse">
+                            <img src="${doc.image_url}" class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm shrink-0">
                             <div>
-                                <p class="text-[10px] font-extrabold uppercase text-blue-500 tracking-wider">Direct Booking</p>
-                                <p class="font-extrabold text-slate-900">${doc.name} <span class="font-medium text-slate-500 text-sm">(${doc.specialization})</span></p>
+                                <p class="text-[10px] font-extrabold uppercase text-blue-500 tracking-wider mb-0.5">Direct Booking Selected</p>
+                                <p class="font-extrabold text-slate-900">${doc.name} <span class="font-medium text-slate-500 text-sm block sm:inline">(${doc.specialization})</span></p>
                             </div>
                         </div>
                     `;
@@ -121,13 +142,20 @@
                 symptoms: document.getElementById('appt-symptoms').value, 
                 date: document.getElementById('appt-date').value 
             };
+            
+            // 🎯 LOGIC: If a specific doctor was selected, send their ID to bypass AI Triage
             if (preSelectedDocId) payload.doctor_id = preSelectedDocId;
 
             try {
+                const token = localStorage.getItem('rakshitplus_jwt');
+                if(!token) { alert("Please login first to book an appointment!"); window.location.href="index.html"; return; }
+
                 const res = await fetch('/api/appointments', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` },
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(payload)
                 });
+                
                 const data = await res.json();
                 
                 if (res.status === 201) {
@@ -144,16 +172,16 @@
                     document.getElementById('res-id').innerHTML = `
                         <div class="mt-4 bg-slate-800 border border-slate-700 p-4 rounded-xl text-left w-full shadow-sm">
                             <div class="flex justify-between items-center mb-1">
-                                <p class="text-xs font-bold text-slate-400 uppercase">Live Queue</p>
+                                <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Live Queue</p>
                                 <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
                             </div>
-                            <p class="text-slate-300 font-medium">Patients Ahead: <span class="font-extrabold text-blue-400 text-2xl ml-2">${qData.patientsAhead}</span></p>
+                            <p class="text-slate-300 font-medium text-sm md:text-base">Patients Ahead: <span class="font-extrabold text-blue-400 text-xl md:text-2xl ml-2">${qData.patientsAhead}</span></p>
                         </div>
-                        <a href="${trackingUrl}" target="_blank" class="mt-6 block w-full bg-white text-slate-900 py-3 rounded-xl font-bold hover:bg-blue-50 transition">Open Live Tracker ➤</a>
+                        <a href="${trackingUrl}" target="_blank" class="mt-4 md:mt-6 block w-full bg-white text-slate-900 py-3 rounded-xl text-sm md:text-base font-bold hover:bg-blue-50 transition">Open Live Tracker ➤</a>
                     `;
                     e.target.reset();
-                } else { alert(data.error || "Please login first!"); window.location.href="index.html"; }
-            } catch(err) { alert("Server error."); }
+                } else { alert(data.error || "Authentication Error. Please Login again."); window.location.href="index.html"; }
+            } catch(err) { alert("Server error. Please check your internet connection."); }
             finally { btn.innerText = "Confirm Appointment"; btn.disabled = false; }
         });
     </script>
