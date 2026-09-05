@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RakshitPlus - Patient Dashboard</title>
+    <title>RakshitPlus - Smart Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .hero-pattern { background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; }
+        .doctor-bg { background: linear-gradient(135deg, #064e3b 0%, #0f766e 100%); }
+        .patient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
     </style>
 </head>
 <body class="text-slate-800 pb-20">
@@ -24,123 +26,162 @@
         </div>
         <div class="flex items-center space-x-4">
             <div class="flex items-center gap-4">
-                <span class="hidden md:inline-block bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md text-sm font-bold border border-blue-200">Patient Portal</span>
+                <span id="roleBadge" class="hidden md:inline-block px-3 py-1.5 rounded-md text-sm font-bold border">Loading...</span>
                 <button onclick="logout()" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition border-2 border-rose-100 px-4 py-2 rounded-lg bg-white">Logout</button>
             </div>
         </div>
     </nav>
 
-    <header class="bg-slate-900 text-white pt-12 pb-20 px-6 hero-pattern relative">
-        <div class="absolute inset-0 bg-blue-600 opacity-10"></div>
+    <header id="dashboardHeader" class="text-white pt-12 pb-20 px-6 hero-pattern relative patient-bg">
+        <div class="absolute inset-0 bg-black opacity-10"></div>
         <div class="max-w-6xl mx-auto relative z-10">
-            <h1 class="text-3xl md:text-5xl font-extrabold mb-3">My Appointments</h1>
-            <p class="text-slate-400 font-medium text-sm md:text-base">Track your medical history and live queues in real-time.</p>
+            <h1 id="headerTitle" class="text-3xl md:text-5xl font-extrabold mb-3">My Dashboard</h1>
+            <p id="headerSub" class="text-slate-300 font-medium text-sm md:text-base">Track your data in real-time.</p>
         </div>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 md:px-6 -mt-10 relative z-20">
-        
         <div id="loader" class="text-center py-20 bg-white rounded-3xl shadow-lg border border-slate-100">
             <div class="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
             <p class="text-slate-500 font-bold">Verifying secure session...</p>
         </div>
 
-        <div id="appointmentsList" class="hidden grid gap-6"></div>
+        <div id="dataList" class="hidden grid gap-6"></div>
 
-        <!-- 🚀 UPDATED: Dynamic Empty / Error State (No more basic alerts) -->
-        <div id="emptyState" class="hidden bg-white rounded-3xl shadow-lg border border-slate-100 p-12 text-center">
-            <!-- Handled dynamically by JS below -->
-        </div>
-
+        <div id="emptyState" class="hidden bg-white rounded-3xl shadow-lg border border-slate-100 p-12 text-center"></div>
     </main>
 
     <script>
+        const token = localStorage.getItem('rakshitplus_jwt');
+        const role = localStorage.getItem('rakshitplus_role');
+
         function logout() { 
             localStorage.removeItem('rakshitplus_jwt'); 
             localStorage.removeItem('rakshitplus_role'); 
             window.location.href = "index.html"; 
         }
 
-        function showUIState(icon, title, message, btnText, btnLink) {
+        function showEmptyState(icon, title, message) {
             document.getElementById('loader').classList.add('hidden');
             const stateBox = document.getElementById('emptyState');
             stateBox.innerHTML = `
                 <div class="text-6xl mb-4">${icon}</div>
                 <h2 class="text-2xl font-extrabold text-slate-900 mb-2">${title}</h2>
-                <p class="text-slate-500 mb-6 font-medium">${message}</p>
-                <a href="${btnLink}" class="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition">${btnText}</a>
+                <p class="text-slate-500 font-medium">${message}</p>
             `;
             stateBox.classList.remove('hidden');
+            document.getElementById('dataList').classList.add('hidden');
         }
 
-        async function fetchDashboard() {
-            const token = localStorage.getItem('rakshitplus_jwt');
-            
-            // 🚀 Modern, silent token check
+        async function markCompleted(id) {
+            if(!confirm("Mark this consultation as completed?")) return;
+            try {
+                const res = await fetch(`/api/doctor/appointments/${id}/complete`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if(res.ok) {
+                    initDashboard(); // Reload data silently
+                } else {
+                    alert("Failed to update status.");
+                }
+            } catch(e) { alert("Network error."); }
+        }
+
+        async function initDashboard() {
             if (!token || token === 'undefined') {
-                localStorage.removeItem('rakshitplus_jwt');
-                showUIState("🔒", "Session Required", "Please log in securely to access your patient dashboard.", "Go to Login", "index.html");
+                window.location.href = "index.html";
                 return;
             }
 
-            try {
-                const response = await fetch('/api/patient/dashboard', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('dataList').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
 
-                // 🚀 If backend rejects token due to DB change/expiration
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('rakshitplus_jwt');
-                    showUIState("⏱️", "Session Expired", "For your security, your session has expired. Please log in again.", "Log In Again", "index.html");
-                    return;
-                }
+            const isDoctor = role === 'doctor';
+            
+            // Set UI specific to role
+            document.getElementById('roleBadge').className = isDoctor 
+                ? "hidden md:inline-block bg-teal-100 text-teal-800 px-3 py-1.5 rounded-md text-sm font-bold border border-teal-200"
+                : "hidden md:inline-block bg-blue-100 text-blue-800 px-3 py-1.5 rounded-md text-sm font-bold border border-blue-200";
+            document.getElementById('roleBadge').innerText = isDoctor ? "Doctor Portal" : "Patient Portal";
+            
+            document.getElementById('dashboardHeader').className = `text-white pt-12 pb-20 px-6 hero-pattern relative ${isDoctor ? 'doctor-bg' : 'patient-bg'}`;
+            document.getElementById('headerTitle').innerText = isDoctor ? "Live Patient Queue" : "My Appointments";
+            document.getElementById('headerSub').innerText = isDoctor ? "Manage your consultations and call the next patient." : "Track your medical history and live queues.";
+
+            try {
+                const endpoint = isDoctor ? '/api/doctor/queue' : '/api/patient/dashboard';
+                const response = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
+
+                if (!response.ok) { logout(); return; }
 
                 const data = await response.json();
                 document.getElementById('loader').classList.add('hidden');
 
                 if (!data || data.length === 0) {
-                    showUIState("🏥", "No Appointments Yet", "You haven't booked any consultations on RakshitPlus.", "Book Your First Appointment", "booking.html");
-                } else {
-                    const listContainer = document.getElementById('appointmentsList');
-                    listContainer.classList.remove('hidden');
-                    
-                    listContainer.innerHTML = data.map(appt => `
-                        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    showEmptyState(
+                        isDoctor ? "☕" : "🏥", 
+                        isDoctor ? "Queue is Empty" : "No Appointments Yet", 
+                        isDoctor ? "You have no pending patients right now." : "You haven't booked any consultations on RakshitPlus."
+                    );
+                    return;
+                }
+
+                const listContainer = document.getElementById('dataList');
+                listContainer.classList.remove('hidden');
+                
+                if(isDoctor) {
+                    // DOCTOR UI RENDER
+                    listContainer.innerHTML = data.map((appt, index) => `
+                        <div class="bg-white rounded-2xl shadow-sm border ${index === 0 ? 'border-teal-500 shadow-teal-100 scale-[1.01]' : 'border-slate-200'} p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
-                                    <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider border border-blue-100">Ticket #${appt.id}</span>
-                                    <span class="px-3 py-1 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider ${appt.status === 'Completed' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">
-                                        ${appt.status}
-                                    </span>
+                                    <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider border border-slate-200">Ticket #${appt.id}</span>
+                                    ${index === 0 ? `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-md text-xs font-bold uppercase flex items-center gap-2 animate-pulse"><span class="w-2 h-2 rounded-full bg-red-500"></span> Current Patient</span>` : `<span class="bg-slate-50 text-slate-500 px-3 py-1 rounded-md text-xs font-bold uppercase">Waiting</span>`}
                                 </div>
-                                <h3 class="text-xl font-extrabold text-slate-900 mb-1">${appt.doctor_name || 'Assigned by AI'}</h3>
-                                <p class="text-sm font-bold text-slate-500 mb-3">${appt.department} Department</p>
-                                <p class="text-xs font-medium text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100">"${appt.symptoms}"</p>
+                                <h3 class="text-xl font-extrabold text-slate-900 mb-1">${appt.name}</h3>
+                                <p class="text-xs font-medium text-slate-600 bg-amber-50 p-3 rounded-lg border border-amber-100">Symptoms: "${appt.symptoms}"</p>
                             </div>
                             
-                            <div class="shrink-0 flex flex-col items-start md:items-end gap-3 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6">
-                                <div class="text-left md:text-right">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Appointment Date</p>
-                                    <p class="font-extrabold text-slate-800">${appt.appointment_date}</p>
+                            <div class="shrink-0 flex flex-col md:items-end gap-3 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 w-full md:w-auto">
+                                <p class="text-xs font-bold text-slate-400 uppercase">Booked For: <span class="text-slate-800">${appt.appointment_date}</span></p>
+                                <button onclick="markCompleted(${appt.id})" class="w-full text-center bg-teal-600 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-teal-700 transition">
+                                    ✅ Mark Completed
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    // PATIENT UI RENDER
+                    listContainer.innerHTML = data.map(appt => `
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider border border-blue-100">Ticket #${appt.id}</span>
+                                    <span class="px-3 py-1 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider ${appt.status === 'Completed' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">${appt.status}</span>
                                 </div>
-                                
+                                <h3 class="text-xl font-extrabold text-slate-900 mb-1">${appt.doctor_name || 'Assigned by AI'}</h3>
+                                <p class="text-sm font-bold text-slate-500 mb-2">${appt.department} Department</p>
+                            </div>
+                            <div class="shrink-0 flex flex-col md:items-end gap-3 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 w-full md:w-auto">
                                 ${appt.status === 'Pending' ? `
-                                    <a href="tracking.html?id=${appt.id}" target="_blank" class="w-full text-center bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-blue-600 transition flex items-center justify-center gap-2">
+                                    <a href="tracking.html?id=${appt.id}" target="_blank" class="w-full text-center bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-blue-600 transition flex items-center justify-center gap-2">
                                         <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Live Track
                                     </a>
                                 ` : `
-                                    <button disabled class="w-full bg-slate-100 text-slate-400 px-5 py-2.5 rounded-xl text-sm font-bold cursor-not-allowed">Consultation Done</button>
+                                    <button disabled class="w-full bg-slate-100 text-slate-400 px-6 py-3 rounded-xl text-sm font-bold cursor-not-allowed">Consultation Done</button>
                                 `}
                             </div>
                         </div>
                     `).join('');
                 }
             } catch (err) {
-                showUIState("⚠️", "Network Error", "We couldn't reach the secure server. Please check your connection.", "Try Again", "dashboard.html");
+                showEmptyState("⚠️", "Network Error", "We couldn't fetch the data. Check your connection.");
             }
         }
 
-        fetchDashboard();
+        initDashboard();
     </script>
 </body>
 </html>
