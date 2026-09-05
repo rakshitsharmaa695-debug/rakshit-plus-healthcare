@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- 🚀 THE MAGIC WAND FOR MOBILE RESPONSIVENESS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RakshitPlus - Smart Healthcare Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,13 +15,15 @@
 </head>
 <body class="text-slate-800 bg-white">
 
-    <!-- 🚀 THE UNIVERSAL NAVBAR (Paste this exactly in all HTML files) -->
-    <nav class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto bg-white sticky top-0 z-40 border-b border-slate-100">
-        <a href="index.html" class="flex items-center">
-            <img src="1000022082.png" alt="RakshitPlus Logo" class="h-20 md:h-24 object-contain transition-all duration-300">
+    <!-- 🚀 UNIVERSAL RESPONSIVE NAVBAR -->
+    <nav class="flex justify-between items-center px-4 md:px-8 py-3 md:py-4 max-w-7xl mx-auto bg-white sticky top-0 z-50 border-b border-slate-100">
+        
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center z-50">
+            <img src="1000022082.png" alt="RakshitPlus Logo" class="h-14 md:h-24 object-contain transition-all duration-300">
         </a>
         
-        <!-- Navbar Order Corrected -->
+        <!-- Desktop Links (Hidden on Mobile) -->
         <div class="hidden md:flex space-x-8 font-medium text-slate-600">
             <a href="index.html" class="text-blue-600 font-bold">Home</a>
             <a href="doctors.html" class="hover:text-blue-600 transition">Find Doctors</a>
@@ -27,7 +31,8 @@
             <a href="contact.html" class="hover:text-blue-600 transition">Contact Us</a>
         </div>
         
-        <div class="flex items-center space-x-4">
+        <!-- Desktop Auth Buttons (Hidden on Mobile) -->
+        <div class="hidden md:flex items-center space-x-4">
             <div id="authButtons" class="flex gap-4">
                 <button onclick="openModal('loginModal')" class="font-semibold text-blue-600 border-2 border-blue-600 px-5 py-2 rounded-lg transition hover:bg-blue-50">Login</button>
                 <a href="booking.html" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg hover:bg-slate-900 transition">Book Now</a>
@@ -38,84 +43,110 @@
                 <button onclick="logout()" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition">Logout</button>
             </div>
         </div>
+
+        <!-- ☰ Mobile Hamburger Icon -->
+        <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-slate-600 hover:text-blue-600 transition z-50 focus:outline-none">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
     </nav>
 
-    <!-- Clean Hero Section -->
+    <!-- 📱 FULL-SCREEN MOBILE MENU (Slides over) -->
+    <div id="mobileMenu" class="fixed inset-0 bg-white z-40 hidden flex-col pt-24 px-6 overflow-y-auto">
+        <a href="index.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 text-blue-600">Home</a>
+        <a href="doctors.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4">Find Doctors</a>
+        <a href="about.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4">About Us</a>
+        <a href="contact.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4">Contact Us</a>
+        
+        <!-- Mobile Auth State -->
+        <div id="authButtonsMobile" class="mt-8 flex flex-col gap-4 pb-10">
+            <button onclick="openModal('loginModal'); toggleMobileMenu()" class="w-full font-bold text-blue-600 border-2 border-blue-600 px-5 py-4 rounded-xl text-lg">Login to Account</button>
+            <a href="booking.html" class="w-full text-center bg-blue-600 text-white px-5 py-4 rounded-xl font-bold shadow-lg text-lg">Book Appointment Now</a>
+        </div>
+        
+        <div id="userProfileBtnMobile" class="hidden mt-8 flex flex-col gap-4 pb-10">
+            <a href="admin.html" id="adminPortalBtnMobile" class="hidden text-center bg-purple-600 text-white px-5 py-4 rounded-xl font-bold shadow-md text-lg">⚙️ Admin Portal</a>
+            <a href="dashboard.html" id="patientDashboardBtnMobile" class="hidden text-center bg-slate-900 text-white px-5 py-4 rounded-xl font-bold shadow-lg text-lg">🏥 My Dashboard</a>
+            <button onclick="logout()" class="w-full font-bold text-rose-500 border-2 border-rose-500 px-5 py-4 rounded-xl text-lg">Logout Securely</button>
+        </div>
+    </div>
+
+    <!-- Responsive Hero Section -->
     <main class="hero-bg border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-8 pt-12 pb-24 grid lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
-            <div class="space-y-6">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 pt-8 md:pt-12 pb-16 md:pb-24 grid lg:grid-cols-2 gap-8 md:gap-12 items-center min-h-[80vh]">
+            <div class="space-y-4 md:space-y-6 text-center lg:text-left mt-4 md:mt-0">
                 <span class="inline-block bg-blue-50 text-blue-600 font-bold px-4 py-1.5 rounded-full text-xs border border-blue-100">AI-Powered Healthcare</span>
-                <h1 class="text-5xl lg:text-[64px] font-extrabold leading-[1.1] text-slate-900 tracking-tight">
+                <h1 class="text-4xl md:text-5xl lg:text-[64px] font-extrabold leading-[1.1] text-slate-900 tracking-tight">
                     Skip the wait. <br> <span class="text-blue-600">Book your specialist instantly.</span>
                 </h1>
-                <p class="text-lg text-slate-500 max-w-lg font-medium pr-8">Matches your symptoms with the right doctors and provides real-time queue tracking directly to your phone.</p>
-                <div class="pt-4 flex gap-4">
-                    <!-- Button directly goes to new Booking Page -->
-                    <a href="booking.html" class="inline-flex items-center bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl shadow-blue-200 gap-2 text-lg hover:bg-slate-900 transition">
-                        📅 Schedule Appointment
+                <p class="text-base md:text-lg text-slate-500 max-w-lg mx-auto lg:mx-0 font-medium md:pr-8">Matches your symptoms with the right doctors and provides real-time queue tracking directly to your phone.</p>
+                <div class="pt-4 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                    <a href="booking.html" class="inline-flex justify-center items-center bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl shadow-blue-200 gap-2 text-lg hover:bg-slate-900 transition w-full sm:w-auto">
+                        📅 Schedule
                     </a>
-                    <a href="doctors.html" class="inline-flex items-center bg-white border-2 border-slate-200 text-slate-700 px-8 py-4 rounded-xl font-bold hover:border-blue-600 hover:text-blue-600 transition gap-2 text-lg">
-                        👨‍⚕️ View Specialists
+                    <a href="doctors.html" class="inline-flex justify-center items-center bg-white border-2 border-slate-200 text-slate-700 px-8 py-4 rounded-xl font-bold hover:border-blue-600 hover:text-blue-600 transition gap-2 text-lg w-full sm:w-auto">
+                        👨‍⚕️ Specialists
                     </a>
                 </div>
             </div>
-            <div class="relative w-full h-[550px] flex justify-end">
-                <div class="w-full lg:w-[90%] h-full rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
-                    <img src="https://images.unsplash.com/photo-1638202993928-7267aad84c31?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700">
+            <div class="relative w-full h-[300px] sm:h-[400px] md:h-[550px] flex justify-center lg:justify-end mt-8 lg:mt-0">
+                <div class="w-full lg:w-[90%] h-full rounded-3xl md:rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
+                    <img src="https://images.unsplash.com/photo-1638202993928-7267aad84c31?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-center">
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- NEW: Platform Features Section -->
-    <section class="max-w-7xl mx-auto px-8 py-24">
-        <div class="text-center mb-16">
+    <!-- Responsive Platform Features -->
+    <section class="max-w-7xl mx-auto px-4 md:px-8 py-16 md:py-24">
+        <div class="text-center mb-10 md:mb-16">
             <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Why Choose RakshitPlus?</h2>
-            <p class="text-slate-500 text-lg font-medium">A seamless, modern approach to hospital management.</p>
+            <p class="text-slate-500 text-base md:text-lg font-medium">A seamless, modern approach to hospital management.</p>
         </div>
-        <div class="grid md:grid-cols-3 gap-10">
-            <div class="text-center">
-                <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm">🧠</div>
-                <h3 class="text-xl font-bold text-slate-900 mb-3">AI Diagnostics</h3>
-                <p class="text-slate-500 font-medium">Our NLP engine reads your symptoms and automatically books you with the correct medical department.</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+            <div class="text-center bg-slate-50 p-8 rounded-3xl border border-slate-100">
+                <div class="w-16 h-16 md:w-20 md:h-20 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl md:text-4xl mx-auto mb-6 shadow-sm">🧠</div>
+                <h3 class="text-lg md:text-xl font-bold text-slate-900 mb-3">AI Diagnostics</h3>
+                <p class="text-slate-500 font-medium text-sm md:text-base">Our NLP engine reads your symptoms and automatically books you with the correct medical department.</p>
             </div>
-            <div class="text-center">
-                <div class="w-20 h-20 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm">🔊</div>
-                <h3 class="text-xl font-bold text-slate-900 mb-3">Smart Alerts</h3>
-                <p class="text-slate-500 font-medium">No more standing in line. Our Web Audio API plays a loud alarm on your phone when it's your turn.</p>
+            <div class="text-center bg-slate-50 p-8 rounded-3xl border border-slate-100">
+                <div class="w-16 h-16 md:w-20 md:h-20 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-3xl md:text-4xl mx-auto mb-6 shadow-sm">🔊</div>
+                <h3 class="text-lg md:text-xl font-bold text-slate-900 mb-3">Smart Alerts</h3>
+                <p class="text-slate-500 font-medium text-sm md:text-base">No more standing in line. Our Web Audio API plays a loud alarm on your phone when it's your turn.</p>
             </div>
-            <div class="text-center">
-                <div class="w-20 h-20 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm">🔬</div>
-                <h3 class="text-xl font-bold text-slate-900 mb-3">Lab Analyzer</h3>
-                <p class="text-slate-500 font-medium">Upload blood report PDFs and get instant dietary insights based on extracted biomarkers.</p>
+            <div class="text-center bg-slate-50 p-8 rounded-3xl border border-slate-100">
+                <div class="w-16 h-16 md:w-20 md:h-20 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-3xl md:text-4xl mx-auto mb-6 shadow-sm">🔬</div>
+                <h3 class="text-lg md:text-xl font-bold text-slate-900 mb-3">Lab Analyzer</h3>
+                <p class="text-slate-500 font-medium text-sm md:text-base">Upload blood report PDFs and get instant dietary insights based on extracted biomarkers.</p>
             </div>
         </div>
     </section>
 
     <!-- Modals -->
-    <div id="loginModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center opacity-0 transition-opacity">
-        <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl transform scale-95 relative">
+    <div id="loginModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center opacity-0 transition-opacity p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl transform scale-95 relative">
             <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-slate-400 font-bold hover:text-red-500 text-xl">✖</button>
-            <h2 class="text-2xl font-extrabold text-slate-900 mb-6">Login</h2>
+            <h2 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-6">Login</h2>
             <form id="loginForm" class="space-y-4">
-                <input type="email" id="log-email" required placeholder="Email Address" class="w-full border-2 border-slate-100 p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50">
-                <input type="password" id="log-password" required placeholder="Password" class="w-full border-2 border-slate-100 p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50">
-                <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold shadow-md hover:bg-blue-700 transition">Login to Dashboard</button>
+                <input type="email" id="log-email" required placeholder="Email Address" class="w-full border-2 border-slate-100 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50 text-base">
+                <input type="password" id="log-password" required placeholder="Password" class="w-full border-2 border-slate-100 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50 text-base">
+                <button type="submit" class="w-full bg-blue-600 text-white p-3 md:p-4 rounded-xl font-bold shadow-md hover:bg-blue-700 transition">Login to Dashboard</button>
             </form>
             <p id="logMsg" class="mt-4 text-center text-sm font-bold hidden"></p>
             <p class="text-center text-sm text-slate-500 mt-6">New user? <button onclick="switchModal('loginModal', 'registerModal')" class="text-blue-600 font-bold hover:underline">Create an account</button></p>
         </div>
     </div>
 
-    <div id="registerModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center opacity-0 transition-opacity">
-        <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl transform scale-95 relative">
+    <div id="registerModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center opacity-0 transition-opacity p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl transform scale-95 relative">
             <button onclick="closeModal('registerModal')" class="absolute top-4 right-4 text-slate-400 font-bold hover:text-red-500 text-xl">✖</button>
-            <h2 class="text-2xl font-extrabold text-slate-900 mb-6">Create Account</h2>
+            <h2 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-6">Create Account</h2>
             <form id="registerForm" class="space-y-4">
-                <input type="text" id="reg-name" required placeholder="Full Name" class="w-full border-2 border-slate-100 p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50">
-                <input type="email" id="reg-email" required placeholder="Email Address" class="w-full border-2 border-slate-100 p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50">
-                <input type="password" id="reg-password" required placeholder="Create Password" class="w-full border-2 border-slate-100 p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50">
-                <button type="submit" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold shadow-md hover:bg-blue-600 transition">Register Now</button>
+                <input type="text" id="reg-name" required placeholder="Full Name" class="w-full border-2 border-slate-100 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50 text-base">
+                <input type="email" id="reg-email" required placeholder="Email Address" class="w-full border-2 border-slate-100 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50 text-base">
+                <input type="password" id="reg-password" required placeholder="Create Password" class="w-full border-2 border-slate-100 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 bg-slate-50 text-base">
+                <button type="submit" class="w-full bg-slate-900 text-white p-3 md:p-4 rounded-xl font-bold shadow-md hover:bg-blue-600 transition">Register Now</button>
             </form>
             <p id="regMsg" class="mt-4 text-center text-sm font-bold hidden"></p>
             <p class="text-center text-sm text-slate-500 mt-6">Already have an account? <button onclick="switchModal('registerModal', 'loginModal')" class="text-blue-600 font-bold hover:underline">Login</button></p>
@@ -123,6 +154,18 @@
     </div>
 
     <script>
+        // Hamburger Menu Toggle Function
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if(menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.add('flex');
+            } else {
+                menu.classList.add('hidden');
+                menu.classList.remove('flex');
+            }
+        }
+
         function openModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.remove('hidden'); setTimeout(()=>{m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95');},10); }
         function closeModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(()=>{m.classList.add('hidden');},300); }
         function switchModal(c, o) { closeModal(c); setTimeout(()=>openModal(o), 300); }
@@ -133,14 +176,22 @@
                 const token = localStorage.getItem('rakshitplus_jwt');
                 const role = localStorage.getItem('rakshitplus_role');
                 
+                // Hide all by default
                 toggleUI('adminPortalBtn', false); toggleUI('patientDashboardBtn', false);
+                toggleUI('adminPortalBtnMobile', false); toggleUI('patientDashboardBtnMobile', false);
 
                 if (token) {
                     toggleUI('authButtons', false); toggleUI('userProfileBtn', true);
-                    if(role === 'admin') toggleUI('adminPortalBtn', true);
-                    else toggleUI('patientDashboardBtn', true);
+                    toggleUI('authButtonsMobile', false); toggleUI('userProfileBtnMobile', true);
+                    
+                    if(role === 'admin') {
+                        toggleUI('adminPortalBtn', true); toggleUI('adminPortalBtnMobile', true);
+                    } else {
+                        toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true);
+                    }
                 } else {
                     toggleUI('authButtons', true); toggleUI('userProfileBtn', false);
+                    toggleUI('authButtonsMobile', true); toggleUI('userProfileBtnMobile', false);
                 }
             } catch(e) {}
         }
