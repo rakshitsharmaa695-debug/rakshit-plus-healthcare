@@ -5,43 +5,42 @@
     <title>RakshitPlus - Smart Healthcare Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         .hero-bg { background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%); }
         .modal-bg { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
-        .ticket-border { border-left: 2px dashed #cbd5e1; }
-        @media (max-width: 768px) { .ticket-border { border-left: none; border-top: 2px dashed #cbd5e1; } }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="text-slate-800 bg-white">
 
+    <!-- 🚀 THE UNIVERSAL NAVBAR (Paste this exactly in all HTML files) -->
     <nav class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto bg-white sticky top-0 z-40 border-b border-slate-100">
         <a href="index.html" class="flex items-center">
-            <img src="1000022082.png" alt="RakshitPlus Logo" class="h-14 object-contain">
+            <img src="1000022082.png" alt="RakshitPlus Logo" class="h-20 md:h-24 object-contain transition-all duration-300">
         </a>
         
+        <!-- Navbar Order Corrected -->
         <div class="hidden md:flex space-x-8 font-medium text-slate-600">
             <a href="index.html" class="text-blue-600 font-bold">Home</a>
-            <a href="doctors.html" class="hover:text-blue-600">Find Doctors</a>
-            <a href="contact.html" class="hover:text-blue-600">Contact Us</a>
+            <a href="doctors.html" class="hover:text-blue-600 transition">Find Doctors</a>
+            <a href="about.html" class="hover:text-blue-600 transition">About Us</a>
+            <a href="contact.html" class="hover:text-blue-600 transition">Contact Us</a>
         </div>
+        
         <div class="flex items-center space-x-4">
             <div id="authButtons" class="flex gap-4">
                 <button onclick="openModal('loginModal')" class="font-semibold text-blue-600 border-2 border-blue-600 px-5 py-2 rounded-lg transition hover:bg-blue-50">Login</button>
-                <a href="#booking-section" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition">Book Appointment</a>
+                <a href="booking.html" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg hover:bg-slate-900 transition">Book Now</a>
             </div>
             <div id="userProfileBtn" class="hidden flex items-center gap-4">
-                <a href="admin.html" id="adminPortalBtn" class="hidden bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-700 shadow-md transition">⚙️ Manage System</a>
-                <a href="doctor.html" id="doctorPortalBtn" class="hidden bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700 shadow-md transition">🩺 Doctor Queue</a>
-                <a href="dashboard.html" id="patientDashboardBtn" class="hidden bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 shadow-lg transition">🏥 My Dashboard</a>
-                
-                <span class="text-sm font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-md border border-slate-200" id="roleBadge">Verified User</span>
-                <button onclick="logout()" class="text-sm font-bold text-slate-500 hover:text-rose-600 transition">Logout</button>
+                <a href="admin.html" id="adminPortalBtn" class="hidden bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md">⚙️ Admin</a>
+                <a href="dashboard.html" id="patientDashboardBtn" class="hidden bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg">🏥 Dashboard</a>
+                <button onclick="logout()" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition">Logout</button>
             </div>
         </div>
     </nav>
 
+    <!-- Clean Hero Section -->
     <main class="hero-bg border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-8 pt-12 pb-24 grid lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
             <div class="space-y-6">
@@ -49,79 +48,46 @@
                 <h1 class="text-5xl lg:text-[64px] font-extrabold leading-[1.1] text-slate-900 tracking-tight">
                     Skip the wait. <br> <span class="text-blue-600">Book your specialist instantly.</span>
                 </h1>
-                <p class="text-lg text-slate-500 max-w-lg font-medium pr-8">Matches your symptoms with the right doctors and provides real-time queue tracking.</p>
+                <p class="text-lg text-slate-500 max-w-lg font-medium pr-8">Matches your symptoms with the right doctors and provides real-time queue tracking directly to your phone.</p>
                 <div class="pt-4 flex gap-4">
-                    <a href="#booking-section" class="inline-flex items-center bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl shadow-blue-200 gap-2 text-lg hover:bg-blue-700 transition">Find a Doctor</a>
-                    <a href="ai-checkup.html" class="inline-flex items-center bg-white border-2 border-slate-200 text-slate-700 px-8 py-4 rounded-xl font-bold hover:border-blue-600 hover:text-blue-600 transition gap-2 text-lg">🤖 AI Checkup</a>
+                    <!-- Button directly goes to new Booking Page -->
+                    <a href="booking.html" class="inline-flex items-center bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl shadow-blue-200 gap-2 text-lg hover:bg-slate-900 transition">
+                        📅 Schedule Appointment
+                    </a>
+                    <a href="doctors.html" class="inline-flex items-center bg-white border-2 border-slate-200 text-slate-700 px-8 py-4 rounded-xl font-bold hover:border-blue-600 hover:text-blue-600 transition gap-2 text-lg">
+                        👨‍⚕️ View Specialists
+                    </a>
                 </div>
             </div>
             <div class="relative w-full h-[550px] flex justify-end">
-                <div class="w-full lg:w-[90%] h-full rounded-[2rem] overflow-hidden shadow-2xl bg-blue-900 border-4 border-white">
-                    <img src="1000022081.png" alt="Rakshit - Founder" class="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700">
+                <div class="w-full lg:w-[90%] h-full rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
+                    <img src="https://images.unsplash.com/photo-1638202993928-7267aad84c31?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700">
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- PREMIUM BOOKING UI -->
-    <section id="booking-section" class="py-24 bg-slate-50 relative">
-        <div class="max-w-5xl mx-auto px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-extrabold text-slate-900 mb-4">Book Your Appointment</h2>
-                <p class="text-slate-500 font-medium">Fast, secure, and powered by our AI triage system.</p>
+    <!-- NEW: Platform Features Section -->
+    <section class="max-w-7xl mx-auto px-8 py-24">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Why Choose RakshitPlus?</h2>
+            <p class="text-slate-500 text-lg font-medium">A seamless, modern approach to hospital management.</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-10">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm">🧠</div>
+                <h3 class="text-xl font-bold text-slate-900 mb-3">AI Diagnostics</h3>
+                <p class="text-slate-500 font-medium">Our NLP engine reads your symptoms and automatically books you with the correct medical department.</p>
             </div>
-
-            <div id="loginPrompt" class="text-center py-12 bg-white rounded-3xl border border-slate-200 shadow-sm max-w-2xl mx-auto">
-                <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">🔒</div>
-                <h2 class="text-2xl font-bold text-slate-900 mb-2">Authentication Required</h2>
-                <p class="text-slate-500 mb-6">Please log in to your patient account to schedule an appointment.</p>
-                <button onclick="openModal('loginModal')" class="bg-blue-600 text-white px-10 py-4 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition">Secure Login</button>
+            <div class="text-center">
+                <div class="w-20 h-20 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm">🔊</div>
+                <h3 class="text-xl font-bold text-slate-900 mb-3">Smart Alerts</h3>
+                <p class="text-slate-500 font-medium">No more standing in line. Our Web Audio API plays a loud alarm on your phone when it's your turn.</p>
             </div>
-
-            <div id="bookingPortal" class="hidden bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden flex flex-col md:flex-row">
-                
-                <!-- Left Side: Form -->
-                <div class="md:w-3/5 p-10 bg-white">
-                    <div class="flex items-center gap-3 mb-8">
-                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold text-lg">1</div>
-                        <h3 class="text-2xl font-bold text-slate-900">Patient Details</h3>
-                    </div>
-                    
-                    <form id="appointmentForm" class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Describe your symptoms in detail</label>
-                            <textarea id="appt-symptoms" rows="3" required class="w-full border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-500 bg-slate-50 transition resize-none" placeholder="e.g. I have been experiencing severe chest pain and shortness of breath since morning..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Preferred Consultation Date</label>
-                            <input type="date" id="appt-date" required class="w-full border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-500 bg-slate-50 transition cursor-pointer text-slate-700 font-medium">
-                        </div>
-                        <button type="submit" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-blue-600 transition shadow-lg mt-4 text-lg">Generate Ticket & Confirm</button>
-                    </form>
-                </div>
-                
-                <!-- Right Side: Digital Ticket -->
-                <div class="md:w-2/5 bg-slate-50 p-10 flex flex-col items-center justify-center text-center ticket-border relative">
-                    <div class="absolute -top-4 -left-4 w-8 h-8 bg-white rounded-full border border-slate-100 hidden md:block"></div>
-                    <div class="absolute -bottom-4 -left-4 w-8 h-8 bg-white rounded-full border border-slate-100 hidden md:block"></div>
-                    
-                    <div id="qrPlaceholder" class="w-full py-12">
-                        <div class="w-20 h-20 bg-slate-200 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl shadow-inner">🎫</div>
-                        <h3 class="font-extrabold text-slate-800 text-xl mb-2">Digital Tracking Ticket</h3>
-                        <p class="text-slate-500 text-sm">Your QR code and live tracking details will appear here after booking.</p>
-                    </div>
-                    
-                    <div id="successResult" class="hidden w-full flex flex-col items-center animate-fade-in">
-                        <div class="bg-green-100 text-green-700 px-4 py-1.5 rounded-full text-xs font-bold mb-6 flex items-center gap-2">
-                            <span>✓</span> Appointment Confirmed
-                        </div>
-                        <div id="qrcode" class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 mb-6 transition-transform hover:scale-105"></div>
-                        <h4 class="text-xl font-extrabold text-slate-900" id="res-dept"></h4>
-                        <p class="text-sm text-slate-500 font-medium mb-4">Department Assigned via AI</p>
-                        
-                        <div id="res-id" class="w-full"></div>
-                    </div>
-                </div>
+            <div class="text-center">
+                <div class="w-20 h-20 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm">🔬</div>
+                <h3 class="text-xl font-bold text-slate-900 mb-3">Lab Analyzer</h3>
+                <p class="text-slate-500 font-medium">Upload blood report PDFs and get instant dietary insights based on extracted biomarkers.</p>
             </div>
         </div>
     </section>
@@ -156,7 +122,6 @@
         </div>
     </div>
 
-    <!-- Scripts (Same Bulletproof Logic) -->
     <script>
         function openModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.remove('hidden'); setTimeout(()=>{m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95');},10); }
         function closeModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(()=>{m.classList.add('hidden');},300); }
@@ -168,23 +133,19 @@
                 const token = localStorage.getItem('rakshitplus_jwt');
                 const role = localStorage.getItem('rakshitplus_role');
                 
-                toggleUI('adminPortalBtn', false); toggleUI('doctorPortalBtn', false); toggleUI('patientDashboardBtn', false);
+                toggleUI('adminPortalBtn', false); toggleUI('patientDashboardBtn', false);
 
                 if (token) {
-                    toggleUI('authButtons', false); toggleUI('userProfileBtn', true); toggleUI('loginPrompt', false); toggleUI('bookingPortal', true);
-                    let badge = document.getElementById('roleBadge');
-                    if(badge) {
-                        if(role === 'admin') { badge.innerText = "System Root"; badge.className = "text-sm font-bold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-md border border-purple-200 hidden md:block"; toggleUI('adminPortalBtn', true); }
-                        else if(role === 'doctor') { badge.innerText = "Verified Doctor"; badge.className = "text-sm font-bold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-md border border-amber-200 hidden md:block"; toggleUI('doctorPortalBtn', true); } 
-                        else { badge.innerText = "Verified Patient"; badge.className = "text-sm font-bold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-md border border-blue-200 hidden md:block"; toggleUI('patientDashboardBtn', true); }
-                    }
+                    toggleUI('authButtons', false); toggleUI('userProfileBtn', true);
+                    if(role === 'admin') toggleUI('adminPortalBtn', true);
+                    else toggleUI('patientDashboardBtn', true);
                 } else {
-                    toggleUI('authButtons', true); toggleUI('userProfileBtn', false); toggleUI('loginPrompt', true); toggleUI('bookingPortal', false);
+                    toggleUI('authButtons', true); toggleUI('userProfileBtn', false);
                 }
-            } catch(e) { console.error("Auth Error", e); }
+            } catch(e) {}
         }
         
-        function logout() { localStorage.removeItem('rakshitplus_jwt'); localStorage.removeItem('rakshitplus_role'); checkAuth(); }
+        function logout() { localStorage.removeItem('rakshitplus_jwt'); localStorage.removeItem('rakshitplus_role'); window.location.reload(); }
         document.addEventListener('DOMContentLoaded', checkAuth);
 
         document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
@@ -192,10 +153,9 @@
             try {
                 const res = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value }) });
                 const msg = document.getElementById('regMsg'); msg.classList.remove('hidden');
-                if(res.ok) { msg.className = "mt-4 text-green-600"; msg.innerText = "Account Created! Please login."; setTimeout(()=>switchModal('registerModal','loginModal'), 1500); }
-                else { const data = await res.json(); msg.className = "mt-4 text-red-600"; msg.innerText = data.error || "Email already exists!"; }
-            } catch(err) { document.getElementById('regMsg').innerText = "Network Error!"; document.getElementById('regMsg').classList.remove('hidden'); }
-            finally { btn.innerText = "Register Now"; btn.disabled = false; }
+                if(res.ok) { msg.className = "mt-4 text-green-600"; msg.innerText = "Account Created!"; setTimeout(()=>switchModal('registerModal','loginModal'), 1000); }
+                else { msg.className = "mt-4 text-red-600"; msg.innerText = "Email exists!"; }
+            } catch(err) { } finally { btn.innerText = "Register Now"; btn.disabled = false; }
         });
         
         document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
@@ -203,42 +163,9 @@
             try {
                 const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('log-email').value, password: document.getElementById('log-password').value }) });
                 const msg = document.getElementById('logMsg'); msg.classList.remove('hidden'); const data = await res.json();
-                if(res.ok) { localStorage.setItem('rakshitplus_jwt', data.token); localStorage.setItem('rakshitplus_role', data.role); msg.className = "mt-4 text-green-600"; msg.innerText = "Login Successful!"; setTimeout(()=>{closeModal('loginModal'); checkAuth();}, 1000); } 
-                else { msg.className = "mt-4 text-red-600"; msg.innerText = data.error || "Invalid credentials!"; }
-            } catch (error) { document.getElementById('logMsg').classList.remove('hidden'); document.getElementById('logMsg').className = "mt-4 text-red-600"; document.getElementById('logMsg').innerText = "Server disconnected!"; } 
-            finally { btn.innerText = "Login to Dashboard"; btn.disabled = false; }
-        });
-
-        document.getElementById('appointmentForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Running Triage..."; btn.disabled = true;
-            try {
-                const res = await fetch('/api/appointments', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` },
-                    body: JSON.stringify({ symptoms: document.getElementById('appt-symptoms').value, date: document.getElementById('appt-date').value })
-                });
-                const data = await res.json();
-                if (res.status === 201) {
-                    const qRes = await fetch(`/api/queue/${data.id}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` } });
-                    const qData = await qRes.json();
-                    toggleUI('qrPlaceholder', false); toggleUI('successResult', true);
-                    const trackingUrl = `${window.location.origin}/tracking.html?id=${data.id}`;
-                    document.getElementById('qrcode').innerHTML = ""; 
-                    new QRCode(document.getElementById("qrcode"), { text: trackingUrl, width: 140, height: 140, colorDark : "#0f172a", colorLight : "#ffffff" });
-                    document.getElementById('res-dept').innerText = data.dept;
-                    document.getElementById('res-id').innerHTML = `
-                        <div class="mt-4 bg-white border border-slate-200 p-4 rounded-xl text-left w-full shadow-sm">
-                            <div class="flex justify-between items-center mb-2">
-                                <p class="text-xs font-bold text-slate-500 uppercase">Live Queue</p>
-                                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-                            </div>
-                            <p class="text-slate-700 font-medium">Patients Ahead: <span class="font-extrabold text-blue-600 text-xl ml-2">${qData.patientsAhead}</span></p>
-                        </div>
-                        <a href="${trackingUrl}" target="_blank" class="mt-6 block w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition">Open Live Tracker ➤</a>
-                    `;
-                    e.target.reset();
-                } else { alert(data.error || "Session expired"); logout(); }
-            } catch(err) { alert("Server error. Try again."); }
-            finally { btn.innerText = "Generate Ticket & Confirm"; btn.disabled = false; }
+                if(res.ok) { localStorage.setItem('rakshitplus_jwt', data.token); localStorage.setItem('rakshitplus_role', data.role); window.location.reload(); } 
+                else { msg.className = "mt-4 text-red-600"; msg.innerText = data.error; }
+            } catch (error) {} finally { btn.innerText = "Login to Dashboard"; btn.disabled = false; }
         });
     </script>
 </body>

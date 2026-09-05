@@ -2,121 +2,278 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RakshitPlus - Master Admin Dashboard</title>
+    <title>RakshitPlus - Admin Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; background: #f1f5f9; }</style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden">
-    <aside class="w-64 bg-slate-900 text-white flex flex-col">
-        <div class="h-20 flex items-center px-8 border-b border-slate-800">
-            <div class="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center font-bold mr-3">+</div>
-            <h1 class="text-xl font-bold">RakshitPlus</h1>
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-2xl z-20 shrink-0">
+        <div class="p-6 border-b border-slate-800">
+            <h1 class="text-2xl font-extrabold text-white tracking-tight">System<span class="text-blue-500">Admin</span></h1>
+            <p class="text-xs text-slate-400 mt-1 font-medium">Root Access Portal</p>
         </div>
-        <nav class="flex-1 px-4 py-8 space-y-2">
-            <a href="#" class="flex items-center px-4 py-3 bg-blue-600/20 text-blue-400 rounded-xl font-bold">📊 Dashboard</a>
-            <a href="index.html" class="flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 rounded-xl font-medium">🌍 Back to Portal</a>
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <button onclick="switchTab('addDoctorTab')" class="w-full flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-md transition hover:bg-blue-500" id="nav-add">
+                <span>➕</span> Add New Doctor
+            </button>
+            <button onclick="switchTab('manageDoctorsTab')" class="w-full flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-bold transition hover:bg-slate-800" id="nav-manage">
+                <span>🩺</span> Manage Staff
+            </button>
         </nav>
+        <div class="p-6 border-t border-slate-800">
+            <a href="index.html" class="flex items-center gap-3 text-slate-400 hover:text-white font-bold transition">
+                <span>←</span> Exit Admin
+            </a>
+        </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full overflow-y-auto">
-        <header class="h-20 bg-white border-b flex items-center justify-between px-10">
-            <h2 class="text-2xl font-extrabold text-slate-800">System Overview</h2>
-            <span class="bg-purple-100 text-purple-700 px-4 py-1.5 rounded-full text-sm font-bold">Root Access</span>
-        </header>
-
-        <div class="p-10 max-w-7xl mx-auto w-full space-y-8">
-            <div class="grid grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center justify-between">
-                    <div><p class="text-sm font-bold text-slate-400 uppercase">Patients</p><p class="text-4xl font-extrabold text-blue-600" id="stat-patients">0</p></div>
-                    <div class="text-2xl">👥</div>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center justify-between">
-                    <div><p class="text-sm font-bold text-slate-400 uppercase">Doctors</p><p class="text-4xl font-extrabold text-emerald-600" id="stat-doctors">0</p></div>
-                    <div class="text-2xl">🩺</div>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center justify-between">
-                    <div><p class="text-sm font-bold text-slate-400 uppercase">Appts</p><p class="text-4xl font-extrabold text-purple-600" id="stat-appts">0</p></div>
-                    <div class="text-2xl">📅</div>
-                </div>
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto p-8 relative">
+        
+        <!-- Header Stats -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-3xl font-extrabold text-slate-900">Dashboard Overview</h2>
+                <p class="text-slate-500 font-medium mt-1">Manage hospital operations and medical staff.</p>
             </div>
-
-            <div class="grid lg:grid-cols-3 gap-8">
-                <div class="bg-white rounded-2xl shadow-sm border p-8 h-fit">
-                    <h3 class="text-lg font-bold text-slate-900 mb-6">➕ Onboard New Doctor</h3>
-                    <form id="addDoctorForm" class="space-y-4">
-                        <input type="text" id="doc-name" required placeholder="Dr. Name" class="w-full border p-3 rounded-xl outline-none">
-                        <input type="email" id="doc-email" required placeholder="Email" class="w-full border p-3 rounded-xl outline-none">
-                        <input type="password" id="doc-password" required placeholder="Temporary Password" class="w-full border p-3 rounded-xl outline-none">
-                        <input type="url" id="doc-image" placeholder="Photo URL (Optional)" class="w-full border p-3 rounded-xl outline-none">
-                        <select id="doc-spec" class="w-full border p-3 rounded-xl outline-none">
-                            <option value="Cardiology">Cardiology</option> <option value="Orthopedics">Orthopedics</option>
-                            <option value="Neurology">Neurology</option> <option value="General Medicine">General Medicine</option>
-                        </select>
-                        <button type="submit" class="w-full bg-slate-900 text-white p-3.5 rounded-xl font-bold">Save Doctor</button>
-                    </form>
-                    <div id="adminMsg" class="mt-4 text-center font-bold hidden text-sm"></div>
+            <div class="flex gap-4">
+                <div class="bg-white px-5 py-2.5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">🩺</div>
+                    <div><p class="text-xs text-slate-400 font-bold uppercase">Doctors</p><p class="text-lg font-extrabold leading-none" id="statDocs">0</p></div>
                 </div>
-
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border overflow-hidden">
-                    <div class="p-6 border-b bg-slate-50"><h3 class="text-lg font-bold">📋 Active Staff Directory</h3></div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-white border-b">
-                                <tr><th class="p-4 text-xs font-bold text-slate-400 uppercase">Doctor</th><th class="p-4 text-xs font-bold text-slate-400 uppercase">Spec</th><th class="p-4 text-xs font-bold text-slate-400 uppercase">ID</th><th class="p-4 text-center">Action</th></tr>
-                            </thead>
-                            <tbody id="doctorsTableBody" class="divide-y divide-slate-100"></tbody>
-                        </table>
-                    </div>
+                <div class="bg-white px-5 py-2.5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold">👥</div>
+                    <div><p class="text-xs text-slate-400 font-bold uppercase">Patients</p><p class="text-lg font-extrabold leading-none" id="statPats">0</p></div>
                 </div>
             </div>
         </div>
+
+        <!-- ADD DOCTOR TAB -->
+        <section id="addDoctorTab" class="block">
+            <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-8">
+                <div class="border-b border-slate-100 pb-5 mb-6 flex justify-between items-center">
+                    <h3 class="text-xl font-extrabold text-slate-900">Register New Doctor</h3>
+                    <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">Comprehensive Profile</span>
+                </div>
+
+                <form id="addDoctorForm" class="grid lg:grid-cols-3 gap-8">
+                    
+                    <!-- Image Upload Column -->
+                    <div class="lg:col-span-1 flex flex-col items-center justify-start border-r border-slate-100 pr-8">
+                        <div class="w-40 h-40 rounded-full border-4 border-dashed border-slate-300 mb-4 relative overflow-hidden group hover:border-blue-500 transition flex items-center justify-center bg-slate-50">
+                            <img id="imagePreview" src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" class="w-full h-full object-cover">
+                            <label class="absolute inset-0 bg-slate-900/50 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 cursor-pointer transition">
+                                <span class="text-2xl mb-1">📷</span>
+                                <span class="text-xs font-bold">Upload Photo</span>
+                                <input type="file" id="doc-image" accept="image/*" class="hidden">
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-400 text-center font-medium">Upload a professional, high-quality picture. Max size: 2MB.</p>
+                    </div>
+
+                    <!-- Details Column -->
+                    <div class="lg:col-span-2 grid md:grid-cols-2 gap-5">
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Full Name</label>
+                            <input type="text" id="doc-name" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 transition font-medium" placeholder="Dr. Rahul Sharma">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Email (Login ID)</label>
+                            <input type="email" id="doc-email" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 transition font-medium" placeholder="dr.rahul@rakshitplus.com">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Temporary Password</label>
+                            <input type="password" id="doc-pass" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 transition font-medium" placeholder="••••••••">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Department / Specialization</label>
+                            <select id="doc-spec" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 transition font-medium text-slate-700">
+                                <option>Cardiology</option><option>Neurology</option><option>Orthopedics</option>
+                                <option>Gastroenterology</option><option>General Medicine</option><option>Pediatrics</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Qualifications</label>
+                            <input type="text" id="doc-qual" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 transition font-medium" placeholder="e.g. MBBS, MD (Medicine)">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Years of Experience</label>
+                            <input type="text" id="doc-exp" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 transition font-medium" placeholder="e.g. 10 Years">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Consultation Fee (₹)</label>
+                            <input type="number" id="doc-fee" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 transition font-medium" placeholder="e.g. 500">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">About Doctor / Bio</label>
+                            <textarea id="doc-about" rows="3" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 transition font-medium resize-none" placeholder="Brief introduction about the doctor's expertise..."></textarea>
+                        </div>
+
+                        <div class="md:col-span-2 pt-2">
+                            <button type="submit" id="submitBtn" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition flex justify-center items-center gap-2 text-lg">
+                                Create Doctor Profile
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- MANAGE DOCTORS TAB -->
+        <section id="manageDoctorsTab" class="hidden">
+            <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-8">
+                <div class="border-b border-slate-100 pb-5 mb-6 flex justify-between items-center">
+                    <h3 class="text-xl font-extrabold text-slate-900">Manage Active Staff</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="p-4 text-xs font-bold text-slate-400 uppercase rounded-l-xl">Doctor Info</th>
+                                <th class="p-4 text-xs font-bold text-slate-400 uppercase">Department</th>
+                                <th class="p-4 text-xs font-bold text-slate-400 uppercase">Fee</th>
+                                <th class="p-4 text-xs font-bold text-slate-400 uppercase rounded-r-xl">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="doctorsTable" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script>
-        const token = localStorage.getItem('rakshitplus_jwt');
-        if(!token) window.location.href = 'index.html';
+        let base64ImageString = "";
 
-        async function loadStats() {
-            const res = await fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${token}` } });
-            const data = await res.json();
-            document.getElementById('stat-patients').innerText = data.patients || 0;
-            document.getElementById('stat-doctors').innerText = data.doctors || 0;
-            document.getElementById('stat-appts').innerText = data.appointments || 0;
+        // UI Tabs Logic
+        function switchTab(tabId) {
+            document.getElementById('addDoctorTab').classList.add('hidden');
+            document.getElementById('manageDoctorsTab').classList.add('hidden');
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            document.getElementById('nav-add').className = "w-full flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-bold transition hover:bg-slate-800";
+            document.getElementById('nav-manage').className = "w-full flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-bold transition hover:bg-slate-800";
+            
+            if(tabId === 'addDoctorTab') {
+                document.getElementById('nav-add').className = "w-full flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-md transition";
+            } else {
+                document.getElementById('nav-manage').className = "w-full flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-md transition";
+                loadDoctors();
+            }
         }
 
-        async function loadDoctorsList() {
+        // 📸 Handle Image Upload and Convert to Base64 (Cloud Safe)
+        document.getElementById('doc-image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            
+            // Check size (max 2MB)
+            if(file.size > 2 * 1024 * 1024) return alert("Image size must be less than 2MB");
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                base64ImageString = reader.result;
+                document.getElementById('imagePreview').src = base64ImageString;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` }});
+                if(!res.ok) { alert("Admin login required"); window.location.href="index.html"; return; }
+                const data = await res.json();
+                document.getElementById('statDocs').innerText = data.doctors;
+                document.getElementById('statPats').innerText = data.patients;
+            } catch(e) { console.log(e); }
+        }
+
+        // Add Doctor (With complete profile)
+        document.getElementById('addDoctorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Creating Profile... ⏳"; btn.disabled = true;
+
+            const payload = {
+                name: document.getElementById('doc-name').value,
+                email: document.getElementById('doc-email').value,
+                password: document.getElementById('doc-pass').value,
+                specialization: document.getElementById('doc-spec').value,
+                qualification: document.getElementById('doc-qual').value,
+                experience: document.getElementById('doc-exp').value,
+                fees: document.getElementById('doc-fee').value,
+                about: document.getElementById('doc-about').value,
+                image_url: base64ImageString || "https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+            };
+
+            try {
+                const res = await fetch('/api/admin/doctors', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` },
+                    body: JSON.stringify(payload)
+                });
+                
+                if(res.ok) {
+                    alert("Doctor Profile Created Successfully!");
+                    e.target.reset();
+                    document.getElementById('imagePreview').src = "https://cdn-icons-png.flaticon.com/512/3774/3774299.png";
+                    base64ImageString = "";
+                    fetchStats();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || "Failed to create doctor");
+                }
+            } catch(e) { alert("Network Error"); } 
+            finally { btn.innerText = "Create Doctor Profile"; btn.disabled = false; }
+        });
+
+        async function loadDoctors() {
             const res = await fetch('/api/doctors');
-            const doctors = await res.json();
-            const tbody = document.getElementById('doctorsTableBody');
-            if(doctors.length === 0) return tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400">No doctors onboarded.</td></tr>`;
-            tbody.innerHTML = doctors.map(doc => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-4 font-bold flex items-center gap-3"><img src="${doc.image_url}" class="w-8 h-8 rounded-full object-cover">${doc.name}</td>
-                    <td class="p-4"><span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">${doc.specialization}</span></td>
-                    <td class="p-4 text-sm text-slate-500">${doc.email}</td>
-                    <td class="p-4 text-center"><button onclick="deleteDoctor(${doc.id})" class="text-rose-500 bg-rose-50 px-3 py-1.5 rounded-lg text-xs font-bold">Remove</button></td>
+            const data = await res.json();
+            
+            document.getElementById('doctorsTable').innerHTML = data.map(doc => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-4 flex items-center gap-4">
+                        <img src="${doc.image_url}" class="w-12 h-12 rounded-full object-cover shadow-sm border border-slate-200">
+                        <div>
+                            <p class="font-extrabold text-slate-900">${doc.name}</p>
+                            <p class="text-xs font-bold text-slate-500">${doc.email}</p>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-100">${doc.specialization}</span>
+                        <p class="text-xs font-semibold text-slate-500 mt-1">${doc.qualification || 'MBBS'}</p>
+                    </td>
+                    <td class="p-4 font-extrabold text-slate-700">₹${doc.fees || 500}</td>
+                    <td class="p-4">
+                        <button onclick="removeDoctor(${doc.id})" class="text-red-500 font-bold hover:text-red-700 bg-red-50 px-4 py-2 rounded-lg text-sm transition">Remove</button>
+                    </td>
                 </tr>
             `).join('');
         }
 
-        document.getElementById('addDoctorForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const res = await fetch('/api/admin/doctors', {
-                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ name: document.getElementById('doc-name').value, email: document.getElementById('doc-email').value, password: document.getElementById('doc-password').value, specialization: document.getElementById('doc-spec').value, image_url: document.getElementById('doc-image').value })
-            });
-            const data = await res.json();
-            if(res.ok) { e.target.reset(); loadStats(); loadDoctorsList(); } else alert(data.error);
-        });
-
-        async function deleteDoctor(id) {
-            if(!confirm("Remove doctor?")) return;
-            await fetch(`/api/admin/doctors/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-            loadStats(); loadDoctorsList();
+        async function removeDoctor(id) {
+            if(!confirm("Are you sure you want to remove this doctor?")) return;
+            await fetch(`/api/admin/doctors/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('rakshitplus_jwt')}` } });
+            loadDoctors(); fetchStats();
         }
 
-        loadStats(); loadDoctorsList();
+        fetchStats();
     </script>
 </body>
 </html>
