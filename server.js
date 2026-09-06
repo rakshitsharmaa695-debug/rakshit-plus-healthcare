@@ -7,7 +7,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { GoogleAIFileManager } = require('@google/generative-ai/server'); // 👈 NAYA GOOGLE FILE MANAGER
+const { GoogleAIFileManager } = require('@google/generative-ai/server'); 
 
 const app = express();
 
@@ -19,7 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 // 🚀 Google Gemini Setup
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const fileManager = new GoogleAIFileManager(GEMINI_API_KEY); // Initialize File Manager
+const fileManager = new GoogleAIFileManager(GEMINI_API_KEY); 
 
 // 🚀 CONNECT TO CLOUD DATABASE
 const pool = new Pool({
@@ -53,13 +53,13 @@ const authenticate = (req, res, next) => {
     }
 };
 
-// Use memory storage for normal uploads, but we'll write to temp file for Gemini
 const upload = multer({ storage: multer.memoryStorage() }); 
 
 // 🧠 Smart AI Triage Engine
 async function aiTriageEngine(symptoms) {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // 🔄 FIXED: Updated model name for triage
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
         const prompt = `Analyze these patient symptoms and return ONLY the most appropriate medical department name (e.g., Cardiology, Neurology, General Medicine, Orthopedics, Gastroenterology). Do not return any other text. Symptoms: "${symptoms}"`;
         const result = await model.generateContent(prompt);
         let dept = result.response.text().trim();
@@ -194,7 +194,6 @@ app.post('/api/admin/add-doctor', authenticate, async (req, res) => {
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No PDF file received." });
     
-    // We must write the buffer to a temporary file because GoogleAIFileManager requires a local file path
     const tempFilePath = path.join(__dirname, `temp_${Date.now()}.pdf`);
     
     try {
@@ -206,8 +205,8 @@ app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req
             displayName: "Patient Lab Report",
         });
 
-        // 2. Analyze the uploaded file using the specific File URI
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // 2. 🔄 FIXED: Updated model name for File API to 'gemini-1.5-pro' for complex document parsing
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
         const prompt = `Analyze this medical lab report document. Extract the medical data and return ONLY a perfectly formatted JSON object (no markdown, no backticks, no conversational text) in this exact format: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. Ensure the JSON is valid.`;
         
         const result = await model.generateContent([
@@ -225,13 +224,12 @@ app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req
         
         const parsedResponse = JSON.parse(aiResponse);
         
-        // Delete temp file & return success
         fs.unlinkSync(tempFilePath);
         return res.status(200).json(parsedResponse);
         
     } catch (error) {
         console.error("Gemini Official File API Error:", error.message);
-        if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath); // Cleanup on fail
+        if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath); 
         return res.status(500).json({ error: "Gemini AI failed to process this document. Error: " + error.message });
     }
 });
