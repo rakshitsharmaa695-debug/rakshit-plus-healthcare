@@ -8,14 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; background-color: #f8fafc; }
-        
-        /* Premium Backgrounds */
         .hero-gradient { background: radial-gradient(circle at 10% 20%, rgb(239, 246, 255) 0%, rgb(255, 255, 255) 90%); }
         .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05); }
         .modal-bg { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); }
-        
-        /* Floating Animations */
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
         .animate-float { animation: float 5s ease-in-out infinite; }
         .animate-float-delayed { animation: float 6s ease-in-out infinite 1.5s; }
@@ -23,105 +19,53 @@
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden">
 
-    <!-- 🚀 ULTRA PREMIUM GLASS NAVBAR -->
     <nav class="fixed w-full top-0 z-50 glass-nav border-b border-slate-100/50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 md:py-4 flex justify-between items-center">
-            
             <a href="index.html" class="flex items-center z-50 group">
                 <img src="1000022082.png" alt="RakshitPlus Logo" class="h-14 md:h-[72px] object-contain group-hover:scale-105 transition-transform duration-300">
             </a>
-            
-            <!-- Desktop Links -->
             <div class="hidden md:flex space-x-10 font-bold text-slate-500">
-                <a href="index.html" class="text-blue-600 relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-blue-600">Home</a>
+                <a href="index.html" class="text-blue-600">Home</a>
                 <a href="doctors.html" class="hover:text-blue-600 transition-colors">Find Doctors</a>
                 <a href="about.html" class="hover:text-blue-600 transition-colors">About</a>
-                <a href="contact.html" class="hover:text-blue-600 transition-colors">Contact</a>
             </div>
-            
-            <!-- Desktop Auth -->
             <div class="hidden md:flex items-center space-x-4">
                 <div id="authButtons" class="flex gap-3">
                     <button onclick="openModal('loginModal')" class="font-bold text-slate-600 hover:text-blue-600 px-4 py-2 transition">Login</button>
-                    <a href="booking.html" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-[0_8px_20px_-6px_rgba(37,99,235,0.5)] hover:bg-slate-900 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">Book Consult</a>
+                    <a href="booking.html" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition-all">Book Consult</a>
                 </div>
                 <div id="userProfileBtn" class="hidden flex items-center gap-4">
-                    <a href="admin.html" id="adminPortalBtn" class="hidden bg-purple-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-purple-700 transition">⚙️ Admin</a>
                     <a href="dashboard.html" id="patientDashboardBtn" class="hidden bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-blue-600 transition">🏥 Dashboard</a>
-                    <button onclick="logout()" class="text-sm font-bold text-slate-400 hover:text-rose-500 transition border border-slate-200 px-4 py-2 rounded-xl">Logout</button>
+                    <button onclick="logout()" class="text-sm font-bold text-slate-400 hover:text-rose-500 transition border px-4 py-2 rounded-xl">Logout</button>
                 </div>
             </div>
-
-            <!-- Hamburger -->
-            <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-slate-600 hover:text-blue-600 transition z-50">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-            </button>
         </div>
     </nav>
 
-    <!-- 📱 MOBILE MENU -->
-    <div id="mobileMenu" class="fixed inset-0 bg-white/95 backdrop-blur-md z-40 hidden flex-col pt-28 px-8 overflow-y-auto">
-        <a href="index.html" class="text-3xl font-extrabold text-blue-600 border-b border-slate-100 py-5">Home</a>
-        <a href="doctors.html" class="text-3xl font-extrabold text-slate-800 border-b border-slate-100 py-5 hover:text-blue-600">Find Doctors</a>
-        <a href="about.html" class="text-3xl font-extrabold text-slate-800 border-b border-slate-100 py-5 hover:text-blue-600">About</a>
-        <a href="contact.html" class="text-3xl font-extrabold text-slate-800 border-b border-slate-100 py-5 hover:text-blue-600">Contact</a>
-        
-        <div id="authButtonsMobile" class="mt-10 flex flex-col gap-4 pb-10">
-            <button onclick="openModal('loginModal'); toggleMobileMenu()" class="w-full font-bold text-slate-700 bg-slate-100 px-6 py-4 rounded-2xl text-xl border border-slate-200">Login Securely</button>
-            <a href="booking.html" class="w-full text-center bg-blue-600 text-white px-6 py-4 rounded-2xl font-bold shadow-xl shadow-blue-200 text-xl">Book Appointment</a>
-        </div>
-        
-        <div id="userProfileBtnMobile" class="hidden mt-10 flex flex-col gap-4 pb-10">
-            <a href="admin.html" id="adminPortalBtnMobile" class="hidden text-center bg-purple-600 text-white px-6 py-4 rounded-2xl font-bold shadow-md text-xl">⚙️ Admin Portal</a>
-            <a href="dashboard.html" id="patientDashboardBtnMobile" class="hidden text-center bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold shadow-xl text-xl">🏥 My Dashboard</a>
-            <button onclick="logout()" class="w-full font-bold text-rose-500 bg-rose-50 border border-rose-100 px-6 py-4 rounded-2xl text-xl">Logout</button>
-        </div>
-    </div>
-
-    <!-- 🌟 HERO SECTION -->
     <main class="hero-gradient min-h-screen flex items-center relative pt-20 overflow-hidden">
+        <div class="absolute top-40 right-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply blur-3xl opacity-30 animate-float"></div>
         
-        <!-- Background Elements -->
-        <div class="absolute top-40 right-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
-        <div class="absolute bottom-10 left-20 w-96 h-96 bg-teal-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float-delayed"></div>
-
         <div class="max-w-7xl mx-auto px-4 md:px-8 grid lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full relative z-10">
-            
-            <!-- Left Text Content -->
             <div class="space-y-6 text-center lg:text-left pt-10 lg:pt-0">
                 <div class="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-slate-200 px-4 py-2 rounded-full shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                     <span class="text-xs md:text-sm font-bold text-slate-700 tracking-wide">Next-Gen Healthcare Portal</span>
                 </div>
-                
                 <h1 class="text-5xl md:text-6xl lg:text-[76px] font-black leading-[1.05] text-slate-900 tracking-tight">
-                    AI-Powered Care. <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-400">Zero Waiting Rooms.</span>
+                    Smart care, <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-400">zero waiting.</span>
                 </h1>
-                
                 <p class="text-lg md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed md:pr-8">
-                    Experience the future of healing. Our intelligent AI triage and live digital queues connect you to top-tier specialists in seconds. Your health, without the hassle.
+                    RakshitPlus uses advanced AI triage and live digital queuing to connect you with top specialists instantly. Skip the physical lines.
                 </p>
-                
                 <div class="pt-4 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
-                    <a href="booking.html" class="inline-flex justify-center items-center bg-slate-900 text-white px-8 py-4.5 rounded-2xl font-bold shadow-xl shadow-slate-900/20 gap-3 text-lg hover:bg-blue-600 hover:-translate-y-1 transition-all duration-300">
-                        Book Your Consultation
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                    </a>
-                    <a href="doctors.html" class="inline-flex justify-center items-center bg-white border-2 border-slate-200 text-slate-700 px-8 py-4.5 rounded-2xl font-bold hover:border-slate-300 hover:shadow-lg transition-all text-lg gap-2">
-                        Meet Our Specialists
-                    </a>
+                    <a href="booking.html" class="inline-flex justify-center items-center bg-slate-900 text-white px-8 py-4.5 rounded-2xl font-bold shadow-xl gap-3 text-lg hover:bg-blue-600 transition-all">Book Consultation</a>
                 </div>
             </div>
 
-            <!-- Right Visual Content -->
             <div class="relative w-full h-[400px] md:h-[550px] lg:h-[650px] flex justify-center items-center mt-4 lg:mt-0">
-                <!-- 🚀 ULTRA STABLE PREMIUM DOCTOR IMAGE APPLIED HERE -->
                 <div class="absolute w-[85%] lg:w-[90%] h-[90%] rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white/50 animate-float z-10 bg-slate-200">
-                    <img src="https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Premium Healthcare Professional" class="w-full h-full object-cover" onerror="this.src='https://cdn.pixabay.com/photo/2017/01/31/22/32/doctor-2027768_1280.png'">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <img src="https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Doctor" class="w-full h-full object-cover">
                 </div>
-
-                <!-- Floating Info Card 1 -->
                 <div class="glass-card absolute bottom-12 -left-4 md:-left-8 p-4 md:p-5 rounded-2xl z-20 animate-float-delayed flex items-center gap-4">
                     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-2xl">🤖</div>
                     <div>
@@ -129,66 +73,60 @@
                         <p class="text-sm md:text-base font-extrabold text-slate-800">AI Auto-Routing Active</p>
                     </div>
                 </div>
-
-                <!-- Floating Info Card 2 -->
-                <div class="glass-card absolute top-20 -right-4 md:-right-8 p-4 md:p-5 rounded-2xl z-20 animate-float flex flex-col items-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Queue Status</p>
-                    <p class="text-3xl font-black text-green-500">Zero</p>
-                    <p class="text-xs font-medium text-slate-500">Wait Time</p>
-                </div>
             </div>
         </div>
     </main>
 
-    <!-- 📊 STATS SECTION -->
-    <section class="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-20 relative z-20 -mt-10 md:-mt-16">
-        <div class="glass-card rounded-[2rem] p-8 md:p-12 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-200/50">
-            <div class="text-center px-4">
-                <p class="text-4xl md:text-5xl font-black text-slate-900 mb-1">100<span class="text-blue-600">%</span></p>
-                <p class="text-sm font-bold text-slate-500 uppercase tracking-wide">Data Security</p>
+    <!-- 🧬 NEW: AI HEALTH SCANNER SECTION -->
+    <section class="max-w-7xl mx-auto px-4 md:px-8 py-20 relative z-20">
+        <div class="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-2xl border border-slate-800">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-pulse"></div>
+            
+            <div class="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <span class="bg-blue-500/20 text-blue-400 border border-blue-500/30 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase mb-6 inline-block">Powered by Gemini AI</span>
+                    <h2 class="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">Drop your lab report. <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Get instant insights.</span></h2>
+                    <p class="text-slate-400 text-lg font-medium mb-8">Our high-performance AI model analyzes your medical PDFs, extracts key biomarkers, and generates personalized dietary corrections in seconds.</p>
+                </div>
+                
+                <!-- AI Drag & Drop Upload UI -->
+                <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-8 text-center relative group">
+                    <input type="file" id="ai-report-upload" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
+                    <div class="border-2 border-dashed border-blue-400/50 rounded-2xl p-10 group-hover:border-blue-400 transition-colors bg-black/20">
+                        <div class="text-6xl mb-4 animate-bounce">📄</div>
+                        <h3 class="text-xl font-extrabold text-white mb-2">Upload Medical PDF</h3>
+                        <p class="text-slate-400 text-sm font-medium">Click or drag & drop your blood test report here.</p>
+                    </div>
+                    
+                    <div id="ai-loading" class="hidden absolute inset-0 bg-slate-900/90 backdrop-blur-md rounded-[2rem] z-30 flex flex-col items-center justify-center">
+                        <div class="w-16 h-16 border-4 border-slate-700 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+                        <p class="text-blue-400 font-bold animate-pulse">AI Model Processing...</p>
+                    </div>
+                </div>
             </div>
-            <div class="text-center px-4">
-                <p class="text-4xl md:text-5xl font-black text-slate-900 mb-1">24<span class="text-blue-600">/7</span></p>
-                <p class="text-sm font-bold text-slate-500 uppercase tracking-wide">AI Precision</p>
-            </div>
-            <div class="text-center px-4">
-                <p class="text-4xl md:text-5xl font-black text-slate-900 mb-1">50<span class="text-blue-600">+</span></p>
-                <p class="text-sm font-bold text-slate-500 uppercase tracking-wide">Top Specialists</p>
-            </div>
-            <div class="text-center px-4">
-                <p class="text-4xl md:text-5xl font-black text-slate-900 mb-1">Zero</p>
-                <p class="text-sm font-bold text-slate-500 uppercase tracking-wide">Queue Anxiety</p>
-            </div>
-        </div>
-    </section>
 
-    <!-- 🚀 FEATURES GRID -->
-    <section class="max-w-7xl mx-auto px-4 md:px-8 py-20 md:py-32">
-        <div class="text-center mb-16 md:mb-24">
-            <h2 class="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">Intelligent Healthcare Infrastructure.</h2>
-            <p class="text-slate-500 text-lg md:text-xl font-medium max-w-2xl mx-auto">We've engineered a seamless ecosystem that completely eliminates administrative friction, letting doctors focus on healing and patients focus on recovery.</p>
-        </div>
-        
-        <div class="grid md:grid-cols-3 gap-8 md:gap-10">
-            <!-- Feature 1 -->
-            <div class="bg-white p-8 md:p-10 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                <div class="w-16 h-16 bg-slate-50 text-slate-900 rounded-2xl flex items-center justify-center text-3xl mb-8 border border-slate-200 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-sm">🧠</div>
-                <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-4">Smart AI Triage</h3>
-                <p class="text-slate-500 font-medium leading-relaxed">Describe how you feel. Our advanced NLP engine analyzes your symptoms in real-time, instantly routing you to the most qualified specialist for your specific needs.</p>
-            </div>
-            
-            <!-- Feature 2 -->
-            <div class="bg-white p-8 md:p-10 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                <div class="w-16 h-16 bg-slate-50 text-slate-900 rounded-2xl flex items-center justify-center text-3xl mb-8 border border-slate-200 group-hover:bg-teal-500 group-hover:text-white transition-colors duration-300 shadow-sm">📡</div>
-                <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-4">Real-Time Queue Tracking</h3>
-                <p class="text-slate-500 font-medium leading-relaxed">Your time is precious. Generate a secure digital pass and track your exact position in the live queue. Get instant ETA updates and audio alerts when it's your turn.</p>
-            </div>
-            
-            <!-- Feature 3 -->
-            <div class="bg-white p-8 md:p-10 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                <div class="w-16 h-16 bg-slate-50 text-slate-900 rounded-2xl flex items-center justify-center text-3xl mb-8 border border-slate-200 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300 shadow-sm">🔬</div>
-                <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-4">Automated Lab Insights</h3>
-                <p class="text-slate-500 font-medium leading-relaxed">Understand your health instantly. Upload any lab report securely, and our intelligent parser will break down complex biomarkers into simple, actionable dietary and health advice.</p>
+            <!-- Dynamic AI Results Container -->
+            <div id="ai-results" class="hidden relative z-10 mt-8 bg-black/40 border border-white/10 rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-white">AI Analysis Results</h3>
+                    <div class="bg-slate-800 px-4 py-2 rounded-xl text-white font-black text-xl">Score: <span id="res-score" class="text-blue-400">0</span>/100</div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-3">Detected Biomarkers</p>
+                        <div id="res-markers" class="space-y-3"></div>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase mb-3">AI Insights</p>
+                            <ul id="res-insights" class="text-slate-300 text-sm space-y-2 list-disc pl-4"></ul>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase mb-3">Dietary Plan</p>
+                            <ul id="res-diet" class="text-slate-300 text-sm space-y-2 list-disc pl-4"></ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -198,17 +136,9 @@
         <div class="bg-white rounded-[2rem] p-8 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform">
             <button onclick="closeModal('loginModal')" class="absolute top-6 right-6 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
             <h2 class="text-3xl font-black text-slate-900 mb-2">Welcome Back</h2>
-            <p class="text-slate-500 font-medium mb-8">Access your secure dashboard.</p>
-            
-            <form id="loginForm" class="space-y-5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Email Address</label>
-                    <input type="email" id="log-email" required class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 font-medium transition" placeholder="hello@example.com">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Password</label>
-                    <input type="password" id="log-password" required class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 font-medium transition" placeholder="••••••••">
-                </div>
+            <form id="loginForm" class="space-y-5 mt-6">
+                <input type="email" id="log-email" required class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 font-medium" placeholder="hello@example.com">
+                <input type="password" id="log-password" required class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 font-medium" placeholder="••••••••">
                 <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition mt-2">Login Securely</button>
             </form>
             <p id="logMsg" class="mt-4 text-center text-sm font-bold hidden"></p>
@@ -220,21 +150,10 @@
         <div class="bg-white rounded-[2rem] p-8 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform">
             <button onclick="closeModal('registerModal')" class="absolute top-6 right-6 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
             <h2 class="text-3xl font-black text-slate-900 mb-2">Create Account</h2>
-            <p class="text-slate-500 font-medium mb-8">Join the healthcare revolution.</p>
-            
-            <form id="registerForm" class="space-y-5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label>
-                    <input type="text" id="reg-name" required class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 font-medium transition" placeholder="John Doe">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Email Address</label>
-                    <input type="email" id="reg-email" required class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 font-medium transition" placeholder="john@example.com">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Create Password</label>
-                    <input type="password" id="reg-password" required class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 font-medium transition" placeholder="••••••••">
-                </div>
+            <form id="registerForm" class="space-y-5 mt-6">
+                <input type="text" id="reg-name" required class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 font-medium" placeholder="John Doe">
+                <input type="email" id="reg-email" required class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 font-medium" placeholder="john@example.com">
+                <input type="password" id="reg-password" required class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 font-medium" placeholder="••••••••">
                 <button type="submit" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition mt-2">Sign Up Now</button>
             </form>
             <p id="regMsg" class="mt-4 text-center text-sm font-bold hidden"></p>
@@ -242,43 +161,22 @@
         </div>
     </div>
 
-    <!-- Core Scripts -->
     <script>
-        // Smooth Navbar Effect on Scroll
-        window.addEventListener('scroll', () => {
-            const nav = document.querySelector('nav');
-            if(window.scrollY > 10) { nav.classList.add('shadow-md'); } 
-            else { nav.classList.remove('shadow-md'); }
-        });
-
-        // Mobile Menu & Modals
-        function toggleMobileMenu() { const m = document.getElementById('mobileMenu'); m.classList.contains('hidden') ? (m.classList.remove('hidden'), m.classList.add('flex')) : (m.classList.add('hidden'), m.classList.remove('flex')); }
         function openModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.remove('hidden'); setTimeout(()=>{m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95');},10); }
         function closeModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(()=>{m.classList.add('hidden');},300); }
         function switchModal(c, o) { closeModal(c); setTimeout(()=>openModal(o), 300); }
         const toggleUI = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
 
-        // Authentication State
         function checkAuth() {
             try {
                 const token = localStorage.getItem('rakshitplus_jwt');
                 const role = localStorage.getItem('rakshitplus_role');
-                
-                toggleUI('adminPortalBtn', false); toggleUI('patientDashboardBtn', false);
-                toggleUI('adminPortalBtnMobile', false); toggleUI('patientDashboardBtnMobile', false);
-
+                toggleUI('patientDashboardBtn', false);
                 if (token && token !== 'undefined') {
                     toggleUI('authButtons', false); toggleUI('userProfileBtn', true);
-                    toggleUI('authButtonsMobile', false); toggleUI('userProfileBtnMobile', true);
-                    
-                    if(role === 'admin') {
-                        toggleUI('adminPortalBtn', true); toggleUI('adminPortalBtnMobile', true);
-                    } else {
-                        toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true);
-                    }
+                    toggleUI('patientDashboardBtn', true);
                 } else {
                     toggleUI('authButtons', true); toggleUI('userProfileBtn', false);
-                    toggleUI('authButtonsMobile', true); toggleUI('userProfileBtnMobile', false);
                 }
             } catch(e) {}
         }
@@ -286,13 +184,12 @@
         function logout() { localStorage.removeItem('rakshitplus_jwt'); localStorage.removeItem('rakshitplus_role'); window.location.reload(); }
         document.addEventListener('DOMContentLoaded', checkAuth);
 
-        // Form Submissions
         document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
             e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Creating..."; btn.disabled = true;
             try {
                 const res = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value }) });
                 const msg = document.getElementById('regMsg'); msg.classList.remove('hidden');
-                if(res.ok) { msg.className = "mt-4 text-green-600"; msg.innerText = "Account Created Successfully!"; setTimeout(()=>switchModal('registerModal','loginModal'), 1000); }
+                if(res.ok) { msg.className = "mt-4 text-green-600"; msg.innerText = "Created Successfully!"; setTimeout(()=>switchModal('registerModal','loginModal'), 1000); }
                 else { msg.className = "mt-4 text-red-600"; msg.innerText = "Email already exists!"; }
             } catch(err) { } finally { btn.innerText = "Sign Up Now"; btn.disabled = false; }
         });
@@ -305,6 +202,44 @@
                 if(res.ok) { localStorage.setItem('rakshitplus_jwt', data.token); localStorage.setItem('rakshitplus_role', data.role); window.location.reload(); } 
                 else { msg.className = "mt-4 text-rose-500"; msg.innerText = data.error; }
             } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; }
+        });
+
+        // 🚀 AI SCANNER LOGIC
+        document.getElementById('ai-report-upload')?.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const token = localStorage.getItem('rakshitplus_jwt');
+            if (!token) return alert("Please log in to use the AI Health Scanner.");
+
+            document.getElementById('ai-loading').classList.remove('hidden');
+            document.getElementById('ai-results').classList.add('hidden');
+
+            const formData = new FormData();
+            formData.append('reportPdf', file);
+
+            try {
+                const res = await fetch('/api/upload-pdf', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    document.getElementById('res-score').innerText = data.score;
+                    document.getElementById('res-markers').innerHTML = data.biomarkers.map(b => `
+                        <div class="bg-white/5 border border-white/10 p-3 rounded-lg flex justify-between items-center">
+                            <span class="text-white font-medium text-sm">${b.name}</span>
+                            <span class="text-${b.color}-400 font-bold text-sm">${b.val} (${b.status})</span>
+                        </div>
+                    `).join('');
+                    document.getElementById('res-insights').innerHTML = data.insights.map(i => `<li>${i}</li>`).join('');
+                    document.getElementById('res-diet').innerHTML = data.diet.map(d => `<li>${d}</li>`).join('');
+                    document.getElementById('ai-results').classList.remove('hidden');
+                } else { alert("Analysis failed."); }
+            } catch (err) { alert("Network error."); } 
+            finally { document.getElementById('ai-loading').classList.add('hidden'); }
         });
     </script>
 </body>
