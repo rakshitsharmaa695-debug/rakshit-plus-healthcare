@@ -4,7 +4,6 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const pdfParse = require('pdf-parse');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
@@ -72,24 +71,6 @@ async function aiTriageEngine(symptoms) {
         if (text.includes('brain') || text.includes('headache')) return "Neurology";
         return "General Medicine";
     }
-}
-
-// Fallback Lab Logic
-function processLabReport(rawText) {
-    const text = rawText.toLowerCase();
-    let score = 100; let biomarkers = []; let insights = []; let diet = [];
-
-    if (text.includes('sugar') || text.includes('glucose')) {
-        const match = text.match(/(?:sugar|glucose).*?(\d{2,3})/);
-        if (match && match[1]) {
-            const val = parseInt(match[1]);
-            if (val > 140) { biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'High', color: 'red', width: '85%' }); score -= 15; insights.push("Elevated blood sugar detected."); diet.push("Avoid sugar."); } 
-            else if (val < 70) { biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'Low', color: 'orange', width: '20%' }); score -= 10; insights.push("Low blood sugar detected."); } 
-            else { biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'Normal', color: 'green', width: '50%' }); }
-        }
-    }
-    if (biomarkers.length === 0) { insights.push("No anomalies."); diet.push("Balanced diet."); }
-    return { score: Math.max(10, Math.min(100, score)), biomarkers, insights, diet };
 }
 
 // 🛡️ API Endpoints (Auth)
@@ -214,30 +195,28 @@ app.post('/api/admin/add-doctor', authenticate, async (req, res) => {
     }
 });
 
-// 🚀 AI LAB REPORT ANALYZER (Failsafe Version)
+// 🚀 AI LAB REPORT ANALYZER (Advanced Gemini Vision Version)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: "No PDF file received by the server." });
         }
         
-        let pdfData;
         try {
-            pdfData = await pdfParse(req.file.buffer);
-            if (!pdfData || !pdfData.text || pdfData.text.trim() === '') {
-                 return res.status(400).json({ error: "The uploaded PDF is empty or is an image-based PDF which cannot be read without OCR." });
-            }
-        } catch (pdfErr) {
-             console.error("PDF Read Error:", pdfErr);
-             return res.status(400).json({ error: "File format is invalid or corrupted. Ensure it is a valid text PDF." });
-        }
-        
-        try {
-            // Attempt Gemini AI Analysis
+            // Using Gemini to directly process the raw PDF bytes (works for scanned and text PDFs)
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-            const prompt = `Analyze this medical lab report text. Return ONLY a perfectly formatted JSON object (no markdown, no conversational text) in this exact format: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. Text: ${pdfData.text}`;
             
-            const result = await model.generateContent(prompt);
+            const prompt = `Analyze this medical lab report document. Extract the medical data and return ONLY a perfectly formatted JSON object (no markdown, no backticks, no conversational text) in this exact format: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. Ensure the JSON is perfectly valid.`;
+            
+            // Pass the raw buffer to Gemini
+            const pdfPart = {
+                inlineData: {
+                    data: req.file.buffer.toString("base64"),
+                    mimeType: "application/pdf"
+                }
+            };
+            
+            const result = await model.generateContent([prompt, pdfPart]);
             let aiResponse = result.response.text();
             
             // Clean markdown artifacts
@@ -248,14 +227,12 @@ app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req
                 return res.status(200).json(parsedResponse);
             } catch (parseError) {
                 console.error("Gemini returned invalid JSON string:", aiResponse);
-                // Fallback triggered
-                return res.status(200).json(processLabReport(pdfData.text)); 
+                return res.status(500).json({ error: "AI successfully read the file but generated an invalid JSON response." });
             }
             
         } catch (aiError) {
-            console.error("Gemini API Connection Error:", aiError.message);
-            // Complete Fallback triggered
-            return res.status(200).json(processLabReport(pdfData.text)); 
+            console.error("Gemini API Error processing PDF directly:", aiError.message);
+            return res.status(500).json({ error: "Gemini API failed to process this specific PDF document. It might be too large or complex." }); 
         }
     } catch (err) { 
         console.error("Critical Server Error in upload-pdf:", err);
