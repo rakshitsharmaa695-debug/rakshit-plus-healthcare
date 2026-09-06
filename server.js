@@ -214,50 +214,52 @@ app.post('/api/admin/add-doctor', authenticate, async (req, res) => {
     }
 });
 
-// 🚀 AI LAB REPORT ANALYZER (Bulletproof Version)
+// 🚀 AI LAB REPORT ANALYZER (Failsafe Version)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ error: "No file uploaded" });
+            return res.status(400).json({ error: "No PDF file received by the server." });
         }
         
         let pdfData;
         try {
             pdfData = await pdfParse(req.file.buffer);
-            if (!pdfData.text || pdfData.text.trim() === '') {
-                 return res.status(400).json({ error: "PDF contains no readable text. Is it an image?" });
+            if (!pdfData || !pdfData.text || pdfData.text.trim() === '') {
+                 return res.status(400).json({ error: "The uploaded PDF is empty or is an image-based PDF which cannot be read without OCR." });
             }
         } catch (pdfErr) {
-             console.error("PDF Parse Error:", pdfErr);
-             return res.status(500).json({ error: "Could not read the PDF file." });
+             console.error("PDF Read Error:", pdfErr);
+             return res.status(400).json({ error: "File format is invalid or corrupted. Ensure it is a valid text PDF." });
         }
         
         try {
+            // Attempt Gemini AI Analysis
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-            const prompt = `Analyze this medical lab report text. Return ONLY a valid JSON object (no markdown, no backticks) in this exact format: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. Ensure the JSON is perfectly valid. Text: ${pdfData.text}`;
+            const prompt = `Analyze this medical lab report text. Return ONLY a perfectly formatted JSON object (no markdown, no conversational text) in this exact format: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. Text: ${pdfData.text}`;
             
             const result = await model.generateContent(prompt);
             let aiResponse = result.response.text();
             
+            // Clean markdown artifacts
             aiResponse = aiResponse.replace(/```json/g, '').replace(/```/g, '').trim();
             
-            let finalJson;
             try {
-                finalJson = JSON.parse(aiResponse);
+                const parsedResponse = JSON.parse(aiResponse);
+                return res.status(200).json(parsedResponse);
             } catch (parseError) {
-                console.error("Failed to parse Gemini output as JSON:", aiResponse);
-                finalJson = processLabReport(pdfData.text); 
+                console.error("Gemini returned invalid JSON string:", aiResponse);
+                // Fallback triggered
+                return res.status(200).json(processLabReport(pdfData.text)); 
             }
             
-            res.json(finalJson);
-            
         } catch (aiError) {
-            console.error("Gemini API Error:", aiError.message);
-            res.json(processLabReport(pdfData.text)); 
+            console.error("Gemini API Connection Error:", aiError.message);
+            // Complete Fallback triggered
+            return res.status(200).json(processLabReport(pdfData.text)); 
         }
     } catch (err) { 
-        console.error("Unexpected Error in upload-pdf:", err);
-        res.status(500).json({ error: "An unexpected error occurred." }); 
+        console.error("Critical Server Error in upload-pdf:", err);
+        return res.status(500).json({ error: "A critical server error occurred processing your request." }); 
     }
 });
 
