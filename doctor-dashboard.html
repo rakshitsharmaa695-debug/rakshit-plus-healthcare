@@ -20,8 +20,8 @@
                 <img src="1000022082.png" alt="RakshitPlus Logo" class="h-10 md:h-12 object-contain group-hover:scale-105 transition-transform duration-300">
             </a>
             <div class="flex items-center gap-4">
-                <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider hidden md:block">Doctor Portal Active</span>
-                <button onclick="logout()" class="text-sm font-bold text-slate-500 hover:text-rose-500 transition border px-4 py-2 rounded-xl">Secure Logout</button>
+                <span class="bg-purple-100 text-purple-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider hidden md:block border border-purple-200 shadow-sm">Doctor Portal Active</span>
+                <button onclick="logout()" class="text-sm font-bold text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition border border-slate-200 px-5 py-2 rounded-xl">Secure Logout</button>
             </div>
         </div>
     </nav>
@@ -31,67 +31,69 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
             <div>
                 <h1 class="text-3xl md:text-4xl font-black text-slate-900 mb-2">My Workspace</h1>
-                <p class="text-slate-500 font-medium">Manage your daily appointments and patient triage.</p>
+                <p class="text-slate-500 font-medium text-lg">Manage your daily appointments and patient triage.</p>
             </div>
-            <button onclick="loadAppointments()" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-purple-600 transition flex items-center gap-2">
+            <button onclick="loadAppointments()" class="bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg hover:bg-purple-600 transition flex items-center gap-2 transform active:scale-95">
                 <span>🔄</span> Refresh Queue
             </button>
         </div>
 
         <!-- Analytics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
-                <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-2xl">📅</div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition">
+                <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-2xl border border-blue-100">📅</div>
                 <div>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wide">Total Appointments</p>
-                    <p id="stat-total" class="text-3xl font-black text-slate-800">0</p>
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-wide">Total Appointments</p>
+                    <p id="stat-total" class="text-3xl font-black text-slate-800 mt-1">0</p>
                 </div>
             </div>
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
-                <div class="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center text-2xl">⏳</div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition">
+                <div class="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center text-2xl border border-amber-100 animate-pulse">⏳</div>
                 <div>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wide">Pending Queue</p>
-                    <p id="stat-pending" class="text-3xl font-black text-slate-800">0</p>
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-wide">Waiting Patients</p>
+                    <p id="stat-pending" class="text-3xl font-black text-slate-800 mt-1">0</p>
                 </div>
             </div>
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
-                <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-2xl">✅</div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition">
+                <div class="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center text-2xl border border-green-100">✅</div>
                 <div>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wide">Completed Today</p>
-                    <p id="stat-completed" class="text-3xl font-black text-slate-800">0</p>
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-wide">Completed Today</p>
+                    <p id="stat-completed" class="text-3xl font-black text-slate-800 mt-1">0</p>
                 </div>
             </div>
         </div>
 
         <!-- Appointment Data Table -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="p-6 border-b border-slate-100">
-                <h2 class="text-lg font-bold text-slate-800">Patient Queue</h2>
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <h2 class="text-lg font-black text-slate-800">Live Patient Queue</h2>
+                <span class="flex items-center gap-2 text-xs font-bold text-slate-500"><span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> Live Sync</span>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-500">
-                    <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="text-xs text-slate-400 uppercase bg-white border-b border-slate-100 font-bold">
                         <tr>
-                            <th scope="col" class="px-6 py-4 rounded-tl-xl">ID</th>
-                            <th scope="col" class="px-6 py-4">Patient Details</th>
-                            <th scope="col" class="px-6 py-4">Date</th>
-                            <th scope="col" class="px-6 py-4">Symptoms</th>
-                            <th scope="col" class="px-6 py-4 rounded-tr-xl">Status</th>
+                            <th scope="col" class="px-6 py-5">ID</th>
+                            <th scope="col" class="px-6 py-5">Patient Details</th>
+                            <th scope="col" class="px-6 py-5">Date</th>
+                            <th scope="col" class="px-6 py-5">Symptoms</th>
+                            <th scope="col" class="px-6 py-5">Status</th>
+                            <th scope="col" class="px-6 py-5 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="appointmentList" class="divide-y divide-slate-100">
+                    <tbody id="appointmentList" class="divide-y divide-slate-50">
                         <!-- Dynamic Rows will appear here -->
                     </tbody>
                 </table>
-                <div id="loadingState" class="p-10 text-center text-slate-500 font-medium">
-                    Loading workspace data...
+                <div id="loadingState" class="p-12 text-center text-slate-500 font-medium">
+                    <div class="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-3"></div>
+                    <p>Loading live workspace data...</p>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        // Authentication Check
         const token = localStorage.getItem('rakshitplus_jwt');
         const role = localStorage.getItem('rakshitplus_role');
 
@@ -106,71 +108,98 @@
             window.location.href = "index.html"; 
         }
 
-        // Fetch Data from Server
+        // Action: Mark Appointment as Completed
+        async function updateStatus(appointmentId) {
+            if(!confirm("Mark this patient visit as completed?")) return;
+            
+            try {
+                const response = await fetch(`/api/doctor/appointment/${appointmentId}/status`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ status: 'Completed' })
+                });
+
+                if (response.ok) {
+                    loadAppointments(); // Refresh the table
+                } else {
+                    alert("Failed to update status.");
+                }
+            } catch(e) {
+                alert("Network error.");
+            }
+        }
+
         async function loadAppointments() {
             const listEl = document.getElementById('appointmentList');
             const loadingEl = document.getElementById('loadingState');
             
             listEl.innerHTML = '';
             loadingEl.style.display = 'block';
-            loadingEl.innerText = "Fetching live data...";
 
             try {
-                // Hitting the newly added doctor API route
                 const response = await fetch('/api/doctor/appointments', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (!response.ok) {
-                    throw new Error("Failed to authenticate session.");
-                }
-
+                if (!response.ok) throw new Error("Auth Failed");
                 const data = await response.json();
                 loadingEl.style.display = 'none';
 
                 if (data.length === 0) {
                     loadingEl.style.display = 'block';
-                    loadingEl.innerText = "No appointments found.";
+                    loadingEl.innerHTML = "<p class='font-bold text-slate-400 py-4'>No appointments in the queue.</p>";
                     return;
                 }
 
-                // Update Stats Counters
+                // Update Stats
                 document.getElementById('stat-total').innerText = data.length;
                 document.getElementById('stat-pending').innerText = data.filter(a => a.status === 'Pending').length;
                 document.getElementById('stat-completed').innerText = data.filter(a => a.status === 'Completed').length;
 
-                // Render Table Rows
+                // Render Rows
                 data.forEach(appt => {
-                    let statusColor = appt.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
-                    let statusDot = appt.status === 'Completed' ? 'bg-green-500' : 'bg-amber-500 animate-pulse';
+                    let isCompleted = appt.status === 'Completed';
+                    let statusColor = isCompleted ? 'bg-green-100 text-green-700 border-green-200' : 'bg-amber-100 text-amber-700 border-amber-200';
+                    let statusDot = isCompleted ? 'bg-green-500' : 'bg-amber-500 animate-pulse';
+                    
+                    // The "Badiya UI" Action Button
+                    let actionButton = isCompleted 
+                        ? `<span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">✔️ Done</span>`
+                        : `<button onclick="updateStatus(${appt.id})" class="inline-flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg text-xs font-bold shadow-md hover:shadow-lg transition transform active:scale-95">🩺 Complete Visit</button>`;
+
+                    let rowClass = isCompleted ? 'opacity-70 bg-slate-50/50' : 'hover:bg-blue-50/30 transition-colors bg-white';
 
                     let row = `
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-6 py-4 font-bold text-slate-900">#${appt.id}</td>
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-slate-800">${appt.patient_name}</div>
-                                <div class="text-xs text-slate-400 mt-1">${appt.age} yrs • ${appt.gender} • ${appt.contact}</div>
+                        <tr class="${rowClass}">
+                            <td class="px-6 py-5 font-black text-slate-900">#${appt.id}</td>
+                            <td class="px-6 py-5">
+                                <div class="font-black text-slate-800 text-base">${appt.patient_name}</div>
+                                <div class="text-xs text-slate-500 mt-1 font-medium">${appt.age} yrs • ${appt.gender} • ${appt.contact}</div>
                             </td>
-                            <td class="px-6 py-4 font-medium text-slate-700">${appt.appointment_date}</td>
-                            <td class="px-6 py-4 max-w-xs truncate" title="${appt.symptoms}">${appt.symptoms}</td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${statusColor}">
+                            <td class="px-6 py-5 font-bold text-slate-600">${appt.appointment_date}</td>
+                            <td class="px-6 py-5 max-w-[200px] truncate font-medium" title="${appt.symptoms}">${appt.symptoms}</td>
+                            <td class="px-6 py-5">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border ${statusColor}">
                                     <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
                                     ${appt.status}
                                 </span>
+                            </td>
+                            <td class="px-6 py-5 text-right">
+                                ${actionButton}
                             </td>
                         </tr>
                     `;
                     listEl.insertAdjacentHTML('beforeend', row);
                 });
-
             } catch (error) {
                 loadingEl.style.display = 'block';
-                loadingEl.innerHTML = `<span class="text-red-500 font-bold">Session expired or error loading data. Please login again.</span>`;
+                loadingEl.innerHTML = `<span class="text-red-500 font-bold">Error loading data.</span>`;
             }
         }
 
-        // Run on page load
         document.addEventListener('DOMContentLoaded', loadAppointments);
     </script>
 </body>

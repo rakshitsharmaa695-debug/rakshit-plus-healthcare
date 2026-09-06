@@ -163,6 +163,26 @@ app.get(['/api/doctor/dashboard', '/api/doctor/appointments'], authenticate, asy
     } catch(e) { res.status(500).json({error: "Server Error"}); }
 });
 
+// 🚀 NEW: Doctor completes an appointment
+app.post('/api/doctor/appointment/:id/status', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'doctor' && req.user.role !== 'admin') {
+            return res.status(403).json({error: "Unauthorized action"});
+        }
+        
+        const { status } = req.body;
+        
+        await pool.query(
+            `UPDATE appointments SET status = $1 WHERE id = $2 AND doctor_id = $3`, 
+            [status, req.params.id, req.user.id]
+        );
+        
+        res.json({ message: "Appointment updated successfully!" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to update status." });
+    }
+});
+
 // 🛡️ ADMIN DASHBOARD APIs 
 app.get(['/api/admin/dashboard', '/api/admin/appointments'], authenticate, async (req, res) => {
     try {
