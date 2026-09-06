@@ -12,7 +12,6 @@ const app = express();
 app.use(express.static(__dirname));
 app.use(express.json({ limit: '10mb' })); 
 
-// 🔐 Token Secret - Isko pehle jaisa same kar diya hai taaki purane login expire na ho
 const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 
 // 🚀 Google Gemini Setup
@@ -67,17 +66,15 @@ async function aiTriageEngine(symptoms) {
         if(dept.includes("Gastro")) return "Gastroenterology";
         return dept || "General Medicine";
     } catch(err) {
-        console.error("AI Triage API Failed, using fallback.");
         const text = symptoms.toLowerCase();
         if (text.includes('chest') || text.includes('heart')) return "Cardiology";
         if (text.includes('bone') || text.includes('fracture')) return "Orthopedics";
         if (text.includes('brain') || text.includes('headache')) return "Neurology";
-        if (text.includes('stomach') || text.includes('food')) return "Gastroenterology";
         return "General Medicine";
     }
 }
 
-// Fallback Rule-Based Engine
+// Fallback Lab Logic
 function processLabReport(rawText) {
     const text = rawText.toLowerCase();
     let score = 100; let biomarkers = []; let insights = []; let diet = [];
@@ -86,15 +83,12 @@ function processLabReport(rawText) {
         const match = text.match(/(?:sugar|glucose).*?(\d{2,3})/);
         if (match && match[1]) {
             const val = parseInt(match[1]);
-            if (val > 140) { biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'High', color: 'red', width: '85%' }); score -= 15; insights.push("Elevated blood sugar detected."); diet.push("Avoid refined carbs and sugar."); } 
+            if (val > 140) { biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'High', color: 'red', width: '85%' }); score -= 15; insights.push("Elevated blood sugar detected."); diet.push("Avoid sugar."); } 
             else if (val < 70) { biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'Low', color: 'orange', width: '20%' }); score -= 10; insights.push("Low blood sugar detected."); } 
             else { biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'Normal', color: 'green', width: '50%' }); }
         }
     }
-    if (biomarkers.length === 0) {
-        insights.push("No critical numeric anomalies detected."); 
-        diet.push("Maintain a balanced diet and regular exercise.");
-    }
+    if (biomarkers.length === 0) { insights.push("No anomalies."); diet.push("Balanced diet."); }
     return { score: Math.max(10, Math.min(100, score)), biomarkers, insights, diet };
 }
 
@@ -117,7 +111,7 @@ app.post('/api/auth/login', async (req, res) => {
         if (!isMatch) return res.status(400).json({ error: "Incorrect password." });
         
         res.json({ token: jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' }), role: user.role });
-    } catch(e) { res.status(500).json({ error: "Server error during login." }); }
+    } catch(e) { res.status(500).json({ error: "Server error." }); }
 });
 
 // 🏥 PATIENT APIs
@@ -160,16 +154,16 @@ app.get(['/api/patient/dashboard', '/api/appointments/me'], authenticate, async 
     } catch(e) { res.json([]); }
 });
 
-// 👨‍⚕️ DOCTOR DASHBOARD APIs (Missing routes fixed!)
+// 👨‍⚕️ DOCTOR DASHBOARD APIs
 app.get(['/api/doctor/dashboard', '/api/doctor/appointments'], authenticate, async (req, res) => {
     try {
         if (req.user.role !== 'doctor' && req.user.role !== 'admin') return res.status(403).json({error: "Unauthorized access"});
-        const result = await pool.query(`SELECT * FROM appointments WHERE doctor_id = $1 ORDER BY id DESC`, [req.user.id]);
+        const result = await pool.query(`SELECT a.*, p.name as real_patient_name FROM appointments a LEFT JOIN users p ON a.patient_id = p.id WHERE a.doctor_id = $1 ORDER BY a.id DESC`, [req.user.id]);
         res.json(result.rows);
     } catch(e) { res.status(500).json({error: "Server Error"}); }
 });
 
-// 🛡️ ADMIN DASHBOARD APIs (Missing routes fixed!)
+// 🛡️ ADMIN DASHBOARD APIs 
 app.get(['/api/admin/dashboard', '/api/admin/appointments'], authenticate, async (req, res) => {
     try {
         if (req.user.role !== 'admin') return res.status(403).json({error: "Unauthorized access"});
@@ -186,6 +180,22 @@ app.get('/api/admin/users', authenticate, async (req, res) => {
     } catch(e) { res.status(500).json({error: "Server Error"}); }
 });
 
+// 🛡️ ADD DOCTOR API
+app.post('/api/admin/add-doctor', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ error: "Only admins can add doctors." });
+        const { name, email, password, specialization, experience, qualification, fees, about } = req.body;
+        const hash = await bcrypt.hash(password, 10);
+        await pool.query(
+            `INSERT INTO users (name, email, password, role, specialization, experience, qualification, fees, about) VALUES ($1, $2, $3, 'doctor', $4, $5, $6, $7, $8)`,
+            [name, email, hash, specialization, experience, qualification, fees, about]
+        );
+        res.status(201).json({ message: "Doctor added successfully!" });
+    } catch (error) { 
+        res.status(500).json({ error: "Failed to add doctor." }); 
+    }
+});
+
 // 🚀 AI LAB REPORT ANALYZER
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     try {
@@ -199,7 +209,6 @@ app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req
             let aiResponse = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
             res.json(JSON.parse(aiResponse));
         } catch (aiError) {
-            console.error("AI API Error, falling back to Regex engine:", aiError.message);
             res.json(processLabReport(pdfData.text)); 
         }
     } catch (err) { res.status(500).json({error: "Failed to parse PDF document."}); }
