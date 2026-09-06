@@ -4,8 +4,10 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const pdfParse = require('pdf-parse');
+const fs = require('fs');
+const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleAIFileManager } = require('@google/generative-ai/server'); // 👈 NAYA GOOGLE FILE MANAGER
 
 const app = express();
 
@@ -17,6 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 // 🚀 Google Gemini Setup
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const fileManager = new GoogleAIFileManager(GEMINI_API_KEY); // Initialize File Manager
 
 // 🚀 CONNECT TO CLOUD DATABASE
 const pool = new Pool({
@@ -50,6 +53,7 @@ const authenticate = (req, res, next) => {
     }
 };
 
+// Use memory storage for normal uploads, but we'll write to temp file for Gemini
 const upload = multer({ storage: multer.memoryStorage() }); 
 
 // 🧠 Smart AI Triage Engine
@@ -66,46 +70,8 @@ async function aiTriageEngine(symptoms) {
         if(dept.includes("Gastro")) return "Gastroenterology";
         return dept || "General Medicine";
     } catch(err) {
-        const text = symptoms.toLowerCase();
-        if (text.includes('chest') || text.includes('heart')) return "Cardiology";
-        if (text.includes('bone') || text.includes('fracture')) return "Orthopedics";
-        if (text.includes('brain') || text.includes('headache')) return "Neurology";
         return "General Medicine";
     }
-}
-
-// Fallback Lab Logic (Used if AI fails or PDF is unreadable)
-function processLabReport(rawText) {
-    // Basic failsafe if rawText is completely empty
-    if (!rawText || typeof rawText !== 'string' || rawText.trim() === '') {
-        return { 
-            score: 50, 
-            biomarkers: [], 
-            insights: ["Could not extract text from document. Document might be an image."], 
-            diet: ["Consult a doctor for visual analysis of this report."] 
-        };
-    }
-
-    const text = rawText.toLowerCase();
-    let score = 100; let biomarkers = []; let insights = []; let diet = [];
-
-    if (text.includes('sugar') || text.includes('glucose')) {
-        const match = text.match(/(?:sugar|glucose).*?(\d{2,3})/);
-        if (match && match[1]) {
-            const val = parseInt(match[1]);
-            if (val > 140) { biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'High', color: 'red', width: '85%' }); score -= 15; insights.push("Elevated blood sugar detected."); diet.push("Avoid sugar."); } 
-            else if (val < 70) { biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'Low', color: 'orange', width: '20%' }); score -= 10; insights.push("Low blood sugar detected."); } 
-            else { biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'Normal', color: 'green', width: '50%' }); }
-        }
-    }
-    
-    // Simple mock biomarkers if the text parse finds nothing
-    if (biomarkers.length === 0) { 
-        biomarkers.push({ name: "Document Analysis", val: "Partial", status: "Incomplete", color: "amber", width: "50%"});
-        insights.push("No critical numeric anomalies detected automatically."); 
-        diet.push("Maintain a balanced diet and regular exercise."); 
-    }
-    return { score: Math.max(10, Math.min(100, score)), biomarkers, insights, diet };
 }
 
 // 🛡️ API Endpoints (Auth)
@@ -155,10 +121,8 @@ app.get('/api/queue/:appointmentId', async (req, res) => {
         const currRes = await pool.query(`SELECT doctor_id, appointment_date, status FROM appointments WHERE id = $1`, [req.params.appointmentId]);
         if (currRes.rows.length === 0) return res.status(404).json({error: "Appointment not found"});
         const currentAppt = currRes.rows[0];
-        
         const qRes = await pool.query(`SELECT COUNT(*) as "patientsAhead" FROM appointments WHERE doctor_id = $1 AND appointment_date = $2 AND status = 'Pending' AND id < $3`, [currentAppt.doctor_id, currentAppt.appointment_date, req.params.appointmentId]);
         const count = parseInt(qRes.rows[0].patientsAhead) || 0;
-        
         res.json({ patientsAhead: count, estimatedWaitTime: count * 15, status: currentAppt.status });
     } catch(e) { res.status(500).json({error: "Error fetching queue data."}); }
 });
@@ -184,14 +148,10 @@ app.post('/api/doctor/appointment/:id/status', authenticate, async (req, res) =>
         if (req.user.role !== 'doctor' && req.user.role !== 'admin') {
             return res.status(403).json({error: "Unauthorized action"});
         }
-        
-        const { status } = req.body;
-        
         await pool.query(
             `UPDATE appointments SET status = $1 WHERE id = $2 AND doctor_id = $3`, 
-            [status, req.params.id, req.user.id]
+            [req.body.status, req.params.id, req.user.id]
         );
-        
         res.json({ message: "Appointment updated successfully!" });
     } catch (error) {
         res.status(500).json({ error: "Failed to update status." });
@@ -230,56 +190,49 @@ app.post('/api/admin/add-doctor', authenticate, async (req, res) => {
     }
 });
 
-// 🚀 AI LAB REPORT ANALYZER (Bulletproof Fallback Strategy)
+// 🚀 AI LAB REPORT ANALYZER (100% BULLETPROOF USING GOOGLE FILE API)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
+    if (!req.file) return res.status(400).json({ error: "No PDF file received." });
+    
+    // We must write the buffer to a temporary file because GoogleAIFileManager requires a local file path
+    const tempFilePath = path.join(__dirname, `temp_${Date.now()}.pdf`);
+    
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: "No PDF file received by the server." });
-        }
+        fs.writeFileSync(tempFilePath, req.file.buffer);
+
+        // 1. Upload to Google Gemini Servers
+        const uploadResult = await fileManager.uploadFile(tempFilePath, {
+            mimeType: "application/pdf",
+            displayName: "Patient Lab Report",
+        });
+
+        // 2. Analyze the uploaded file using the specific File URI
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const prompt = `Analyze this medical lab report document. Extract the medical data and return ONLY a perfectly formatted JSON object (no markdown, no backticks, no conversational text) in this exact format: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. Ensure the JSON is valid.`;
         
-        let extractedText = "";
-        
-        // STEP 1: Always try to read text first
-        try {
-            const pdfData = await pdfParse(req.file.buffer);
-            extractedText = pdfData.text || "";
-        } catch (pdfErr) {
-             console.error("PDF-Parse Failed:", pdfErr.message);
-             // If pdf-parse totally crashes, we will just send empty text to fallback
-        }
-        
-        // If text is totally blank (likely an image), don't even bother Gemini, go straight to fallback
-        if (extractedText.trim() === '') {
-            console.log("PDF is blank or an image. Sending generic fallback data.");
-            return res.status(200).json(processLabReport(""));
-        }
-        
-        // STEP 2: Only if we have text, send it to Gemini
-        try {
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-            const prompt = `Analyze this medical lab report text. Return ONLY a perfectly formatted JSON object (no markdown, no backticks, no conversational text) in this exact format: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. Text: ${extractedText}`;
-            
-            const result = await model.generateContent(prompt);
-            let aiResponse = result.response.text();
-            
-            aiResponse = aiResponse.replace(/```json/g, '').replace(/```/g, '').trim();
-            
-            try {
-                const parsedResponse = JSON.parse(aiResponse);
-                return res.status(200).json(parsedResponse);
-            } catch (parseError) {
-                console.error("Gemini returned invalid JSON string:", aiResponse);
-                return res.status(200).json(processLabReport(extractedText));
+        const result = await model.generateContent([
+            prompt,
+            {
+                fileData: {
+                    fileUri: uploadResult.file.uri,
+                    mimeType: uploadResult.file.mimeType
+                }
             }
-            
-        } catch (aiError) {
-            console.error("Gemini API Error processing text:", aiError.message);
-            // If Gemini fails, use rule-based fallback
-            return res.status(200).json(processLabReport(extractedText)); 
-        }
-    } catch (err) { 
-        console.error("Critical Server Error in upload-pdf:", err);
-        return res.status(500).json({ error: "A critical server error occurred processing your request." }); 
+        ]);
+        
+        let aiResponse = result.response.text();
+        aiResponse = aiResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+        
+        const parsedResponse = JSON.parse(aiResponse);
+        
+        // Delete temp file & return success
+        fs.unlinkSync(tempFilePath);
+        return res.status(200).json(parsedResponse);
+        
+    } catch (error) {
+        console.error("Gemini Official File API Error:", error.message);
+        if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath); // Cleanup on fail
+        return res.status(500).json({ error: "Gemini AI failed to process this document. Error: " + error.message });
     }
 });
 
