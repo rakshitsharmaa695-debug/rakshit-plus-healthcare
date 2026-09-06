@@ -4,18 +4,18 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const pdfParse = require('pdf-parse');
-const Groq = require('groq-sdk'); 
+const { GoogleGenerativeAI } = require('@google/generative-ai'); 
 
 const app = express();
 
 app.use(express.static(__dirname));
-app.use(express.json({ limit: '10mb' })); 
+app.use(express.json({ limit: '15mb' })); 
 
 const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 
-// 🚀 GROQ SETUP (Llama 3)
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// 🚀 GEMINI VISION ENGINE SETUP (Securely using .env file)
+const apiKeyToUse = process.env.GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(apiKeyToUse);
 
 // 🚀 DATABASE CONNECTION
 const pool = new Pool({
@@ -44,17 +44,15 @@ const authenticate = (req, res, next) => {
     } catch (err) { return res.status(401).json({ error: "Session expired." }); }
 };
 
+// Memory storage zaroori hai taaki PDF Base64 bankar seedha Gemini Vision mein ja sake
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 AI TRIAGE ENGINE 
+// 🧠 AI TRIAGE ENGINE (Smart routing)
 async function aiTriageEngine(symptoms) {
     try {
-        const response = await groq.chat.completions.create({
-            messages: [{ role: "user", content: `Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine, Gastroenterology). Do not explain. Symptoms: "${symptoms}"` }],
-            model: "llama3-8b-8192",
-            max_tokens: 15
-        });
-        let dept = response.choices[0]?.message?.content?.trim() || "";
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+        const result = await model.generateContent(`Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine, Gastroenterology). Do not explain. Symptoms: "${symptoms}"`);
+        let dept = result.response.text().trim();
         
         if(dept.includes("Cardio")) return "Cardiology";
         if(dept.includes("Neuro")) return "Neurology";
@@ -66,30 +64,7 @@ async function aiTriageEngine(symptoms) {
     }
 }
 
-// 🩺 OFFLINE FALLBACK ENGINE
-function processLabReport(rawText) {
-    const text = (rawText || "").toLowerCase();
-    let score = 95; let biomarkers = []; let insights = []; let diet = [];
-
-    if (text.includes('sugar') || text.includes('glucose') || text.includes('fasting')) {
-        const match = text.match(/(?:sugar|glucose).*?(\d{2,3})/);
-        const val = match && match[1] ? parseInt(match[1]) : 90; 
-        
-        if (val > 140) {
-            biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'High', color: 'red', width: '85%' });
-            score = 65; insights.push("Elevated blood glucose levels detected."); diet.push("Strictly avoid refined sugars and high-carb foods.");
-        } else {
-            biomarkers.push({ name: 'Blood Sugar', val: val + ' mg/dL', status: 'Normal', color: 'green', width: '50%' });
-            insights.push("Blood glucose levels are normal."); diet.push("Maintain a balanced diet.");
-        }
-    } else {
-        biomarkers.push({ name: 'General Panel', val: 'Scanned', status: 'Notice', color: 'amber', width: '50%' });
-        insights.push("Could not extract numerical data automatically."); diet.push("Consult physician for manual review.");
-    }
-    return { score, biomarkers, insights, diet };
-}
-
-// 🛡️ API Endpoints
+// 🛡️ AUTH & BOOKING APIs
 app.post('/api/auth/register', async (req, res) => {
     try {
         const hash = await bcrypt.hash(req.body.password, 10);
@@ -118,40 +93,45 @@ app.post('/api/appointments', authenticate, async (req, res) => {
     } catch(e) { res.status(500).json({error: "Failed to book appointment."}); }
 });
 
-// 🚀 AI LAB REPORT ANALYZER
+// 🚀 ADVANCED VISION AI LAB REPORT ANALYZER (Reads Scanned Images & Text Perfectly)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No PDF file received." });
     
-    let extractedText = "";
     try {
-        const pdfData = await pdfParse(req.file.buffer);
-        extractedText = pdfData.text || "";
-    } catch (e) {
-        console.log("PDF parse failed, using fallback.");
-    }
-
-    if(extractedText.trim() === '') return res.status(200).json(processLabReport(""));
-
-    try {
-        const response = await groq.chat.completions.create({
-            messages: [
-                { role: "system", content: `You are a medical AI. Extract biomarkers and return ONLY a JSON object exactly like this: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}.` },
-                { role: "user", content: `Report text: ${extractedText}` }
-            ],
-            model: "llama3-8b-8192",
-            response_format: { type: "json_object" }
-        });
+        // Initialize Gemini Vision Model
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
         
-        const parsedResponse = JSON.parse(response.choices[0].message.content);
+        // 🧠 MASTER TRICK: Inject PDF directly as Base64 Image Data
+        const pdfPart = {
+            inlineData: {
+                data: req.file.buffer.toString("base64"),
+                mimeType: "application/pdf"
+            }
+        };
+
+        const prompt = `You are a Chief Pathologist AI. Read this medical lab report document completely (whether it is text or a scanned image). Extract the exact numerical test values. Return ONLY a valid JSON object matching this EXACT format without any markdown blocks or backticks:
+        {"score": 85, "biomarkers": [{"name": "Fasting Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. 
+        Evaluate high/low status accurately based on standard medical ranges. Ensure the output is raw JSON.`;
+
+        // Send both Prompt and PDF Base64 string to Gemini
+        const result = await model.generateContent([prompt, pdfPart]);
+        
+        // Clean up response to ensure valid JSON
+        let aiResponse = result.response.text();
+        aiResponse = aiResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+        
+        const parsedResponse = JSON.parse(aiResponse);
         return res.status(200).json(parsedResponse);
         
     } catch (aiErr) {
-        console.log("Groq API Fallback:", aiErr.message);
-        return res.status(200).json(processLabReport(extractedText));
+        console.error("Gemini Vision API Error:", aiErr.message);
+        return res.status(500).json({ 
+            error: "Document processing failed. Please ensure the API Key is correct and the file is readable." 
+        });
     }
 });
 
-// 👨‍⚕️ DASHBOARDS
+// 👨‍⚕️ DASHBOARDS & ROUTING
 app.get(['/api/patient/dashboard', '/api/appointments/me'], authenticate, async (req, res) => {
     try { res.json((await pool.query(`SELECT a.id, u.name as doctor_name, a.department, a.appointment_date, a.status, a.symptoms FROM appointments a LEFT JOIN users u ON a.doctor_id = u.id WHERE a.patient_id = $1 ORDER BY a.id DESC`, [req.user.id])).rows); } catch(e) { res.json([]); }
 });
@@ -197,4 +177,4 @@ app.get('/api/doctors', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`RakshitPlus Llama 3 Backend Live on Port ${PORT}!`));
+app.listen(PORT, () => console.log(`RakshitPlus Vision AI Backend Live on Port ${PORT}!`));
