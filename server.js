@@ -163,7 +163,6 @@ app.get(['/api/doctor/dashboard', '/api/doctor/appointments'], authenticate, asy
     } catch(e) { res.status(500).json({error: "Server Error"}); }
 });
 
-// 🚀 NEW: Doctor completes an appointment
 app.post('/api/doctor/appointment/:id/status', authenticate, async (req, res) => {
     try {
         if (req.user.role !== 'doctor' && req.user.role !== 'admin') {
@@ -200,7 +199,6 @@ app.get('/api/admin/users', authenticate, async (req, res) => {
     } catch(e) { res.status(500).json({error: "Server Error"}); }
 });
 
-// 🛡️ ADD DOCTOR API
 app.post('/api/admin/add-doctor', authenticate, async (req, res) => {
     try {
         if (req.user.role !== 'admin') return res.status(403).json({ error: "Only admins can add doctors." });
@@ -216,22 +214,51 @@ app.post('/api/admin/add-doctor', authenticate, async (req, res) => {
     }
 });
 
-// 🚀 AI LAB REPORT ANALYZER
+// 🚀 AI LAB REPORT ANALYZER (Bulletproof Version)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     try {
-        if (!req.file) return res.status(400).json({error: "No file uploaded"});
-        const pdfData = await pdfParse(req.file.buffer);
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+        
+        let pdfData;
+        try {
+            pdfData = await pdfParse(req.file.buffer);
+            if (!pdfData.text || pdfData.text.trim() === '') {
+                 return res.status(400).json({ error: "PDF contains no readable text. Is it an image?" });
+            }
+        } catch (pdfErr) {
+             console.error("PDF Parse Error:", pdfErr);
+             return res.status(500).json({ error: "Could not read the PDF file." });
+        }
         
         try {
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-            const prompt = `Analyze this medical lab report text. Return ONLY a valid JSON object (no markdown, no backticks) in this exact format: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. Text: ${pdfData.text}`;
+            const prompt = `Analyze this medical lab report text. Return ONLY a valid JSON object (no markdown, no backticks) in this exact format: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. Ensure the JSON is perfectly valid. Text: ${pdfData.text}`;
+            
             const result = await model.generateContent(prompt);
-            let aiResponse = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
-            res.json(JSON.parse(aiResponse));
+            let aiResponse = result.response.text();
+            
+            aiResponse = aiResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+            
+            let finalJson;
+            try {
+                finalJson = JSON.parse(aiResponse);
+            } catch (parseError) {
+                console.error("Failed to parse Gemini output as JSON:", aiResponse);
+                finalJson = processLabReport(pdfData.text); 
+            }
+            
+            res.json(finalJson);
+            
         } catch (aiError) {
+            console.error("Gemini API Error:", aiError.message);
             res.json(processLabReport(pdfData.text)); 
         }
-    } catch (err) { res.status(500).json({error: "Failed to parse PDF document."}); }
+    } catch (err) { 
+        console.error("Unexpected Error in upload-pdf:", err);
+        res.status(500).json({ error: "An unexpected error occurred." }); 
+    }
 });
 
 app.get('/api/doctors', async (req, res) => { 
