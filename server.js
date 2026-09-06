@@ -58,7 +58,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // 🧠 Smart AI Triage Engine
 async function aiTriageEngine(symptoms) {
     try {
-        // 🔄 FIXED: Updated model name for triage
+        // 🔄 FIXED: Added -latest tag to avoid 404
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
         const prompt = `Analyze these patient symptoms and return ONLY the most appropriate medical department name (e.g., Cardiology, Neurology, General Medicine, Orthopedics, Gastroenterology). Do not return any other text. Symptoms: "${symptoms}"`;
         const result = await model.generateContent(prompt);
@@ -205,8 +205,8 @@ app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req
             displayName: "Patient Lab Report",
         });
 
-        // 2. 🔄 FIXED: Updated model name for File API to 'gemini-1.5-pro' for complex document parsing
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+        // 2. 🔄 FIXED: Added -latest tag to avoid 404
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
         const prompt = `Analyze this medical lab report document. Extract the medical data and return ONLY a perfectly formatted JSON object (no markdown, no backticks, no conversational text) in this exact format: {"score": 85, "biomarkers": [{"name": "Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. Ensure the JSON is valid.`;
         
         const result = await model.generateContent([
