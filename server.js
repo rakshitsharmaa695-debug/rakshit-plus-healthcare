@@ -1,4 +1,4 @@
-require('dotenv').config(); // 👈 YEH LINE SABSE UPAR ZAROORI HAI
+require('dotenv').config(); 
 const express = require('express');
 const { Pool } = require('pg'); 
 const bcrypt = require('bcryptjs');
@@ -12,9 +12,10 @@ const app = express();
 app.use(express.static(__dirname));
 app.use(express.json({ limit: '10mb' })); 
 
-const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Fallback_Secret";
+// 🔐 Token Secret - Isko pehle jaisa same kar diya hai taaki purane login expire na ho
+const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 
-// 🚀 Google Gemini Setup (Ab Safe Hai!)
+// 🚀 Google Gemini Setup
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
@@ -24,7 +25,6 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false } 
 });
 
-// Initialize Database Tables
 const initDB = async () => {
     try {
         await pool.query(`CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'patient', specialization TEXT, image_url TEXT, experience TEXT, qualification TEXT, about TEXT, fees INTEGER, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
@@ -53,7 +53,7 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 Smart AI Triage Engine (Powered by Google Gemini)
+// 🧠 Smart AI Triage Engine
 async function aiTriageEngine(symptoms) {
     try {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -67,7 +67,7 @@ async function aiTriageEngine(symptoms) {
         if(dept.includes("Gastro")) return "Gastroenterology";
         return dept || "General Medicine";
     } catch(err) {
-        console.error("AI Triage API Failed, using local fallback.");
+        console.error("AI Triage API Failed, using fallback.");
         const text = symptoms.toLowerCase();
         if (text.includes('chest') || text.includes('heart')) return "Cardiology";
         if (text.includes('bone') || text.includes('fracture')) return "Orthopedics";
@@ -98,15 +98,13 @@ function processLabReport(rawText) {
     return { score: Math.max(10, Math.min(100, score)), biomarkers, insights, diet };
 }
 
-// 🛡️ API Endpoints 
+// 🛡️ API Endpoints (Auth)
 app.post('/api/auth/register', async (req, res) => {
     try {
         const hash = await bcrypt.hash(req.body.password, 10);
         await pool.query(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3)`, [req.body.name, req.body.email, hash]);
         res.status(201).json({ message: "Registered Successfully!" });
-    } catch (error) { 
-        res.status(400).json({ error: "Email already exists!" }); 
-    }
+    } catch (error) { res.status(400).json({ error: "Email already exists!" }); }
 });
 
 app.post('/api/auth/login', async (req, res) => {
@@ -119,11 +117,10 @@ app.post('/api/auth/login', async (req, res) => {
         if (!isMatch) return res.status(400).json({ error: "Incorrect password." });
         
         res.json({ token: jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' }), role: user.role });
-    } catch(e) { 
-        res.status(500).json({ error: "Server error during login." }); 
-    }
+    } catch(e) { res.status(500).json({ error: "Server error during login." }); }
 });
 
+// 🏥 PATIENT APIs
 app.post('/api/appointments', authenticate, async (req, res) => {
     const { patient_name, age, gender, contact, symptoms, date, doctor_id } = req.body;
     try {
@@ -140,9 +137,7 @@ app.post('/api/appointments', authenticate, async (req, res) => {
             const insRes = await pool.query(`INSERT INTO appointments (patient_id, doctor_id, patient_name, age, gender, contact, symptoms, department, appointment_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, [req.user.id, docId, patient_name, age, gender, contact, symptoms, dept, date]);
             res.status(201).json({ message: "Booked!", id: insRes.rows[0].id, dept: dept });
         }
-    } catch(e) { 
-        res.status(500).json({error: "Failed to book appointment."}); 
-    }
+    } catch(e) { res.status(500).json({error: "Failed to book appointment."}); }
 });
 
 app.get('/api/queue/:appointmentId', async (req, res) => {
@@ -155,20 +150,43 @@ app.get('/api/queue/:appointmentId', async (req, res) => {
         const count = parseInt(qRes.rows[0].patientsAhead) || 0;
         
         res.json({ patientsAhead: count, estimatedWaitTime: count * 15, status: currentAppt.status });
-    } catch(e) { 
-        res.status(500).json({error: "Error fetching queue data."}); 
-    }
+    } catch(e) { res.status(500).json({error: "Error fetching queue data."}); }
 });
 
-app.get('/api/patient/dashboard', authenticate, async (req, res) => {
+app.get(['/api/patient/dashboard', '/api/appointments/me'], authenticate, async (req, res) => {
     try {
         const result = await pool.query(`SELECT a.id, u.name as doctor_name, a.department, a.appointment_date, a.status, a.symptoms FROM appointments a LEFT JOIN users u ON a.doctor_id = u.id WHERE a.patient_id = $1 ORDER BY a.id DESC`, [req.user.id]);
         res.json(result.rows);
-    } catch(e) { 
-        res.json([]); 
-    }
+    } catch(e) { res.json([]); }
 });
 
+// 👨‍⚕️ DOCTOR DASHBOARD APIs (Missing routes fixed!)
+app.get(['/api/doctor/dashboard', '/api/doctor/appointments'], authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'doctor' && req.user.role !== 'admin') return res.status(403).json({error: "Unauthorized access"});
+        const result = await pool.query(`SELECT * FROM appointments WHERE doctor_id = $1 ORDER BY id DESC`, [req.user.id]);
+        res.json(result.rows);
+    } catch(e) { res.status(500).json({error: "Server Error"}); }
+});
+
+// 🛡️ ADMIN DASHBOARD APIs (Missing routes fixed!)
+app.get(['/api/admin/dashboard', '/api/admin/appointments'], authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({error: "Unauthorized access"});
+        const result = await pool.query(`SELECT * FROM appointments ORDER BY id DESC`);
+        res.json(result.rows);
+    } catch(e) { res.status(500).json({error: "Server Error"}); }
+});
+
+app.get('/api/admin/users', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({error: "Unauthorized access"});
+        const result = await pool.query(`SELECT id, name, email, role, specialization, fees FROM users ORDER BY id DESC`);
+        res.json(result.rows);
+    } catch(e) { res.status(500).json({error: "Server Error"}); }
+});
+
+// 🚀 AI LAB REPORT ANALYZER
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({error: "No file uploaded"});
@@ -184,18 +202,14 @@ app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req
             console.error("AI API Error, falling back to Regex engine:", aiError.message);
             res.json(processLabReport(pdfData.text)); 
         }
-    } catch (err) { 
-        res.status(500).json({error: "Failed to parse PDF document."}); 
-    }
+    } catch (err) { res.status(500).json({error: "Failed to parse PDF document."}); }
 });
 
 app.get('/api/doctors', async (req, res) => { 
     try {
         const result = await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE role = 'doctor'`);
         res.json(result.rows);
-    } catch(e) { 
-        res.json([]); 
-    }
+    } catch(e) { res.json([]); }
 });
 
 app.get('/api/doctors/:id', async (req, res) => {
@@ -203,9 +217,7 @@ app.get('/api/doctors/:id', async (req, res) => {
         const result = await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE role = 'doctor' AND id = $1`, [req.params.id]);
         if (result.rows.length === 0) return res.status(404).json({error: "Doctor not found"});
         res.json(result.rows[0]);
-    } catch(e) { 
-        res.status(500).json({error: "Server Error"}); 
-    }
+    } catch(e) { res.status(500).json({error: "Server Error"}); }
 });
 
 const PORT = process.env.PORT || 3000;
