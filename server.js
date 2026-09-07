@@ -11,7 +11,7 @@ app.use(express.json({ limit: '15mb' }));
 
 const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 
-// 🚀 GEMINI API SETUP (Raw Core bypassed)
+// 🚀 API KEY SETUP (Now acting as OpenRouter Gateway Key)
 const apiKeyToUse = process.env.GEMINI_API_KEY;
 
 // 🚀 DATABASE CONNECTION
@@ -40,98 +40,66 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 AI TRIAGE ENGINE (REST API BYPASS)
+// 🧠 AI TRIAGE ENGINE (API GATEWAY BYPASS)
 async function aiTriageEngine(symptoms) {
     try {
-        const prompt = `Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine). Symptoms: "${symptoms}"`;
-        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            body: JSON.stringify({
+                model: "google/gemini-1.5-flash",
+                messages: [{ role: "user", content: `Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine). Symptoms: "${symptoms}"` }]
+            })
         });
-        
-        if (!response.ok) { // Fallback format
-            response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyToUse}`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-            });
-        }
-        
         const data = await response.json();
-        let dept = data.candidates[0].content.parts[0].text.trim();
+        let dept = data.choices[0].message.content.trim();
         return ["Cardiology", "Neurology", "Orthopedics", "Gastroenterology"].find(d => dept.includes(d)) || "General Medicine";
     } catch(err) { return "General Medicine"; }
 }
 
-// 🤖 🌟 BULLETPROOF REAL-TIME CHAT ENGINE (REST API BYPASS)
+// 🤖 🌟 REAL-TIME CHAT ENGINE (API GATEWAY BYPASS)
 app.post('/api/ai-chat', async (req, res) => {
     const { history, message } = req.body;
     if (!apiKeyToUse) return res.status(500).json({ error: "API Key is missing on the server." });
 
     try {
-        let formattedContents = [];
-        let sysInstruction = 'You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a compassionate real doctor. Ask follow-up clarifying questions if symptoms are vague. Keep replies concise and structured.';
+        let msgs = [{ role: "system", content: 'You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a compassionate real doctor. Ask follow-up clarifying questions if symptoms are vague. Keep replies concise and structured.' }];
         
         if (history && history.length > 0) {
-            formattedContents = history.map(msg => ({
-                role: msg.role === 'model' ? 'model' : 'user',
-                parts: [{ text: msg.parts[0].text }]
-            }));
-            formattedContents.push({ role: 'user', parts: [{ text: message }] });
-        } else {
-            formattedContents.push({ role: 'user', parts: [{ text: `System Persona: ${sysInstruction}\n\nPatient says: ${message}` }] });
-        }
-
-        // Direct Deep Server Hit
-        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
-            body: JSON.stringify({ contents: formattedContents })
-        });
-
-        if (!response.ok) { // Backup Direct Key Method
-            response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyToUse}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: formattedContents })
+            history.forEach(m => {
+                msgs.push({ role: m.role === 'model' ? 'assistant' : 'user', content: m.parts[0].text });
             });
         }
+        msgs.push({ role: "user", content: message });
+
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
+            body: JSON.stringify({ model: "google/gemini-1.5-flash", messages: msgs })
+        });
 
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message || "Google API Auth Error");
+        if (!response.ok) throw new Error(data.error?.message || "API Gateway Auth Error");
 
-        return res.json({ reply: data.candidates[0].content.parts[0].text });
+        return res.json({ reply: data.choices[0].message.content });
 
     } catch (err) {
-        console.error("REST Chat Error:", err);
+        console.error("Chat Error:", err);
         res.status(500).json({ error: `System Core Error: ${err.message}` });
     }
 });
 
-// 🚀 ADVANCED VISION AI LAB REPORT ANALYZER (REST API BYPASS)
+// 🚀 LAB REPORT ANALYZER (Kept on Google REST Fallback for now)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No PDF file received." });
     try {
         const base64Pdf = req.file.buffer.toString("base64");
         const prompt = `You are a Chief Pathologist AI. Read this medical lab report. Extract numerical test values. Return ONLY raw JSON matching this format: {"score": 85, "biomarkers": [{"name": "Fasting Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}.`;
         
-        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
-            body: JSON.stringify({
-                contents: [{ role: "user", parts: [{ text: prompt }, { inlineData: { mimeType: "application/pdf", data: base64Pdf } }] }]
-            })
+        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyToUse}`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }, { inlineData: { mimeType: "application/pdf", data: base64Pdf } }] }] })
         });
-
-        if (!response.ok) { // Fallback
-            response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyToUse}`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ role: "user", parts: [{ text: prompt }, { inlineData: { mimeType: "application/pdf", data: base64Pdf } }] }]
-                })
-            });
-        }
-
         const data = await response.json();
         if (!response.ok) throw new Error(data.error?.message || "Google File API Error");
 
