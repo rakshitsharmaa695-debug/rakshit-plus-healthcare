@@ -11,8 +11,8 @@ app.use(express.json({ limit: '15mb' }));
 
 const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 
-// 🚀 OPENROUTER API KEY
-const apiKeyToUse = process.env.GEMINI_API_KEY;
+// 🚀 GROQ API KEY SETUP
+const apiKeyToUse = process.env.GEMINI_API_KEY; // Now holding Groq Key (gsk_...)
 
 // 🚀 DATABASE CONNECTION
 const pool = new Pool({
@@ -40,17 +40,17 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 100% VERIFIED FREE MODELS (OpenRouter 2026)
-const orModels = [
-    "meta-llama/llama-3.1-8b-instruct:free",
-    "qwen/qwen-2.5-7b-instruct:free",
-    "microsoft/phi-3-mini-128k-instruct:free"
+// 🧠 GROQ ULTRA-FAST MODELS
+const groqModels = [
+    "llama-3.1-8b-instant",
+    "mixtral-8x7b-32768",
+    "llama3-8b-8192"
 ];
 
 async function aiTriageEngine(symptoms) {
-    for (const modelName of orModels) {
+    for (const modelName of groqModels) {
         try {
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
                 body: JSON.stringify({
@@ -63,12 +63,12 @@ async function aiTriageEngine(symptoms) {
                 let dept = data.choices[0].message.content.trim();
                 return ["Cardiology", "Neurology", "Orthopedics", "Gastroenterology"].find(d => dept.includes(d)) || "General Medicine";
             }
-        } catch(err) { /* Ignore and try next */ }
+        } catch(err) { /* Try next */ }
     }
     return "General Medicine";
 }
 
-// 🤖 🌟 UNBREAKABLE REAL-TIME CHAT ENGINE
+// 🤖 🌟 GROQ REAL-TIME CHAT ENGINE (Blazing Fast)
 app.post('/api/ai-chat', async (req, res) => {
     const { history, message } = req.body;
     if (!apiKeyToUse) return res.status(500).json({ error: "API Key is missing on the server." });
@@ -76,17 +76,15 @@ app.post('/api/ai-chat', async (req, res) => {
     let msgs = [{ role: "system", content: 'You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a compassionate real doctor. Ask follow-up clarifying questions if symptoms are vague. Keep replies concise and structured.' }];
     
     if (history && history.length > 0) {
-        history.forEach(m => {
-            msgs.push({ role: m.role === 'model' ? 'assistant' : 'user', content: m.parts[0].text });
-        });
+        history.forEach(m => { msgs.push({ role: m.role === 'model' ? 'assistant' : 'user', content: m.parts[0].text }); });
     }
     msgs.push({ role: "user", content: message });
 
-    let lastError = "Unknown Gateway Error";
+    let lastError = "Groq Gateway Error";
 
-    for (const modelName of orModels) {
+    for (const modelName of groqModels) {
         try {
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
                 body: JSON.stringify({ model: modelName, messages: msgs })
@@ -95,36 +93,17 @@ app.post('/api/ai-chat', async (req, res) => {
             const data = await response.json();
             
             if (response.ok && data.choices) {
-                console.log(`✅ Success with OpenRouter model: ${modelName}`);
+                console.log(`✅ Success with Groq model: ${modelName}`);
                 return res.json({ reply: data.choices[0].message.content });
-            } else {
-                lastError = data.error?.message || `Model ${modelName} rejected request.`;
-            }
-        } catch (err) {
-            lastError = err.message;
-        }
+            } else { lastError = data.error?.message || `Model ${modelName} error.`; }
+        } catch (err) { lastError = err.message; }
     }
-    
     res.status(500).json({ error: `System Core Error: ${lastError}` });
 });
 
-// 🚀 LAB REPORT ANALYZER (Kept on Google REST Fallback)
+// 🚀 LAB REPORT ANALYZER (Disabled for Groq)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
-    if (!req.file) return res.status(400).json({ error: "No PDF file received." });
-    try {
-        const base64Pdf = req.file.buffer.toString("base64");
-        const prompt = `You are a Chief Pathologist AI. Read this medical lab report. Extract numerical test values. Return ONLY raw JSON matching this format: {"score": 85, "biomarkers": [{"name": "Fasting Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}.`;
-        
-        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyToUse}`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }, { inlineData: { mimeType: "application/pdf", data: base64Pdf } }] }] })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message || "Google File API Error");
-
-        let aiResponse = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
-        res.status(200).json(JSON.parse(aiResponse));
-    } catch (err) { res.status(500).json({ error: `Processing failed: ${err.message}` }); }
+    res.status(500).json({ error: "PDF Analysis is temporarily offline while using Groq Engine." });
 });
 
 // 🛡️ AUTH, BOOKING & DASHBOARDS
