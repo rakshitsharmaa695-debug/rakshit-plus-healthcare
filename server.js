@@ -1,201 +1,337 @@
-require('dotenv').config(); 
 const express = require('express');
-const { Pool } = require('pg'); 
+
+const { Pool } = require('pg');
+
 const bcrypt = require('bcryptjs');
+
 const jwt = require('jsonwebtoken');
+
 const multer = require('multer');
-const { NlpManager } = require('node-nlp'); // 🧠 Smart Offline AI Library
+
+
 
 const app = express();
+
 app.use(express.static(__dirname));
-app.use(express.json({ limit: '15mb' })); 
+
+app.use(express.json({ limit: '15mb' }));
+
+
 
 const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 
+
+
+// 🚀 GROQ API KEY SETUP
+
+const apiKeyToUse = process.env.GEMINI_API_KEY;
+
+
+
 // 🚀 DATABASE CONNECTION
+
 const pool = new Pool({
-    connectionString: "postgresql://rakshitplus_db_user:NNn5OEOt6EGL57R3LlFXIYXTV1mxT0hu@dpg-dae3etf40ujc73dlb71g-a.ohio-postgres.render.com/rakshitplus_db",
-    ssl: { rejectUnauthorized: false } 
+
+connectionString: "postgresql://rakshitplus_db_user:NNn5OEOt6EGL57R3LlFXIYXTV1mxT0hu@dpg-dae3etf40ujc73dlb71g-a.ohio-postgres.render.com/rakshitplus_db",
+
+ssl: { rejectUnauthorized: false }
+
 });
+
+
 
 const initDB = async () => {
-    try {
-        await pool.query(`CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'patient', specialization TEXT, image_url TEXT, experience TEXT, qualification TEXT, about TEXT, fees INTEGER, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
-        await pool.query(`CREATE TABLE IF NOT EXISTS appointments (id SERIAL PRIMARY KEY, patient_id INTEGER, doctor_id INTEGER, patient_name TEXT, age INTEGER, gender TEXT, contact TEXT, symptoms TEXT, department TEXT, appointment_date TEXT, status TEXT DEFAULT 'Pending')`);
-        console.log("☁️ Cloud PostgreSQL Connected!");
-    } catch (err) { console.error("DB Connection Error:", err); }
+
+try {
+
+await pool.query(`CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'patient', specialization TEXT, image_url TEXT, experience TEXT, qualification TEXT, about TEXT, fees INTEGER, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
+
+await pool.query(`CREATE TABLE IF NOT EXISTS appointments (id SERIAL PRIMARY KEY, patient_id INTEGER, doctor_id INTEGER, patient_name TEXT, age INTEGER, gender TEXT, contact TEXT, symptoms TEXT, department TEXT, appointment_date TEXT, status TEXT DEFAULT 'Pending')`);
+
+console.log("☁️ Cloud PostgreSQL Connected!");
+
+} catch (err) { console.error("DB Connection Error:", err); }
+
 };
+
 initDB();
 
+
+
 const authenticate = (req, res, next) => {
-    const token = req.header('Authorization');
-    if (!token) return res.status(401).json({ error: "Access Denied." });
-    try { 
-        req.user = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET); 
-        next(); 
-    } catch (err) { return res.status(401).json({ error: "Session expired." }); }
+
+const token = req.header('Authorization');
+
+if (!token) return res.status(401).json({ error: "Access Denied." });
+
+try {
+
+req.user = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET);
+
+next();
+
+} catch (err) { return res.status(401).json({ error: "Session expired." }); }
+
 };
 
-const upload = multer({ storage: multer.memoryStorage() }); 
 
-// ==========================================
-// 🧠 SMART OFFLINE VIRTUAL DOCTOR (NLP AI)
-// ==========================================
-const manager = new NlpManager({ languages: ['en'], forceNER: true });
 
-const trainAI = async () => {
-    // 1. Greetings
-    manager.addDocument('en', 'hi', 'greetings');
-    manager.addDocument('en', 'hello', 'greetings');
-    manager.addDocument('en', 'hey', 'greetings');
-    manager.addDocument('en', 'namaste', 'greetings');
-    manager.addAnswer('en', 'greetings', 'Hello! I am RakshitPlus Virtual Doctor. How are you feeling today? Please describe your symptoms.');
+const upload = multer({ storage: multer.memoryStorage() });
 
-    // 2. Cardiology
-    manager.addDocument('en', 'I have chest pain', 'dept.cardiology');
-    manager.addDocument('en', 'my heart is beating fast', 'dept.cardiology');
-    manager.addDocument('en', 'seene me dard hai', 'dept.cardiology');
-    manager.addDocument('en', 'palpitations', 'dept.cardiology');
-    manager.addAnswer('en', 'dept.cardiology', 'Chest pain or heart issues need immediate care. I recommend booking an appointment with our **Cardiology** department.');
 
-    // 3. Neurology
-    manager.addDocument('en', 'I have a severe headache', 'dept.neurology');
-    manager.addDocument('en', 'feeling dizzy', 'dept.neurology');
-    manager.addDocument('en', 'sir dard aur chakkar', 'dept.neurology');
-    manager.addDocument('en', 'migraine', 'dept.neurology');
-    manager.addAnswer('en', 'dept.neurology', 'Severe headaches or dizziness are related to the nervous system. A **Neurologist** would be the right specialist for you.');
 
-    // 4. Gastroenterology
-    manager.addDocument('en', 'my stomach hurts', 'dept.gastro');
-    manager.addDocument('en', 'vomiting and nausea', 'dept.gastro');
-    manager.addDocument('en', 'pet me dard hai', 'dept.gastro');
-    manager.addDocument('en', 'gas and acidity', 'dept.gastro');
-    manager.addAnswer('en', 'dept.gastro', 'Stomach pain, acidity, and digestion issues are treated by a Gastroenterologist. Please book an appointment with our **Gastroenterology** department.');
+// 🧠 GROQ ULTRA-FAST MODELS (Decommissioned removed)
 
-    // 5. Orthopedics
-    manager.addDocument('en', 'my back hurts', 'dept.ortho');
-    manager.addDocument('en', 'joint pain', 'dept.ortho');
-    manager.addDocument('en', 'kamar dard aur haddi me dard', 'dept.ortho');
-    manager.addDocument('en', 'knee pain', 'dept.ortho');
-    manager.addAnswer('en', 'dept.ortho', 'For bone, joint, or muscle pain, I suggest consulting our **Orthopedics** specialist.');
+const groqModels = [
 
-    // 6. General Medicine
-    manager.addDocument('en', 'I have a fever', 'dept.general');
-    manager.addDocument('en', 'cold and cough', 'dept.general');
-    manager.addDocument('en', 'bukhar aur khasi', 'dept.general');
-    manager.addDocument('en', 'feeling weak and tired', 'dept.general');
-    manager.addAnswer('en', 'dept.general', 'This seems like a general viral issue or fatigue. Please take some rest and consult our **General Medicine** doctor.');
+"llama-3.1-8b-instant",
 
-    // 7. Fallback / Unknown
-    manager.addAnswer('en', 'None', 'I want to make sure I understand correctly. Could you please describe your symptoms a bit more clearly? (e.g., mention if you have fever, pain, etc.)');
+"mixtral-8x7b-32768"
 
-    await manager.train();
-    // manager.save(); HATA DIYA GAYA HAI - Cloud deployment ab fail nahi hoga!
-    console.log("🧠 Offline Smart NLP AI Trained and Ready in Memory!");
-};
-trainAI();
+];
 
-// 🚀 OFFLINE TRIAGE ENGINE (Department Selector for Booking)
-const aiTriageEngine = async (symptoms) => {
-    try {
-        const response = await manager.process('en', symptoms);
-        const intent = response.intent;
-        
-        if (intent === 'dept.cardiology') return "Cardiology";
-        if (intent === 'dept.neurology') return "Neurology";
-        if (intent === 'dept.gastro') return "Gastroenterology";
-        if (intent === 'dept.ortho') return "Orthopedics";
-        
-        return "General Medicine";
-    } catch (e) {
-        return "General Medicine";
-    }
-};
 
-// 🤖 🌟 REAL-TIME CHAT ENGINE (Offline AI Bot)
+
+async function aiTriageEngine(symptoms) {
+
+for (const modelName of groqModels) {
+
+try {
+
+const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+
+method: 'POST',
+
+headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
+
+body: JSON.stringify({
+
+model: modelName,
+
+messages: [{ role: "user", content: `Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine). Symptoms: "${symptoms}"` }]
+
+})
+
+});
+
+const data = await response.json();
+
+if (data.choices) {
+
+let dept = data.choices[0].message.content.trim();
+
+return ["Cardiology", "Neurology", "Orthopedics", "Gastroenterology"].find(d => dept.includes(d)) || "General Medicine";
+
+}
+
+} catch(err) { /* Try next */ }
+
+}
+
+return "General Medicine";
+
+}
+
+
+
+// 🤖 🌟 GROQ REAL-TIME CHAT ENGINE
+
 app.post('/api/ai-chat', async (req, res) => {
-    const { message } = req.body;
-    if (!message) return res.status(400).json({ error: "Message is required." });
 
-    try {
-        const response = await manager.process('en', message);
-        setTimeout(() => {
-            res.json({ reply: response.answer });
-        }, 500); // 500ms delay for natural human-like typing feel
-    } catch (err) { 
-        res.status(500).json({ error: "System Core Error: AI is resting." }); 
-    }
+const { history, message } = req.body;
+
+if (!apiKeyToUse) return res.status(500).json({ error: "API Key is missing on the server." });
+
+
+
+let msgs = [{ role: "system", content: 'You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a compassionate real doctor. Ask follow-up clarifying questions if symptoms are vague. Keep replies concise and structured.' }];
+
+
+if (history && history.length > 0) {
+
+history.forEach(m => { msgs.push({ role: m.role === 'model' ? 'assistant' : 'user', content: m.parts[0].text }); });
+
+}
+
+msgs.push({ role: "user", content: message });
+
+
+
+let lastError = "Groq Gateway Error";
+
+
+
+for (const modelName of groqModels) {
+
+try {
+
+const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+
+method: 'POST',
+
+headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
+
+body: JSON.stringify({ model: modelName, messages: msgs })
+
 });
 
-// ==========================================
-// 🛡️ AUTH, BOOKING & DASHBOARDS
-// ==========================================
 
-// 🚀 LAB REPORT ANALYZER (Mocked)
+
+const data = await response.json();
+
+
+if (response.ok && data.choices) {
+
+console.log(`✅ Success with Groq model: ${modelName}`);
+
+return res.json({ reply: data.choices[0].message.content });
+
+} else { lastError = data.error?.message || `Model ${modelName} error.`; }
+
+} catch (err) { lastError = err.message; }
+
+}
+
+res.status(500).json({ error: `System Core Error: ${lastError}` });
+
+});
+
+
+
+// 🚀 LAB REPORT ANALYZER
+
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
-    res.status(500).json({ error: "PDF Analysis is currently offline." });
+
+res.status(500).json({ error: "PDF Analysis is temporarily offline while using Groq Engine." });
+
 });
+
+
+
+// 🛡️ AUTH, BOOKING & DASHBOARDS
 
 app.post('/api/auth/register', async (req, res) => {
-    try {
-        const hash = await bcrypt.hash(req.body.password, 10);
-        await pool.query(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3)`, [req.body.name, req.body.email, hash]);
-        res.status(201).json({ message: "Registered Successfully!" });
-    } catch (error) { res.status(400).json({ error: "Email already exists!" }); }
+
+try {
+
+const hash = await bcrypt.hash(req.body.password, 10);
+
+await pool.query(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3)`, [req.body.name, req.body.email, hash]);
+
+res.status(201).json({ message: "Registered Successfully!" });
+
+} catch (error) { res.status(400).json({ error: "Email already exists!" }); }
+
 });
+
+
 
 app.post('/api/auth/login', async (req, res) => {
-    try {
-        const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [req.body.email]);
-        if (result.rows.length === 0 || !(await bcrypt.compare(req.body.password, result.rows[0].password))) 
-            return res.status(400).json({ error: "Invalid credentials." });
-        res.json({ token: jwt.sign({ id: result.rows[0].id, role: result.rows[0].role }, JWT_SECRET, { expiresIn: '24h' }), role: result.rows[0].role });
-    } catch(e) { res.status(500).json({ error: "Server error." }); }
+
+try {
+
+const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [req.body.email]);
+
+if (result.rows.length === 0 || !(await bcrypt.compare(req.body.password, result.rows[0].password)))
+
+return res.status(400).json({ error: "Invalid credentials." });
+
+res.json({ token: jwt.sign({ id: result.rows[0].id, role: result.rows[0].role }, JWT_SECRET, { expiresIn: '24h' }), role: result.rows[0].role });
+
+} catch(e) { res.status(500).json({ error: "Server error." }); }
+
 });
+
+
 
 app.post('/api/appointments', authenticate, async (req, res) => {
-    const { patient_name, age, gender, contact, symptoms, date, doctor_id } = req.body;
-    try {
-        let dept = doctor_id ? (await pool.query(`SELECT specialization FROM users WHERE id = $1`, [doctor_id])).rows[0].specialization : await aiTriageEngine(symptoms);
-        let docId = doctor_id || (await pool.query(`SELECT id FROM users WHERE role = 'doctor' AND specialization = $1 LIMIT 1`, [dept])).rows[0]?.id || 1; 
-        const insRes = await pool.query(`INSERT INTO appointments (patient_id, doctor_id, patient_name, age, gender, contact, symptoms, department, appointment_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, [req.user.id, docId, patient_name, age, gender, contact, symptoms, dept, date]);
-        res.status(201).json({ message: "Booked!", id: insRes.rows[0].id, dept: dept });
-    } catch(e) { res.status(500).json({error: "Failed"}); }
+
+const { patient_name, age, gender, contact, symptoms, date, doctor_id } = req.body;
+
+try {
+
+let dept = doctor_id ? (await pool.query(`SELECT specialization FROM users WHERE id = $1`, [doctor_id])).rows[0].specialization : await aiTriageEngine(symptoms);
+
+let docId = doctor_id || (await pool.query(`SELECT id FROM users WHERE role = 'doctor' AND specialization = $1 LIMIT 1`, [dept])).rows[0]?.id || 1;
+
+const insRes = await pool.query(`INSERT INTO appointments (patient_id, doctor_id, patient_name, age, gender, contact, symptoms, department, appointment_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, [req.user.id, docId, patient_name, age, gender, contact, symptoms, dept, date]);
+
+res.status(201).json({ message: "Booked!", id: insRes.rows[0].id, dept: dept });
+
+} catch(e) { res.status(500).json({error: "Failed"}); }
+
 });
+
+
 
 app.get(['/api/patient/dashboard', '/api/appointments/me'], authenticate, async (req, res) => {
-    try { res.json((await pool.query(`SELECT a.id, u.name as doctor_name, a.department, a.appointment_date, a.status, a.symptoms FROM appointments a LEFT JOIN users u ON a.doctor_id = u.id WHERE a.patient_id = $1 ORDER BY a.id DESC`, [req.user.id])).rows); } catch(e) { res.json([]); }
+
+try { res.json((await pool.query(`SELECT a.id, u.name as doctor_name, a.department, a.appointment_date, a.status, a.symptoms FROM appointments a LEFT JOIN users u ON a.doctor_id = u.id WHERE a.patient_id = $1 ORDER BY a.id DESC`, [req.user.id])).rows); } catch(e) { res.json([]); }
+
 });
+
+
 
 app.get('/api/queue/:appointmentId', async (req, res) => {
-    try {
-        const currRes = await pool.query(`SELECT doctor_id, appointment_date, status FROM appointments WHERE id = $1`, [req.params.appointmentId]);
-        if (currRes.rows.length === 0) return res.status(404).json({error: "Not found"});
-        const count = parseInt((await pool.query(`SELECT COUNT(*) as "patientsAhead" FROM appointments WHERE doctor_id = $1 AND appointment_date = $2 AND status = 'Pending' AND id < $3`, [currRes.rows[0].doctor_id, currRes.rows[0].appointment_date, req.params.appointmentId])).rows[0].patientsAhead) || 0;
-        res.json({ patientsAhead: count, estimatedWaitTime: count * 15, status: currRes.rows[0].status });
-    } catch(e) { res.status(500).json({error: "Error"}); }
+
+try {
+
+const currRes = await pool.query(`SELECT doctor_id, appointment_date, status FROM appointments WHERE id = $1`, [req.params.appointmentId]);
+
+if (currRes.rows.length === 0) return res.status(404).json({error: "Not found"});
+
+const count = parseInt((await pool.query(`SELECT COUNT(*) as "patientsAhead" FROM appointments WHERE doctor_id = $1 AND appointment_date = $2 AND status = 'Pending' AND id < $3`, [currRes.rows[0].doctor_id, currRes.rows[0].appointment_date, req.params.appointmentId])).rows[0].patientsAhead) || 0;
+
+res.json({ patientsAhead: count, estimatedWaitTime: count * 15, status: currRes.rows[0].status });
+
+} catch(e) { res.status(500).json({error: "Error"}); }
+
 });
+
+
 
 app.get(['/api/doctor/dashboard', '/api/doctor/appointments'], authenticate, async (req, res) => {
-    try { res.json((await pool.query(`SELECT a.*, p.name as real_patient_name FROM appointments a LEFT JOIN users p ON a.patient_id = p.id WHERE a.doctor_id = $1 ORDER BY a.id DESC`, [req.user.id])).rows); } catch(e) { res.status(500).json({error: "Error"}); }
+
+try { res.json((await pool.query(`SELECT a.*, p.name as real_patient_name FROM appointments a LEFT JOIN users p ON a.patient_id = p.id WHERE a.doctor_id = $1 ORDER BY a.id DESC`, [req.user.id])).rows); } catch(e) { res.status(500).json({error: "Error"}); }
+
 });
+
+
 
 app.post('/api/doctor/appointment/:id/status', authenticate, async (req, res) => {
-    try { await pool.query(`UPDATE appointments SET status = $1 WHERE id = $2 AND doctor_id = $3`, [req.body.status, req.params.id, req.user.id]); res.json({ message: "Updated!" });
-    } catch (error) { res.status(500).json({ error: "Failed" }); }
+
+try { await pool.query(`UPDATE appointments SET status = $1 WHERE id = $2 AND doctor_id = $3`, [req.body.status, req.params.id, req.user.id]); res.json({ message: "Updated!" });
+
+} catch (error) { res.status(500).json({ error: "Failed" }); }
+
 });
 
-app.get('/api/doctors', async (req, res) => { 
-    try { res.json((await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE role = 'doctor'`)).rows); } catch(e) { res.json([]); }
+
+
+app.get('/api/doctors', async (req, res) => {
+
+try { res.json((await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE role = 'doctor'`)).rows); } catch(e) { res.json([]); }
+
 });
+
+
 
 app.get(['/api/doctor/:id', '/api/doctors/:id'], async (req, res) => {
-    try {
-        const result = await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE id = $1 AND role = 'doctor'`, [req.params.id]);
-        if (result.rows.length === 0) return res.status(404).json({ error: "Doctor not found" });
-        res.json(result.rows[0]);
-    } catch(e) { res.status(500).json({ error: "Server error" }); }
+
+try {
+
+const result = await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE id = $1 AND role = 'doctor'`, [req.params.id]);
+
+if (result.rows.length === 0) return res.status(404).json({ error: "Doctor not found" });
+
+res.json(result.rows[0]);
+
+} catch(e) { res.status(500).json({ error: "Server error" }); }
+
 });
 
+
+
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => console.log(`RakshitPlus Backend Live on Port ${PORT}!`));
