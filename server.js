@@ -4,15 +4,13 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
+const { NlpManager } = require('node-nlp'); // 🧠 Smart Offline AI Library
 
 const app = express();
 app.use(express.static(__dirname));
 app.use(express.json({ limit: '15mb' })); 
 
 const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
-
-// 🚀 GROQ API KEY SETUP
-const apiKeyToUse = process.env.GEMINI_API_KEY; // Now holding Groq Key (gsk_...)
 
 // 🚀 DATABASE CONNECTION
 const pool = new Pool({
@@ -40,73 +38,104 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 GROQ ULTRA-FAST MODELS
-const groqModels = [
-    "llama-3.1-8b-instant",
-    "mixtral-8x7b-32768",
-    "llama3-8b-8192"
-];
+// ==========================================
+// 🧠 SMART OFFLINE VIRTUAL DOCTOR (NLP AI)
+// ==========================================
+const manager = new NlpManager({ languages: ['en'], forceNER: true });
 
-async function aiTriageEngine(symptoms) {
-    for (const modelName of groqModels) {
-        try {
-            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
-                body: JSON.stringify({
-                    model: modelName,
-                    messages: [{ role: "user", content: `Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine). Symptoms: "${symptoms}"` }]
-                })
-            });
-            const data = await response.json();
-            if (data.choices) {
-                let dept = data.choices[0].message.content.trim();
-                return ["Cardiology", "Neurology", "Orthopedics", "Gastroenterology"].find(d => dept.includes(d)) || "General Medicine";
-            }
-        } catch(err) { /* Try next */ }
+const trainAI = async () => {
+    // 1. Greetings
+    manager.addDocument('en', 'hi', 'greetings');
+    manager.addDocument('en', 'hello', 'greetings');
+    manager.addDocument('en', 'hey', 'greetings');
+    manager.addDocument('en', 'namaste', 'greetings');
+    manager.addAnswer('en', 'greetings', 'Hello! I am RakshitPlus Virtual Doctor. How are you feeling today? Please describe your symptoms.');
+
+    // 2. Cardiology
+    manager.addDocument('en', 'I have chest pain', 'dept.cardiology');
+    manager.addDocument('en', 'my heart is beating fast', 'dept.cardiology');
+    manager.addDocument('en', 'seene me dard hai', 'dept.cardiology');
+    manager.addDocument('en', 'palpitations', 'dept.cardiology');
+    manager.addAnswer('en', 'dept.cardiology', 'Chest pain or heart issues need immediate care. I recommend booking an appointment with our **Cardiology** department.');
+
+    // 3. Neurology
+    manager.addDocument('en', 'I have a severe headache', 'dept.neurology');
+    manager.addDocument('en', 'feeling dizzy', 'dept.neurology');
+    manager.addDocument('en', 'sir dard aur chakkar', 'dept.neurology');
+    manager.addDocument('en', 'migraine', 'dept.neurology');
+    manager.addAnswer('en', 'dept.neurology', 'Severe headaches or dizziness are related to the nervous system. A **Neurologist** would be the right specialist for you.');
+
+    // 4. Gastroenterology
+    manager.addDocument('en', 'my stomach hurts', 'dept.gastro');
+    manager.addDocument('en', 'vomiting and nausea', 'dept.gastro');
+    manager.addDocument('en', 'pet me dard hai', 'dept.gastro');
+    manager.addDocument('en', 'gas and acidity', 'dept.gastro');
+    manager.addAnswer('en', 'dept.gastro', 'Stomach pain, acidity, and digestion issues are treated by a Gastroenterologist. Please book an appointment with our **Gastroenterology** department.');
+
+    // 5. Orthopedics
+    manager.addDocument('en', 'my back hurts', 'dept.ortho');
+    manager.addDocument('en', 'joint pain', 'dept.ortho');
+    manager.addDocument('en', 'kamar dard aur haddi me dard', 'dept.ortho');
+    manager.addDocument('en', 'knee pain', 'dept.ortho');
+    manager.addAnswer('en', 'dept.ortho', 'For bone, joint, or muscle pain, I suggest consulting our **Orthopedics** specialist.');
+
+    // 6. General Medicine
+    manager.addDocument('en', 'I have a fever', 'dept.general');
+    manager.addDocument('en', 'cold and cough', 'dept.general');
+    manager.addDocument('en', 'bukhar aur khasi', 'dept.general');
+    manager.addDocument('en', 'feeling weak and tired', 'dept.general');
+    manager.addAnswer('en', 'dept.general', 'This seems like a general viral issue or fatigue. Please take some rest and consult our **General Medicine** doctor.');
+
+    // 7. Fallback / Unknown
+    manager.addAnswer('en', 'None', 'I want to make sure I understand correctly. Could you please describe your symptoms a bit more clearly? (e.g., mention if you have fever, pain, etc.)');
+
+    await manager.train();
+    manager.save();
+    console.log("🧠 Offline Smart NLP AI Trained and Ready!");
+};
+trainAI();
+
+// 🚀 OFFLINE TRIAGE ENGINE (Department Selector for Booking)
+const aiTriageEngine = async (symptoms) => {
+    try {
+        const response = await manager.process('en', symptoms);
+        const intent = response.intent;
+        
+        if (intent === 'dept.cardiology') return "Cardiology";
+        if (intent === 'dept.neurology') return "Neurology";
+        if (intent === 'dept.gastro') return "Gastroenterology";
+        if (intent === 'dept.ortho') return "Orthopedics";
+        
+        return "General Medicine";
+    } catch (e) {
+        return "General Medicine";
     }
-    return "General Medicine";
-}
+};
 
-// 🤖 🌟 GROQ REAL-TIME CHAT ENGINE (Blazing Fast)
+// 🤖 🌟 REAL-TIME CHAT ENGINE (Offline AI Bot)
 app.post('/api/ai-chat', async (req, res) => {
-    const { history, message } = req.body;
-    if (!apiKeyToUse) return res.status(500).json({ error: "API Key is missing on the server." });
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ error: "Message is required." });
 
-    let msgs = [{ role: "system", content: 'You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a compassionate real doctor. Ask follow-up clarifying questions if symptoms are vague. Keep replies concise and structured.' }];
-    
-    if (history && history.length > 0) {
-        history.forEach(m => { msgs.push({ role: m.role === 'model' ? 'assistant' : 'user', content: m.parts[0].text }); });
+    try {
+        const response = await manager.process('en', message);
+        setTimeout(() => {
+            res.json({ reply: response.answer });
+        }, 500); // 500ms delay for natural human-like typing feel
+    } catch (err) { 
+        res.status(500).json({ error: "System Core Error: AI is resting." }); 
     }
-    msgs.push({ role: "user", content: message });
-
-    let lastError = "Groq Gateway Error";
-
-    for (const modelName of groqModels) {
-        try {
-            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
-                body: JSON.stringify({ model: modelName, messages: msgs })
-            });
-
-            const data = await response.json();
-            
-            if (response.ok && data.choices) {
-                console.log(`✅ Success with Groq model: ${modelName}`);
-                return res.json({ reply: data.choices[0].message.content });
-            } else { lastError = data.error?.message || `Model ${modelName} error.`; }
-        } catch (err) { lastError = err.message; }
-    }
-    res.status(500).json({ error: `System Core Error: ${lastError}` });
 });
 
-// 🚀 LAB REPORT ANALYZER (Disabled for Groq)
-app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
-    res.status(500).json({ error: "PDF Analysis is temporarily offline while using Groq Engine." });
-});
-
+// ==========================================
 // 🛡️ AUTH, BOOKING & DASHBOARDS
+// ==========================================
+
+// 🚀 LAB REPORT ANALYZER (Mocked)
+app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
+    res.status(500).json({ error: "PDF Analysis is currently offline." });
+});
+
 app.post('/api/auth/register', async (req, res) => {
     try {
         const hash = await bcrypt.hash(req.body.password, 10);
