@@ -42,8 +42,14 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// SENIOR DEV HACK: List of models to try automatically
-const availableModels = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash", "gemini-1.5-flash-latest"];
+// 🧠 SENIOR DEV HACK: Ultimate list of active models (Auto-Fallback Array)
+const availableModels = [
+    "gemini-1.5-flash-002", 
+    "gemini-1.5-flash-001", 
+    "gemini-1.5-flash", 
+    "gemini-2.0-flash", 
+    "gemini-pro"
+];
 
 async function aiTriageEngine(symptoms) {
     for (const modelName of availableModels) {
@@ -64,7 +70,7 @@ app.post('/api/ai-chat', async (req, res) => {
 
     let lastError = "Unknown error";
 
-    // Auto-Discovery Loop: Tries models until one works!
+    // Auto-Discovery Loop: Tries models until one works perfectly
     for (const modelName of availableModels) {
         try {
             const model = genAI.getGenerativeModel({ model: modelName });
@@ -77,7 +83,7 @@ app.post('/api/ai-chat', async (req, res) => {
 
             const result = await chat.sendMessage(prompt);
             console.log(`✅ Success with model: ${modelName}`);
-            return res.json({ reply: result.response.text() }); // Send reply and exit loop
+            return res.json({ reply: result.response.text() }); 
             
         } catch (err) {
             console.log(`⚠️ Model ${modelName} failed. Trying next...`);
@@ -85,7 +91,7 @@ app.post('/api/ai-chat', async (req, res) => {
         }
     }
     
-    // If all models somehow fail
+    // If all models fail
     res.status(500).json({ error: `AI Models not responding. Detailed Error: ${lastError}` });
 });
 
@@ -103,7 +109,7 @@ app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req
             
             const result = await model.generateContent([prompt, pdfPart]);
             let aiResponse = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
-            return res.status(200).json(JSON.parse(aiResponse)); // Success!
+            return res.status(200).json(JSON.parse(aiResponse)); 
             
         } catch (aiErr) { 
             lastError = aiErr.message; 
