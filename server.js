@@ -42,73 +42,75 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
+// SENIOR DEV HACK: List of models to try automatically
+const availableModels = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash", "gemini-1.5-flash-latest"];
+
 async function aiTriageEngine(symptoms) {
-    try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const result = await model.generateContent(`Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine). Symptoms: "${symptoms}"`);
-        let dept = result.response.text().trim();
-        return ["Cardiology", "Neurology", "Orthopedics", "Gastroenterology"].find(d => dept.includes(d)) || "General Medicine";
-    } catch(err) { return "General Medicine"; }
+    for (const modelName of availableModels) {
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const result = await model.generateContent(`Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine). Symptoms: "${symptoms}"`);
+            let dept = result.response.text().trim();
+            return ["Cardiology", "Neurology", "Orthopedics", "Gastroenterology"].find(d => dept.includes(d)) || "General Medicine";
+        } catch(err) { /* Ignore and try next model */ }
+    }
+    return "General Medicine";
 }
 
 // 🤖 🌟 BULLETPROOF REAL-TIME DOCTOR CHAT ENGINE
 app.post('/api/ai-chat', async (req, res) => {
     const { history, message } = req.body;
-    
-    try {
-        if (!apiKeyToUse) throw new Error("API Key is missing on the server.");
+    if (!apiKeyToUse) return res.status(500).json({ error: "API Key is missing on the server." });
 
-        // Removed '-latest' to fix the 404 error
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const chat = model.startChat({ history: history || [] });
-        
-        let prompt = message;
-        if (!history || history.length === 0) {
-            prompt = `System Persona: You are "RakshitPlus AI", an empathetic, highly skilled virtual medical assistant. Talk exactly like a compassionate real doctor (e.g., "Hello! I am here to help. How are you feeling?"). Ask follow-up clarifying questions if symptoms are vague. Keep replies concise, readable, and structured. Always add a short disclaimer that you are an AI.\n\nPatient says: ${message}`;
-        }
+    let lastError = "Unknown error";
 
-        const result = await chat.sendMessage(prompt);
-        res.json({ reply: result.response.text() });
-        
-    } catch (err) {
-        console.error("Chat Error 1.5-flash:", err.message);
-        
-        // SENIOR DEV HACK: Automatic Fallback to standard gemini-pro if 404 happens
-        if (err.message.includes("404") || err.message.includes("not found")) {
-            try {
-                const fallbackModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-                const fallbackChat = fallbackModel.startChat({ history: history || [] });
-                
-                let prompt = message;
-                if (!history || history.length === 0) {
-                    prompt = `System Persona: You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a real doctor.\n\nPatient says: ${message}`;
-                }
-
-                const fallbackResult = await fallbackChat.sendMessage(prompt);
-                return res.json({ reply: fallbackResult.response.text() });
-            } catch (fallbackErr) {
-                console.error("Chat Error Pro:", fallbackErr.message);
-                return res.status(500).json({ error: `AI System Error: ${fallbackErr.message}` });
+    // Auto-Discovery Loop: Tries models until one works!
+    for (const modelName of availableModels) {
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const chat = model.startChat({ history: history || [] });
+            
+            let prompt = message;
+            if (!history || history.length === 0) {
+                prompt = `System Persona: You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a compassionate real doctor. Ask follow-up clarifying questions if symptoms are vague. Keep replies concise and structured.\n\nPatient says: ${message}`;
             }
+
+            const result = await chat.sendMessage(prompt);
+            console.log(`✅ Success with model: ${modelName}`);
+            return res.json({ reply: result.response.text() }); // Send reply and exit loop
+            
+        } catch (err) {
+            console.log(`⚠️ Model ${modelName} failed. Trying next...`);
+            lastError = err.message;
         }
-        
-        res.status(500).json({ error: `AI System Error: ${err.message}` });
     }
+    
+    // If all models somehow fail
+    res.status(500).json({ error: `AI Models not responding. Detailed Error: ${lastError}` });
 });
 
 // 🚀 ADVANCED VISION AI LAB REPORT ANALYZER
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No PDF file received." });
-    try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const pdfPart = { inlineData: { data: req.file.buffer.toString("base64"), mimeType: "application/pdf" } };
-        const prompt = `You are a Chief Pathologist AI. Read this medical lab report. Extract numerical test values. Return ONLY raw JSON matching this format: {"score": 85, "biomarkers": [{"name": "Fasting Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}.`;
-        const result = await model.generateContent([prompt, pdfPart]);
-        let aiResponse = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
-        res.status(200).json(JSON.parse(aiResponse));
-    } catch (aiErr) { 
-        res.status(500).json({ error: `Document processing failed: ${aiErr.message}` }); 
+    
+    let lastError = "Unknown error";
+
+    for (const modelName of availableModels) {
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const pdfPart = { inlineData: { data: req.file.buffer.toString("base64"), mimeType: "application/pdf" } };
+            const prompt = `You are a Chief Pathologist AI. Read this medical lab report. Extract numerical test values. Return ONLY raw JSON matching this format: {"score": 85, "biomarkers": [{"name": "Fasting Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}.`;
+            
+            const result = await model.generateContent([prompt, pdfPart]);
+            let aiResponse = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
+            return res.status(200).json(JSON.parse(aiResponse)); // Success!
+            
+        } catch (aiErr) { 
+            lastError = aiErr.message; 
+        }
     }
+    
+    res.status(500).json({ error: `Document processing failed: ${lastError}` });
 });
 
 // 🛡️ AUTH, BOOKING & DASHBOARDS
