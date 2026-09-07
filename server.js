@@ -51,31 +51,27 @@ async function aiTriageEngine(symptoms) {
     } catch(err) { return "General Medicine"; }
 }
 
-// 🤖 🌟 NEW: REAL-TIME DOCTOR CHAT ENGINE
+// 🤖 🌟 UPDATED: REAL-TIME DOCTOR CHAT ENGINE (With System Instructions & Smart Error Logging)
 app.post('/api/ai-chat', async (req, res) => {
     const { history, message } = req.body;
     
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-        // Restore context if history exists
-        const chat = model.startChat({ history: history || [] });
-        
-        // System Persona Injection on first message
-        let prompt = message;
-        if (!history || history.length === 0) {
-            prompt = `System Persona: You are "RakshitPlus AI", an empathetic, highly skilled virtual medical assistant. 
-            - Talk exactly like a compassionate real doctor (e.g. "Hello! I'm here to help. How are you feeling?").
-            - Ask follow-up clarifying questions if symptoms are vague.
-            - Keep replies concise, readable, and structured.
-            - Always add a short disclaimer if giving medical advice.
-            Patient says: ${message}`;
-        }
+        if (!apiKeyToUse) throw new Error("API Key is missing on the server.");
 
-        const result = await chat.sendMessage(prompt);
+        // Advanced Gemini 1.5 System Instruction implementation
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+            systemInstruction: 'You are "RakshitPlus AI", an empathetic, highly skilled virtual medical assistant. Talk exactly like a compassionate real doctor (e.g., "Hello! I am here to help. How are you feeling?"). Ask follow-up clarifying questions if symptoms are vague. Keep replies concise, readable, and structured. Always add a short disclaimer that you are an AI.'
+        });
+        
+        const chat = model.startChat({ history: history || [] });
+        const result = await chat.sendMessage(message);
+        
         res.json({ reply: result.response.text() });
     } catch (err) {
-        console.error("Chat Error:", err);
-        res.status(500).json({ error: "I'm facing a temporary network issue. Please give me a moment and try again." });
+        console.error("Chat Error Details:", err.message);
+        // Smart Error Return: Will tell frontend exactly what broke
+        res.status(500).json({ error: `AI System Error: ${err.message}` });
     }
 });
 
@@ -89,7 +85,7 @@ app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req
         const result = await model.generateContent([prompt, pdfPart]);
         let aiResponse = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
         res.status(200).json(JSON.parse(aiResponse));
-    } catch (aiErr) { res.status(500).json({ error: "Document processing failed." }); }
+    } catch (aiErr) { res.status(500).json({ error: `Document processing failed: ${aiErr.message}` }); }
 });
 
 // 🛡️ AUTH, BOOKING & DASHBOARDS
