@@ -12,7 +12,7 @@ app.use(express.json({ limit: '15mb' }));
 const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 
 // 🚀 GROQ API KEY SETUP
-const apiKeyToUse = process.env.GEMINI_API_KEY; 
+const apiKeyToUse = process.env.GEMINI_API_KEY; // Now holding Groq Key (gsk_...)
 
 // 🚀 DATABASE CONNECTION
 const pool = new Pool({
@@ -40,10 +40,11 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 GROQ ULTRA-FAST MODELS (Active)
+// 🧠 GROQ ULTRA-FAST MODELS
 const groqModels = [
     "llama-3.1-8b-instant",
-    "mixtral-8x7b-32768"
+    "mixtral-8x7b-32768",
+    "llama3-8b-8192"
 ];
 
 async function aiTriageEngine(symptoms) {
@@ -67,7 +68,7 @@ async function aiTriageEngine(symptoms) {
     return "General Medicine";
 }
 
-// 🤖 🌟 GROQ REAL-TIME CHAT ENGINE
+// 🤖 🌟 GROQ REAL-TIME CHAT ENGINE (Blazing Fast)
 app.post('/api/ai-chat', async (req, res) => {
     const { history, message } = req.body;
     if (!apiKeyToUse) return res.status(500).json({ error: "API Key is missing on the server." });
@@ -100,7 +101,7 @@ app.post('/api/ai-chat', async (req, res) => {
     res.status(500).json({ error: `System Core Error: ${lastError}` });
 });
 
-// 🚀 LAB REPORT ANALYZER
+// 🚀 LAB REPORT ANALYZER (Disabled for Groq)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     res.status(500).json({ error: "PDF Analysis is temporarily offline while using Groq Engine." });
 });
