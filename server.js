@@ -11,7 +11,7 @@ app.use(express.json({ limit: '15mb' }));
 
 const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 
-// 🚀 API KEY SETUP (Now acting as OpenRouter Gateway Key)
+// 🚀 OPENROUTER API KEY
 const apiKeyToUse = process.env.GEMINI_API_KEY;
 
 // 🚀 DATABASE CONNECTION
@@ -40,56 +40,76 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 AI TRIAGE ENGINE (API GATEWAY BYPASS)
+// 🧠 UNBREAKABLE FALLBACK MODELS FOR OPENROUTER
+const orModels = [
+    "google/gemini-pro",
+    "google/gemini-flash-1.5",
+    "meta-llama/llama-3.1-8b-instruct:free",
+    "mistralai/mistral-7b-instruct:free"
+];
+
 async function aiTriageEngine(symptoms) {
-    try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
-            body: JSON.stringify({
-                model: "google/gemini-1.5-flash",
-                messages: [{ role: "user", content: `Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine). Symptoms: "${symptoms}"` }]
-            })
-        });
-        const data = await response.json();
-        let dept = data.choices[0].message.content.trim();
-        return ["Cardiology", "Neurology", "Orthopedics", "Gastroenterology"].find(d => dept.includes(d)) || "General Medicine";
-    } catch(err) { return "General Medicine"; }
+    for (const modelName of orModels) {
+        try {
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
+                body: JSON.stringify({
+                    model: modelName,
+                    messages: [{ role: "user", content: `Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine). Symptoms: "${symptoms}"` }]
+                })
+            });
+            const data = await response.json();
+            if (data.choices) {
+                let dept = data.choices[0].message.content.trim();
+                return ["Cardiology", "Neurology", "Orthopedics", "Gastroenterology"].find(d => dept.includes(d)) || "General Medicine";
+            }
+        } catch(err) { /* Ignore and try next */ }
+    }
+    return "General Medicine";
 }
 
-// 🤖 🌟 REAL-TIME CHAT ENGINE (API GATEWAY BYPASS)
+// 🤖 🌟 UNBREAKABLE REAL-TIME CHAT ENGINE (API GATEWAY BYPASS)
 app.post('/api/ai-chat', async (req, res) => {
     const { history, message } = req.body;
     if (!apiKeyToUse) return res.status(500).json({ error: "API Key is missing on the server." });
 
-    try {
-        let msgs = [{ role: "system", content: 'You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a compassionate real doctor. Ask follow-up clarifying questions if symptoms are vague. Keep replies concise and structured.' }];
-        
-        if (history && history.length > 0) {
-            history.forEach(m => {
-                msgs.push({ role: m.role === 'model' ? 'assistant' : 'user', content: m.parts[0].text });
-            });
-        }
-        msgs.push({ role: "user", content: message });
-
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
-            body: JSON.stringify({ model: "google/gemini-1.5-flash", messages: msgs })
+    let msgs = [{ role: "system", content: 'You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a compassionate real doctor. Ask follow-up clarifying questions if symptoms are vague. Keep replies concise and structured.' }];
+    
+    if (history && history.length > 0) {
+        history.forEach(m => {
+            msgs.push({ role: m.role === 'model' ? 'assistant' : 'user', content: m.parts[0].text });
         });
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message || "API Gateway Auth Error");
-
-        return res.json({ reply: data.choices[0].message.content });
-
-    } catch (err) {
-        console.error("Chat Error:", err);
-        res.status(500).json({ error: `System Core Error: ${err.message}` });
     }
+    msgs.push({ role: "user", content: message });
+
+    let lastError = "Unknown Gateway Error";
+
+    for (const modelName of orModels) {
+        try {
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
+                body: JSON.stringify({ model: modelName, messages: msgs })
+            });
+
+            const data = await response.json();
+            
+            if (response.ok && data.choices) {
+                console.log(`✅ Success with OpenRouter model: ${modelName}`);
+                return res.json({ reply: data.choices[0].message.content });
+            } else {
+                lastError = data.error?.message || `Model ${modelName} rejected request.`;
+            }
+        } catch (err) {
+            lastError = err.message;
+        }
+    }
+    
+    res.status(500).json({ error: `System Core Error: ${lastError}` });
 });
 
-// 🚀 LAB REPORT ANALYZER (Kept on Google REST Fallback for now)
+// 🚀 LAB REPORT ANALYZER (Kept on Google REST Fallback)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No PDF file received." });
     try {
