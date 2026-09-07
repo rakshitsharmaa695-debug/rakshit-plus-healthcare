@@ -40,12 +40,11 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 100% STABLE FREE MODELS (Google Gemma & Zephyr)
+// 🧠 100% VERIFIED FREE MODELS (OpenRouter 2026)
 const orModels = [
-    "google/gemma-2-9b-it:free",
-    "meta-llama/llama-3-8b-instruct:free",
-    "huggingfaceh4/zephyr-7b-beta:free",
-    "gryphe/mythomax-l2-13b:free"
+    "meta-llama/llama-3.1-8b-instruct:free",
+    "qwen/qwen-2.5-7b-instruct:free",
+    "microsoft/phi-3-mini-128k-instruct:free"
 ];
 
 async function aiTriageEngine(symptoms) {
@@ -109,7 +108,7 @@ app.post('/api/ai-chat', async (req, res) => {
     res.status(500).json({ error: `System Core Error: ${lastError}` });
 });
 
-// 🚀 LAB REPORT ANALYZER
+// 🚀 LAB REPORT ANALYZER (Kept on Google REST Fallback)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No PDF file received." });
     try {
