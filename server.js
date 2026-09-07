@@ -4,7 +4,6 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const { GoogleGenerativeAI } = require('@google/generative-ai'); 
 
 const app = express();
 app.use(express.static(__dirname));
@@ -12,9 +11,8 @@ app.use(express.json({ limit: '15mb' }));
 
 const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 
-// 🚀 GEMINI API SETUP
+// 🚀 GEMINI API SETUP (Raw Core bypassed)
 const apiKeyToUse = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKeyToUse);
 
 // 🚀 DATABASE CONNECTION
 const pool = new Pool({
@@ -42,81 +40,104 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 SENIOR DEV HACK: Ultimate list of active models (Auto-Fallback Array)
-const availableModels = [
-    "gemini-1.5-flash-002", 
-    "gemini-1.5-flash-001", 
-    "gemini-1.5-flash", 
-    "gemini-2.0-flash", 
-    "gemini-pro"
-];
-
+// 🧠 AI TRIAGE ENGINE (REST API BYPASS)
 async function aiTriageEngine(symptoms) {
-    for (const modelName of availableModels) {
-        try {
-            const model = genAI.getGenerativeModel({ model: modelName });
-            const result = await model.generateContent(`Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine). Symptoms: "${symptoms}"`);
-            let dept = result.response.text().trim();
-            return ["Cardiology", "Neurology", "Orthopedics", "Gastroenterology"].find(d => dept.includes(d)) || "General Medicine";
-        } catch(err) { /* Ignore and try next model */ }
-    }
-    return "General Medicine";
+    try {
+        const prompt = `Analyze these symptoms and return ONLY the medical department name (e.g., Cardiology, Neurology, Orthopedics, General Medicine). Symptoms: "${symptoms}"`;
+        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        
+        if (!response.ok) { // Fallback format
+            response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyToUse}`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+        }
+        
+        const data = await response.json();
+        let dept = data.candidates[0].content.parts[0].text.trim();
+        return ["Cardiology", "Neurology", "Orthopedics", "Gastroenterology"].find(d => dept.includes(d)) || "General Medicine";
+    } catch(err) { return "General Medicine"; }
 }
 
-// 🤖 🌟 BULLETPROOF REAL-TIME DOCTOR CHAT ENGINE
+// 🤖 🌟 BULLETPROOF REAL-TIME CHAT ENGINE (REST API BYPASS)
 app.post('/api/ai-chat', async (req, res) => {
     const { history, message } = req.body;
     if (!apiKeyToUse) return res.status(500).json({ error: "API Key is missing on the server." });
 
-    let lastError = "Unknown error";
-
-    // Auto-Discovery Loop: Tries models until one works perfectly
-    for (const modelName of availableModels) {
-        try {
-            const model = genAI.getGenerativeModel({ model: modelName });
-            const chat = model.startChat({ history: history || [] });
-            
-            let prompt = message;
-            if (!history || history.length === 0) {
-                prompt = `System Persona: You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a compassionate real doctor. Ask follow-up clarifying questions if symptoms are vague. Keep replies concise and structured.\n\nPatient says: ${message}`;
-            }
-
-            const result = await chat.sendMessage(prompt);
-            console.log(`✅ Success with model: ${modelName}`);
-            return res.json({ reply: result.response.text() }); 
-            
-        } catch (err) {
-            console.log(`⚠️ Model ${modelName} failed. Trying next...`);
-            lastError = err.message;
+    try {
+        let formattedContents = [];
+        let sysInstruction = 'You are "RakshitPlus AI", an empathetic virtual medical assistant. Talk like a compassionate real doctor. Ask follow-up clarifying questions if symptoms are vague. Keep replies concise and structured.';
+        
+        if (history && history.length > 0) {
+            formattedContents = history.map(msg => ({
+                role: msg.role === 'model' ? 'model' : 'user',
+                parts: [{ text: msg.parts[0].text }]
+            }));
+            formattedContents.push({ role: 'user', parts: [{ text: message }] });
+        } else {
+            formattedContents.push({ role: 'user', parts: [{ text: `System Persona: ${sysInstruction}\n\nPatient says: ${message}` }] });
         }
+
+        // Direct Deep Server Hit
+        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
+            body: JSON.stringify({ contents: formattedContents })
+        });
+
+        if (!response.ok) { // Backup Direct Key Method
+            response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyToUse}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: formattedContents })
+            });
+        }
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error?.message || "Google API Auth Error");
+
+        return res.json({ reply: data.candidates[0].content.parts[0].text });
+
+    } catch (err) {
+        console.error("REST Chat Error:", err);
+        res.status(500).json({ error: `System Core Error: ${err.message}` });
     }
-    
-    // If all models fail
-    res.status(500).json({ error: `AI Models not responding. Detailed Error: ${lastError}` });
 });
 
-// 🚀 ADVANCED VISION AI LAB REPORT ANALYZER
+// 🚀 ADVANCED VISION AI LAB REPORT ANALYZER (REST API BYPASS)
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No PDF file received." });
-    
-    let lastError = "Unknown error";
+    try {
+        const base64Pdf = req.file.buffer.toString("base64");
+        const prompt = `You are a Chief Pathologist AI. Read this medical lab report. Extract numerical test values. Return ONLY raw JSON matching this format: {"score": 85, "biomarkers": [{"name": "Fasting Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}.`;
+        
+        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKeyToUse}` },
+            body: JSON.stringify({
+                contents: [{ role: "user", parts: [{ text: prompt }, { inlineData: { mimeType: "application/pdf", data: base64Pdf } }] }]
+            })
+        });
 
-    for (const modelName of availableModels) {
-        try {
-            const model = genAI.getGenerativeModel({ model: modelName });
-            const pdfPart = { inlineData: { data: req.file.buffer.toString("base64"), mimeType: "application/pdf" } };
-            const prompt = `You are a Chief Pathologist AI. Read this medical lab report. Extract numerical test values. Return ONLY raw JSON matching this format: {"score": 85, "biomarkers": [{"name": "Fasting Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}.`;
-            
-            const result = await model.generateContent([prompt, pdfPart]);
-            let aiResponse = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
-            return res.status(200).json(JSON.parse(aiResponse)); 
-            
-        } catch (aiErr) { 
-            lastError = aiErr.message; 
+        if (!response.ok) { // Fallback
+            response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyToUse}`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ role: "user", parts: [{ text: prompt }, { inlineData: { mimeType: "application/pdf", data: base64Pdf } }] }]
+                })
+            });
         }
-    }
-    
-    res.status(500).json({ error: `Document processing failed: ${lastError}` });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error?.message || "Google File API Error");
+
+        let aiResponse = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
+        res.status(200).json(JSON.parse(aiResponse));
+    } catch (err) { res.status(500).json({ error: `Processing failed: ${err.message}` }); }
 });
 
 // 🛡️ AUTH, BOOKING & DASHBOARDS
