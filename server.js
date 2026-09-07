@@ -90,8 +90,8 @@ const trainAI = async () => {
     manager.addAnswer('en', 'None', 'I want to make sure I understand correctly. Could you please describe your symptoms a bit more clearly? (e.g., mention if you have fever, pain, etc.)');
 
     await manager.train();
-    manager.save();
-    console.log("🧠 Offline Smart NLP AI Trained and Ready!");
+    // manager.save(); HATA DIYA GAYA HAI - Cloud deployment ab fail nahi hoga!
+    console.log("🧠 Offline Smart NLP AI Trained and Ready in Memory!");
 };
 trainAI();
 
