@@ -44,7 +44,7 @@ const authenticate = (req, res, next) => {
     } catch (err) { return res.status(401).json({ error: "Session expired." }); }
 };
 
-// Memory storage zaroori hai taaki PDF Base64 bankar seedha Gemini Vision mein ja sake
+// Memory storage for Base64 Gemini Vision
 const upload = multer({ storage: multer.memoryStorage() }); 
 
 // 🧠 AI TRIAGE ENGINE (Smart routing)
@@ -93,41 +93,27 @@ app.post('/api/appointments', authenticate, async (req, res) => {
     } catch(e) { res.status(500).json({error: "Failed to book appointment."}); }
 });
 
-// 🚀 ADVANCED VISION AI LAB REPORT ANALYZER (Reads Scanned Images & Text Perfectly)
+// 🚀 ADVANCED VISION AI LAB REPORT ANALYZER
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No PDF file received." });
     
     try {
-        // Initialize Gemini Vision Model
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-        
-        // 🧠 MASTER TRICK: Inject PDF directly as Base64 Image Data
-        const pdfPart = {
-            inlineData: {
-                data: req.file.buffer.toString("base64"),
-                mimeType: "application/pdf"
-            }
-        };
+        const pdfPart = { inlineData: { data: req.file.buffer.toString("base64"), mimeType: "application/pdf" } };
 
         const prompt = `You are a Chief Pathologist AI. Read this medical lab report document completely (whether it is text or a scanned image). Extract the exact numerical test values. Return ONLY a valid JSON object matching this EXACT format without any markdown blocks or backticks:
         {"score": 85, "biomarkers": [{"name": "Fasting Blood Sugar", "val": "110 mg/dL", "status": "Normal", "color": "green", "width": "50%"}], "insights": ["Insight 1"], "diet": ["Diet 1"]}. 
         Evaluate high/low status accurately based on standard medical ranges. Ensure the output is raw JSON.`;
 
-        // Send both Prompt and PDF Base64 string to Gemini
         const result = await model.generateContent([prompt, pdfPart]);
-        
-        // Clean up response to ensure valid JSON
         let aiResponse = result.response.text();
         aiResponse = aiResponse.replace(/```json/g, '').replace(/```/g, '').trim();
         
         const parsedResponse = JSON.parse(aiResponse);
         return res.status(200).json(parsedResponse);
-        
     } catch (aiErr) {
         console.error("Gemini Vision API Error:", aiErr.message);
-        return res.status(500).json({ 
-            error: "Document processing failed. Please ensure the API Key is correct and the file is readable." 
-        });
+        return res.status(500).json({ error: "Document processing failed. Please ensure the API Key is correct and the file is readable." });
     }
 });
 
@@ -172,8 +158,36 @@ app.post('/api/admin/add-doctor', authenticate, async (req, res) => {
     } catch (error) { res.status(500).json({ error: "Failed" }); }
 });
 
+// 🩺 FETCH ALL DOCTORS
 app.get('/api/doctors', async (req, res) => { 
     try { res.json((await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE role = 'doctor'`)).rows); } catch(e) { res.json([]); }
+});
+
+// 🩺 FETCH SINGLE DOCTOR PROFILE (Added for the frontend error fix)
+app.get('/api/doctor/:id', async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE id = $1 AND role = 'doctor'`, 
+            [req.params.id]
+        );
+        if (result.rows.length === 0) return res.status(404).json({ error: "Doctor not found" });
+        res.json(result.rows[0]);
+    } catch(e) { 
+        res.status(500).json({ error: "Server error" }); 
+    }
+});
+
+app.get('/api/doctors/:id', async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE id = $1 AND role = 'doctor'`, 
+            [req.params.id]
+        );
+        if (result.rows.length === 0) return res.status(404).json({ error: "Doctor not found" });
+        res.json(result.rows[0]);
+    } catch(e) { 
+        res.status(500).json({ error: "Server error" }); 
+    }
 });
 
 const PORT = process.env.PORT || 3000;
