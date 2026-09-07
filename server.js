@@ -51,16 +51,16 @@ async function aiTriageEngine(symptoms) {
     } catch(err) { return "General Medicine"; }
 }
 
-// 🤖 🌟 UPDATED: REAL-TIME DOCTOR CHAT ENGINE (With System Instructions & Smart Error Logging)
+// 🤖 🌟 UPDATED: REAL-TIME DOCTOR CHAT ENGINE (Model Name Fixed)
 app.post('/api/ai-chat', async (req, res) => {
     const { history, message } = req.body;
     
     try {
         if (!apiKeyToUse) throw new Error("API Key is missing on the server.");
 
-        // Advanced Gemini 1.5 System Instruction implementation
+        // FIXED: Added '-latest' to the model name
         const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash",
+            model: "gemini-1.5-flash-latest",
             systemInstruction: 'You are "RakshitPlus AI", an empathetic, highly skilled virtual medical assistant. Talk exactly like a compassionate real doctor (e.g., "Hello! I am here to help. How are you feeling?"). Ask follow-up clarifying questions if symptoms are vague. Keep replies concise, readable, and structured. Always add a short disclaimer that you are an AI.'
         });
         
@@ -70,7 +70,6 @@ app.post('/api/ai-chat', async (req, res) => {
         res.json({ reply: result.response.text() });
     } catch (err) {
         console.error("Chat Error Details:", err.message);
-        // Smart Error Return: Will tell frontend exactly what broke
         res.status(500).json({ error: `AI System Error: ${err.message}` });
     }
 });
