@@ -102,75 +102,82 @@
         </div>
     </main>
 
-    <!-- 🌟 REAL-TIME AI DOCTOR CHAT WIDGET -->
-    <div class="fixed bottom-6 right-4 md:right-8 z-50 flex flex-col items-end">
+    <!-- 🌟 CHAT WINDOW -->
+    <div id="ai-chat-window" class="hidden fixed bottom-[110px] right-4 md:right-8 z-50 w-[92vw] sm:w-[400px] bg-[#0f172a] border border-slate-700 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex-col h-[65vh] sm:h-[550px] transform transition-all">
         
-        <!-- Chat Window -->
-        <div id="ai-chat-window" class="hidden w-[92vw] sm:w-[400px] bg-[#0f172a] border border-slate-700 rounded-2xl shadow-2xl mb-4 overflow-hidden transform transition-all flex flex-col h-[65vh] sm:h-[550px]">
+        <!-- Premium Header with Original Logo -->
+        <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 border-b border-blue-500/30 flex justify-between items-center shadow-md z-10">
+            <div class="flex items-center gap-3">
+                <img src="1000022082.png" alt="RakshitPlus AI" class="w-11 h-11 object-contain bg-white rounded-full p-1 shadow-lg flex-shrink-0">
+                <div class="text-left flex flex-col">
+                    <h3 class="text-white font-black text-lg leading-tight tracking-wide">Virtual Doctor</h3>
+                    <!-- Exact Text Match -->
+                    <span class="text-[11px] text-blue-300 font-semibold mt-0.5">Powered By RakshitPlus AI</span>
+                </div>
+            </div>
+            <button id="close-ai-chat" class="text-slate-400 hover:text-white transition bg-white/10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">✖</button>
+        </div>
+        
+        <!-- Chat Area (Watermark Removed) -->
+        <div id="chat-messages" class="relative flex-1 p-4 chat-scroll overflow-y-auto bg-[#0f172a] flex flex-col gap-4">
             
-            <!-- Header -->
-            <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 border-b border-blue-500/30 flex justify-between items-center shadow-md z-10">
-                <div class="flex items-center gap-3">
-                    <div class="relative">
-                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-xl shadow-lg">🩺</div>
-                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-blue-900 rounded-full"></span>
-                    </div>
-                    <div class="text-left flex flex-col -ml-1">
-                        <span class="text-[9px] text-blue-300 font-bold uppercase tracking-widest opacity-80 mb-0.5">Powered by RakshitPlus AI</span>
-                        <h3 class="text-white font-black text-lg leading-tight">Virtual Doctor</h3>
-                    </div>
+            <!-- Welcome Message using Original Logo -->
+            <div class="flex gap-2 w-full bubble-enter relative z-10">
+                <img src="1000022082.png" alt="AI" class="w-8 h-8 rounded-full object-contain bg-white p-0.5 border border-blue-400/30 flex-shrink-0 shadow">
+                <div class="bg-slate-800 border border-slate-700 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-sm shadow-md leading-relaxed">
+                    Hello! I am your virtual doctor. Please describe how you are feeling today, and I will help assess your symptoms.
                 </div>
-                <button id="close-ai-chat" class="text-slate-400 hover:text-white transition bg-white/10 w-8 h-8 rounded-full flex items-center justify-center">✖</button>
-            </div>
-            
-            <!-- Chat Area (Bubbles) -->
-            <div id="chat-messages" class="flex-1 p-4 chat-scroll overflow-y-auto bg-[#0f172a] flex flex-col gap-4">
-                <!-- Welcome Message -->
-                <div class="flex gap-2 w-full bubble-enter">
-                    <div class="w-8 h-8 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center text-sm shadow">🩺</div>
-                    <div class="bg-slate-800 border border-slate-700 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-sm shadow-md leading-relaxed">
-                        Hello! I am RakshitPlus AI, your virtual doctor. Please describe how you are feeling today, and I will help assess your symptoms.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Typing Indicator (Hidden) -->
-            <div id="typing-indicator" class="hidden p-4 bg-[#0f172a]">
-                <div class="flex gap-2 w-full">
-                    <div class="w-8 h-8 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center text-sm shadow opacity-70">🩺</div>
-                    <div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex items-center gap-1 shadow-md">
-                        <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
-                        <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
-                        <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Input Footer -->
-            <div class="p-3 bg-slate-900 border-t border-slate-700 flex gap-2">
-                <input type="text" id="chat-input" placeholder="Type your symptoms here..." class="flex-1 bg-slate-800 border border-slate-600 rounded-full px-4 py-2.5 text-white text-sm outline-none focus:border-blue-500 focus:bg-slate-700 transition-colors">
-                <button id="chat-send-btn" class="w-11 h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95">
-                    <svg class="w-5 h-5 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
-                </button>
             </div>
         </div>
 
-        <!-- Glowing Floating Button -->
-        <button id="ai-widget-toggle" class="relative group focus:outline-none">
-            <div class="absolute inset-0 bg-blue-500 rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
-            <div class="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-tr from-blue-600 to-teal-400 rounded-full shadow-2xl flex items-center justify-center text-2xl md:text-3xl border-2 border-white/20 transform group-hover:scale-110 transition-transform duration-300">
-                🩺
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" class="hidden p-4 bg-[#0f172a]">
+            <div class="flex gap-2 w-full">
+                <img src="1000022082.png" alt="AI" class="w-8 h-8 rounded-full object-contain bg-white p-0.5 opacity-70 flex-shrink-0 shadow">
+                <div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex items-center gap-1 shadow-md">
+                    <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
+                    <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
+                    <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
+                </div>
             </div>
-            <!-- Notification Badge -->
-            <span class="absolute top-0 right-0 flex h-4 w-4">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border border-white"></span>
-            </span>
+        </div>
+
+        <!-- Input Footer -->
+        <div class="p-3 bg-slate-900 border-t border-slate-700 flex flex-col gap-2">
+            <div class="flex gap-2">
+                <input type="text" id="chat-input" placeholder="Type your symptoms here..." class="flex-1 bg-slate-800 border border-slate-600 rounded-full px-4 py-2.5 text-white text-sm outline-none focus:border-blue-500 focus:bg-slate-700 transition-colors">
+                <button id="chat-send-btn" class="w-11 h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95 flex-shrink-0">
+                    <svg class="w-5 h-5 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                </button>
+            </div>
+            <p class="text-center text-[9px] text-slate-500 tracking-wide mt-1">Responses are generated by AI. Not a medical diagnosis.</p>
+        </div>
+    </div>
+
+    <!-- 🌟 FLOATING ACTION WIDGET & LABEL -->
+    <div class="fixed bottom-6 right-4 md:right-8 z-40 flex flex-col items-center gap-2">
+        <!-- Floating Button with Original Logo -->
+        <button id="ai-widget-toggle" class="relative group focus:outline-none flex flex-col items-center">
+            <!-- Pulse Glow -->
+            <div class="absolute inset-0 bg-blue-500 rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+            
+            <div class="relative w-14 h-14 md:w-16 md:h-16 bg-white rounded-full shadow-[0_8px_30px_rgba(37,99,235,0.4)] flex items-center justify-center border-[1.5px] border-blue-400/60 transform group-hover:scale-105 transition-all duration-300 z-10 p-1">
+                <img src="1000022082.png" alt="RakshitPlus AI" class="w-full h-full object-contain rounded-full">
+                <!-- Notification Badge -->
+                <span class="absolute top-0 right-0 flex h-4 w-4">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border border-white"></span>
+                </span>
+            </div>
         </button>
+        
+        <!-- AI Health Checkup Tag -->
+        <span class="text-[11px] md:text-xs font-black text-slate-800 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-slate-200 uppercase tracking-wide">
+            AI Health Checkup
+        </span>
     </div>
 
     <!-- 🌟 AUTHENTICATION MODALS -->
-    <!-- (Modals are identical to previous version, safe) -->
     <div id="loginModal" class="fixed inset-0 modal-bg z-[100] hidden flex items-center justify-center opacity-0 transition-opacity p-4">
         <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform">
             <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
@@ -181,11 +188,27 @@
                 <button type="submit" class="w-full bg-blue-600 text-white p-3 md:p-4 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition mt-2">Login Securely</button>
             </form>
             <p id="logMsg" class="mt-4 text-center text-sm font-bold hidden"></p>
+            <p class="text-center text-xs md:text-sm text-slate-500 font-medium mt-6 md:mt-8">New to RakshitPlus? <button onclick="switchModal('loginModal', 'registerModal')" class="text-blue-600 font-bold hover:underline">Create an account</button></p>
+        </div>
+    </div>
+
+    <div id="registerModal" class="fixed inset-0 modal-bg z-[100] hidden flex items-center justify-center opacity-0 transition-opacity p-4">
+        <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform">
+            <button onclick="closeModal('registerModal')" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
+            <h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">Create Account</h2>
+            <form id="registerForm" class="space-y-4 md:space-y-5 mt-6">
+                <input type="text" id="reg-name" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="John Doe">
+                <input type="email" id="reg-email" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="john@example.com">
+                <input type="password" id="reg-password" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="••••••••">
+                <button type="submit" class="w-full bg-slate-900 text-white p-3 md:p-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition mt-2">Sign Up Now</button>
+            </form>
+            <p id="regMsg" class="mt-4 text-center text-sm font-bold hidden"></p>
+            <p class="text-center text-xs md:text-sm text-slate-500 font-medium mt-6 md:mt-8">Already registered? <button onclick="switchModal('registerModal', 'loginModal')" class="text-blue-600 font-bold hover:underline">Login here</button></p>
         </div>
     </div>
 
     <script>
-        // --- Mobile Menu ---
+        // --- Core UI & Logic ---
         document.getElementById('mobileMenuBtn').addEventListener('click', function() {
             const menu = document.getElementById('mobileMenu');
             if (menu.classList.contains('max-h-0')) {
@@ -198,16 +221,19 @@
         });
         function openModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.remove('hidden'); setTimeout(()=>{m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95');},10); }
         function closeModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(()=>{m.classList.add('hidden');},300); }
+        function switchModal(c, o) { closeModal(c); setTimeout(()=>openModal(o), 300); }
 
         function checkAuth() {
             const token = localStorage.getItem('rakshitplus_jwt');
             const role = localStorage.getItem('rakshitplus_role');
             if (token) {
                 document.getElementById('authButtons')?.classList.add('hidden');
+                document.getElementById('mobileAuthButtons')?.classList.add('hidden');
                 document.getElementById('userProfileBtn')?.classList.remove('hidden');
-                if (role === 'admin') document.getElementById('adminPortalBtn')?.classList.remove('hidden');
-                else if (role === 'doctor') document.getElementById('doctorDashboardBtn')?.classList.remove('hidden');
-                else document.getElementById('patientDashboardBtn')?.classList.remove('hidden');
+                document.getElementById('mobileUserProfileBtn')?.classList.remove('hidden');
+                if (role === 'admin') { document.getElementById('adminPortalBtn')?.classList.remove('hidden'); }
+                else if (role === 'doctor') { document.getElementById('doctorDashboardBtn')?.classList.remove('hidden'); }
+                else { document.getElementById('patientDashboardBtn')?.classList.remove('hidden'); }
             }
         }
         function logout() { localStorage.removeItem('rakshitplus_jwt'); localStorage.removeItem('rakshitplus_role'); window.location.reload(); }
@@ -223,7 +249,7 @@
             } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; }
         });
 
-        // 🌟 RAKSHITPLUS AI REAL-TIME CHAT LOGIC (Senior Dev Implementation)
+        // --- 🌟 RAKSHITPLUS AI CHAT LOGIC ---
         const aiToggleBtn = document.getElementById('ai-widget-toggle');
         const aiChatWindow = document.getElementById('ai-chat-window');
         const closeAiChatBtn = document.getElementById('close-ai-chat');
@@ -232,10 +258,8 @@
         const chatMessages = document.getElementById('chat-messages');
         const typingIndicator = document.getElementById('typing-indicator');
 
-        // Gemini context history array
         let chatHistory = [];
 
-        // Formatting Markdown (Bold & Bullets) from Gemini
         function formatMarkdown(text) {
             return text
                 .replace(/\*\*(.*?)\*\*/g, '<b class="text-white">$1</b>')
@@ -244,73 +268,66 @@
                 .replace(/\n/g, '<br>');
         }
 
-        // Toggle Widget
         aiToggleBtn.addEventListener('click', () => {
-            aiChatWindow.classList.toggle('hidden');
-            const badge = aiToggleBtn.querySelector('.animate-ping');
-            if(badge) badge.parentElement.remove(); // Remove notification dot on open
-            if(!aiChatWindow.classList.contains('hidden')) chatInput.focus();
+            if(aiChatWindow.classList.contains('hidden')) {
+                aiChatWindow.classList.remove('hidden');
+                aiChatWindow.classList.add('flex');
+                const badge = aiToggleBtn.querySelector('.animate-ping');
+                if(badge) badge.parentElement.remove(); 
+                setTimeout(() => chatInput.focus(), 100);
+            } else {
+                aiChatWindow.classList.add('hidden');
+                aiChatWindow.classList.remove('flex');
+            }
         });
-        closeAiChatBtn.addEventListener('click', () => aiChatWindow.classList.add('hidden'));
+        closeAiChatBtn.addEventListener('click', () => {
+            aiChatWindow.classList.add('hidden');
+            aiChatWindow.classList.remove('flex');
+        });
 
-        // Scroll to bottom
-        function scrollToBottom() {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+        function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
 
-        // Send Message Handler
         async function sendMessage() {
             const message = chatInput.value.trim();
             if (!message) return;
 
-            // 1. Append User Bubble
             chatInput.value = "";
             chatMessages.innerHTML += `
-                <div class="flex gap-2 w-full justify-end bubble-enter">
+                <div class="flex gap-2 w-full justify-end bubble-enter relative z-10">
                     <div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] text-sm shadow-md">
                         ${message}
                     </div>
                 </div>`;
             scrollToBottom();
-
-            // 2. Show Typing Indicator
             typingIndicator.classList.remove('hidden');
             scrollToBottom();
 
             try {
-                // 3. API Call
                 const res = await fetch('/api/ai-chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ history: chatHistory, message: message })
                 });
-                
                 const data = await res.json();
-                
-                // Hide Typing Indicator
                 typingIndicator.classList.add('hidden');
 
                 if (res.ok) {
-                    // Update History for Gemini
                     chatHistory.push({ role: "user", parts: [{ text: message }] });
                     chatHistory.push({ role: "model", parts: [{ text: data.reply }] });
 
-                    // 4. Append AI Bubble
+                    // Appending Original Logo to AI Bubble
                     chatMessages.innerHTML += `
-                        <div class="flex gap-2 w-full bubble-enter">
-                            <div class="w-8 h-8 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center text-sm shadow">🩺</div>
+                        <div class="flex gap-2 w-full bubble-enter relative z-10">
+                            <img src="1000022082.png" alt="AI" class="w-8 h-8 rounded-full object-contain bg-white p-0.5 border border-blue-400/30 flex-shrink-0 shadow">
                             <div class="bg-slate-800 border border-slate-700 text-slate-300 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-sm shadow-md leading-relaxed">
                                 ${formatMarkdown(data.reply)}
                             </div>
                         </div>`;
                     scrollToBottom();
-                } else {
-                    throw new Error(data.error);
-                }
+                } else throw new Error(data.error);
             } catch(e) {
                 typingIndicator.classList.add('hidden');
                 chatMessages.innerHTML += `
-                    <div class="flex gap-2 w-full justify-center bubble-enter my-2">
+                    <div class="flex gap-2 w-full justify-center bubble-enter my-2 relative z-10">
                         <div class="bg-rose-500/20 text-rose-400 border border-rose-500/30 p-2 rounded-xl text-xs font-bold text-center">
                             ⚠️ Connection error. Please try asking again.
                         </div>
@@ -319,11 +336,8 @@
             }
         }
 
-        // Events
         chatSendBtn.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
     </script>
 </body>
 </html>
