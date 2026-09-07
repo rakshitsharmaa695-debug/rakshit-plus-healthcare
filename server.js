@@ -40,12 +40,12 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 UNBREAKABLE FALLBACK MODELS FOR OPENROUTER
+// 🧠 100% STABLE FREE MODELS (Google Gemma & Zephyr)
 const orModels = [
-    "google/gemini-pro",
-    "google/gemini-flash-1.5",
-    "meta-llama/llama-3.1-8b-instruct:free",
-    "mistralai/mistral-7b-instruct:free"
+    "google/gemma-2-9b-it:free",
+    "meta-llama/llama-3-8b-instruct:free",
+    "huggingfaceh4/zephyr-7b-beta:free",
+    "gryphe/mythomax-l2-13b:free"
 ];
 
 async function aiTriageEngine(symptoms) {
@@ -69,7 +69,7 @@ async function aiTriageEngine(symptoms) {
     return "General Medicine";
 }
 
-// 🤖 🌟 UNBREAKABLE REAL-TIME CHAT ENGINE (API GATEWAY BYPASS)
+// 🤖 🌟 UNBREAKABLE REAL-TIME CHAT ENGINE
 app.post('/api/ai-chat', async (req, res) => {
     const { history, message } = req.body;
     if (!apiKeyToUse) return res.status(500).json({ error: "API Key is missing on the server." });
@@ -109,7 +109,7 @@ app.post('/api/ai-chat', async (req, res) => {
     res.status(500).json({ error: `System Core Error: ${lastError}` });
 });
 
-// 🚀 LAB REPORT ANALYZER (Kept on Google REST Fallback)
+// 🚀 LAB REPORT ANALYZER
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No PDF file received." });
     try {
