@@ -17,12 +17,6 @@
         
         .chat-scroll::-webkit-scrollbar { width: 6px; }
         .chat-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        /* Typing indicator animation */
-        .typing-dot { animation: typingBounce 1.4s infinite ease-in-out both; }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     </style>
 </head>
 <body class="text-slate-800 antialiased">
@@ -42,19 +36,22 @@
 
     <div class="max-w-7xl mx-auto px-4 md:px-8 pt-32 pb-20 flex flex-col lg:flex-row gap-8 lg:gap-12">
         
-        <!-- 🌟 LEFT SIDE: CONVERSATIONAL BOOKING (CHATBOT STYLE) -->
+        <!-- 🌟 LEFT SIDE: CONVERSATIONAL BOOKING -->
         <div class="lg:w-2/3 bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden flex flex-col h-[650px]">
             
-            <!-- Chat Header -->
-            <div class="bg-slate-50 border-b border-slate-200 p-5 flex items-center justify-between z-10 shadow-sm">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl shadow-inner border border-blue-200">🤖</div>
-                    <div>
-                        <h2 class="font-black text-slate-900 text-lg">Booking Assistant</h2>
-                        <p class="text-xs font-bold text-green-500 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Online</p>
+            <!-- 🌟 UPDATED CHAT HEADER -->
+            <div class="bg-slate-50 border-b border-slate-200 p-4 md:p-5 flex items-center justify-between z-10 shadow-sm">
+                <div class="flex items-center gap-3 md:gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-md border border-slate-100 shrink-0 p-1">
+                        <img src="1000022082.png" alt="AI" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex flex-col">
+                        <h2 class="font-black text-slate-900 text-base md:text-lg leading-tight">Virtual Booking Assistant</h2>
+                        <span class="text-[10px] md:text-[11px] text-blue-500 font-bold mb-0.5 tracking-wide">Powered By RakshitPlus AI</span>
+                        <p class="text-[10px] md:text-xs font-bold text-green-500 flex items-center gap-1 mt-0.5"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse"></span> Online</p>
                     </div>
                 </div>
-                <div id="doctorBadge" class="hidden bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-purple-200">
+                <div id="doctorBadge" class="hidden bg-purple-50 text-purple-700 px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-bold border border-purple-200 shrink-0 text-center uppercase tracking-wide">
                     Direct Booking
                 </div>
             </div>
@@ -71,7 +68,7 @@
 
         </div>
         
-        <!-- 🌟 RIGHT SIDE: DIGITAL TICKET & QR CODE TRACKER (RESTORED PERFECTLY) -->
+        <!-- 🌟 RIGHT SIDE: DIGITAL TICKET & QR CODE TRACKER -->
         <div class="lg:w-1/3 bg-slate-900 rounded-[2rem] p-6 md:p-10 text-center shadow-2xl relative overflow-hidden flex flex-col justify-center min-h-[400px]">
             <div class="absolute inset-0 bg-blue-500 opacity-20 blur-3xl rounded-full"></div>
             
@@ -133,17 +130,17 @@
             { key: 'time', type: 'options', q: "Please select a preferred time slot.", opts: ['10:00 AM', '11:30 AM', '01:00 PM', '02:30 PM', '04:00 PM', '06:00 PM'] }
         ];
 
-        // Helper to scroll
         function scrollToBottom() {
             setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
         }
 
-        // Render Bot Message
         function appendBotMessage(text) {
             const html = `
                 <div class="flex gap-3 w-full chat-bubble">
-                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shadow-md shrink-0 text-sm">AI</div>
-                    <div class="bg-white border border-slate-200 text-slate-800 p-3.5 rounded-2xl rounded-tl-none max-w-[85%] text-sm font-medium shadow-sm">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md shrink-0 border border-slate-200 p-1">
+                        <img src="1000022082.png" class="w-full h-full object-contain">
+                    </div>
+                    <div class="bg-white border border-slate-200 text-slate-800 p-3.5 rounded-2xl rounded-tl-none max-w-[85%] text-sm font-medium shadow-sm leading-relaxed">
                         ${text}
                     </div>
                 </div>
@@ -152,11 +149,10 @@
             scrollToBottom();
         }
 
-        // Render User Message
         function appendUserMessage(text) {
             const html = `
                 <div class="flex gap-3 w-full justify-end chat-bubble">
-                    <div class="bg-slate-800 text-white p-3.5 rounded-2xl rounded-tr-none max-w-[85%] text-sm font-bold shadow-md">
+                    <div class="bg-blue-600 text-white p-3.5 rounded-2xl rounded-tr-none max-w-[85%] text-sm font-bold shadow-md">
                         ${text}
                     </div>
                 </div>
@@ -165,7 +161,6 @@
             scrollToBottom();
         }
 
-        // Generate the Input UI based on current step
         function renderInput() {
             if (currentStep >= questions.length) {
                 inputBox.innerHTML = '';
@@ -203,7 +198,6 @@
             }
         }
 
-        // Handle the submission of an answer
         function submitAnswer(predefinedValue = null) {
             const step = questions[currentStep];
             let value = predefinedValue;
@@ -214,29 +208,23 @@
 
             if (!value) return alert("Please provide an answer.");
 
-            // Save to object
             bookingData[step.key] = value;
-            
-            // Show user bubble
             appendUserMessage(value);
             currentStep++;
 
-            // Ask next question after tiny delay
             setTimeout(() => {
                 if(currentStep < questions.length) {
                     appendBotMessage(questions[currentStep].q);
                     renderInput();
                 } else {
-                    renderInput(); // Triggers processBooking()
+                    renderInput(); 
                 }
             }, 400);
         }
 
-        // Initialization Logic
         async function startChat() {
             if(preSelectedDocId) {
                 document.getElementById('doctorBadge').classList.remove('hidden');
-                // Fetch doctor name for personalization
                 try {
                     const res = await fetch(`/api/doctors/${preSelectedDocId}`);
                     const doc = await res.json();
@@ -245,7 +233,7 @@
                     appendBotMessage(`Hello! Let's get your appointment booked.`);
                 }
             } else {
-                appendBotMessage(`Hello! Let's get your appointment booked. Our AI will automatically assign you to the best specialist.`);
+                appendBotMessage(`Hello! Let's get your appointment booked. RakshitPlus AI will automatically assign you to the best specialist.`);
             }
 
             setTimeout(() => {
@@ -258,7 +246,6 @@
         async function processBooking() {
             appendBotMessage("<span class='animate-pulse text-blue-600 font-bold'>Processing your appointment and generating Smart Queue Pass... ⏳</span>");
 
-            // Merge Date and Time
             const finalDateTime = `${bookingData.date} | ${bookingData.time}`;
             
             const payload = {
@@ -283,7 +270,6 @@
                 if (res.status === 201) {
                     appendBotMessage(`🎉 <b>Booking Complete!</b><br>Please look at the <b>Digital Ticket</b> generated on the right side of your screen. You can scan the QR code to track your live queue status.`);
                     
-                    // 🎫 TRIGGER THE RIGHT SIDE QR TICKET
                     const qRes = await fetch(`/api/queue/${data.id}`);
                     const qData = await qRes.json();
                     
@@ -316,7 +302,6 @@
             }
         }
 
-        // Start the sequence
         document.addEventListener('DOMContentLoaded', startChat);
 
     </script>
