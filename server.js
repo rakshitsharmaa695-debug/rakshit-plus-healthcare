@@ -11,7 +11,7 @@ app.use(express.json({ limit: '15mb' }));
 
 const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
 
-// 🚀 DATABASE CONNECTION (UNTOUCHED & SAFE)
+// 🚀 DATABASE CONNECTION (SAFE)
 const pool = new Pool({
     connectionString: "postgresql://rakshitplus_db_user:NNn5OEOt6EGL57R3LlFXIYXTV1mxT0hu@dpg-dae3etf40ujc73dlb71g-a.ohio-postgres.render.com/rakshitplus_db",
     ssl: { rejectUnauthorized: false } 
@@ -26,142 +26,61 @@ const initDB = async () => {
 };
 initDB();
 
+// 🔒 AUTHENTICATION MIDDLEWARE
 const authenticate = (req, res, next) => {
     const token = req.header('Authorization');
-    if (!token) return res.status(401).json({ error: "Access Denied." });
+    if (!token) return res.status(401).json({ error: "Access Denied. Please Login." });
     try { 
         req.user = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET); 
         next(); 
-    } catch (err) { return res.status(401).json({ error: "Session expired." }); }
+    } catch (err) { return res.status(401).json({ error: "Session expired. Please Login again." }); }
 };
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 ADVANCED BILINGUAL DIAGNOSTIC ENGINE
+// 🧠 ADVANCED BILINGUAL DIAGNOSTIC ENGINE (SAFE)
 const symptomTree = {
     "start": {
         msg: "Welcome to RakshitPlus AI. Please choose your language. <br><br> Kripya apni bhasha chunein:",
         options: ["🇬🇧 English", "🇮🇳 Hindi/Hinglish"]
     },
 
-    // ================= ENGLISH BRANCH =================
-    "🇬🇧 English": {
-        msg: "Where are you experiencing discomfort?",
-        options: ["🤕 Head", "🫀 Chest", "🍕 Stomach", "🤒 General Fever"]
-    },
-    "🤕 Head": {
-        msg: "Please select your specific symptom:",
-        options: ["Severe throbbing pain", "Dizziness/Spinning"]
-    },
-    "Severe throbbing pain": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Symptoms suggest a Migraine or Tension Headache.<br><br><b>💡 Advice:</b> Rest in a quiet, dark room and stay hydrated.",
-        dept: "Neurology", options: ["🔄 Restart"]
-    },
-    "Dizziness/Spinning": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Symptoms point towards Vertigo, weakness, or low blood pressure.<br><br><b>💡 Advice:</b> Sit or lie down immediately to avoid falling.",
-        dept: "Neurology", options: ["🔄 Restart"]
-    },
-    "🫀 Chest": {
-        msg: "What kind of chest issue are you facing?",
-        options: ["Heavy tightness/Pain", "Continuous Cough"]
-    },
-    "Heavy tightness/Pain": {
-        msg: "<b>🩺 Probable Diagnosis:</b> This could be Angina (Cardiac issue) or severe Acid Reflux. Chest pain should never be ignored.<br><br><b>🚨 Advice:</b> Seek medical attention immediately.",
-        dept: "Cardiology", options: ["🔄 Restart"]
-    },
-    "Continuous Cough": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Symptoms indicate Bronchitis, Asthma, or a Respiratory Infection.<br><br><b>💡 Advice:</b> Avoid cold drinks, take steam inhalation, and keep warm.",
-        dept: "Pulmonology", options: ["🔄 Restart"]
-    },
-    "🍕 Stomach": {
-        msg: "What is your primary stomach issue?",
-        options: ["Severe Cramps/Pain", "Nausea & Diarrhea"]
-    },
-    "Severe Cramps/Pain": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Could be Gastritis, Appendicitis, or Kidney Stones.<br><br><b>💡 Advice:</b> Drink warm water and strictly avoid spicy/oily food.",
-        dept: "Gastroenterology", options: ["🔄 Restart"]
-    },
-    "Nausea & Diarrhea": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Highly likely to be Food Poisoning or an intestinal infection.<br><br><b>💡 Advice:</b> Keep yourself hydrated with ORS (Electrolytes).",
-        dept: "General Medicine", options: ["🔄 Restart"]
-    },
-    "🤒 General Fever": {
-        msg: "How high is your fever?",
-        options: ["Low grade & Chills", "High fever with body ache"]
-    },
-    "Low grade & Chills": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Likely a common Viral infection or Seasonal Cold.<br><br><b>💡 Advice:</b> Get plenty of rest and monitor your temperature.",
-        dept: "General Medicine", options: ["🔄 Restart"]
-    },
-    "High fever with body ache": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Could be Dengue, Malaria, or severe Typhoid.<br><br><b>💡 Advice:</b> Do not take antibiotics without a proper blood test.",
-        dept: "General Medicine", options: ["🔄 Restart"]
-    },
+    "🇬🇧 English": { msg: "Where are you experiencing discomfort?", options: ["🤕 Head", "🫀 Chest", "🍕 Stomach", "🤒 General Fever"] },
+    "🤕 Head": { msg: "Please select your specific symptom:", options: ["Severe throbbing pain", "Dizziness/Spinning"] },
+    "Severe throbbing pain": { msg: "<b>🩺 Probable Diagnosis:</b> Symptoms suggest a Migraine or Tension Headache.<br><br><b>💡 Advice:</b> Rest in a quiet, dark room and stay hydrated.", dept: "Neurology", options: ["🔄 Restart"] },
+    "Dizziness/Spinning": { msg: "<b>🩺 Probable Diagnosis:</b> Symptoms point towards Vertigo, weakness, or low blood pressure.<br><br><b>💡 Advice:</b> Sit or lie down immediately to avoid falling.", dept: "Neurology", options: ["🔄 Restart"] },
+    "🫀 Chest": { msg: "What kind of chest issue are you facing?", options: ["Heavy tightness/Pain", "Continuous Cough"] },
+    "Heavy tightness/Pain": { msg: "<b>🩺 Probable Diagnosis:</b> This could be Angina (Cardiac issue) or severe Acid Reflux. Chest pain should never be ignored.<br><br><b>🚨 Advice:</b> Seek medical attention immediately.", dept: "Cardiology", options: ["🔄 Restart"] },
+    "Continuous Cough": { msg: "<b>🩺 Probable Diagnosis:</b> Symptoms indicate Bronchitis, Asthma, or a Respiratory Infection.<br><br><b>💡 Advice:</b> Avoid cold drinks, take steam inhalation, and keep warm.", dept: "Pulmonology", options: ["🔄 Restart"] },
+    "🍕 Stomach": { msg: "What is your primary stomach issue?", options: ["Severe Cramps/Pain", "Nausea & Diarrhea"] },
+    "Severe Cramps/Pain": { msg: "<b>🩺 Probable Diagnosis:</b> Could be Gastritis, Appendicitis, or Kidney Stones.<br><br><b>💡 Advice:</b> Drink warm water and strictly avoid spicy/oily food.", dept: "Gastroenterology", options: ["🔄 Restart"] },
+    "Nausea & Diarrhea": { msg: "<b>🩺 Probable Diagnosis:</b> Highly likely to be Food Poisoning or an intestinal infection.<br><br><b>💡 Advice:</b> Keep yourself hydrated with ORS (Electrolytes).", dept: "General Medicine", options: ["🔄 Restart"] },
+    "🤒 General Fever": { msg: "How high is your fever?", options: ["Low grade & Chills", "High fever with body ache"] },
+    "Low grade & Chills": { msg: "<b>🩺 Probable Diagnosis:</b> Likely a common Viral infection or Seasonal Cold.<br><br><b>💡 Advice:</b> Get plenty of rest and monitor your temperature.", dept: "General Medicine", options: ["🔄 Restart"] },
+    "High fever with body ache": { msg: "<b>🩺 Probable Diagnosis:</b> Could be Dengue, Malaria, or severe Typhoid.<br><br><b>💡 Advice:</b> Do not take antibiotics without a proper blood test.", dept: "General Medicine", options: ["🔄 Restart"] },
 
-    // ================= HINGLISH BRANCH =================
-    "🇮🇳 Hindi/Hinglish": {
-        msg: "Aapko kis hisse mein pareshani mehsoos ho rahi hai?",
-        options: ["🤕 Sir (Head)", "🫀 Chaati (Chest)", "🍕 Pet (Stomach)", "🤒 Bukhar (Fever)"]
-    },
-    "🤕 Sir (Head)": {
-        msg: "Sir mein exactly kaisa feel ho raha hai?",
-        options: ["Tez dard (Throbbing)", "Chakkar aana (Dizziness)"]
-    },
-    "Tez dard (Throbbing)": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Yeh Migraine ya Tension Headache ho sakta hai.<br><br><b>💡 Advice:</b> Shanti wale andhere kamre mein aaram karein aur paani piyein.",
-        dept: "Neurology", options: ["🔄 Naya Checkup"]
-    },
-    "Chakkar aana (Dizziness)": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Yeh Vertigo (chakkar) ya Low BP ki wajah se ho sakta hai.<br><br><b>💡 Advice:</b> Turant baith jayein ya let jayein taaki aap girein nahi.",
-        dept: "Neurology", options: ["🔄 Naya Checkup"]
-    },
-    "🫀 Chaati (Chest)": {
-        msg: "Chaati (Chest) mein kya problem ho rahi hai?",
-        options: ["Dard ya Jakdan (Tightness)", "Lagaatar Khansi (Cough)"]
-    },
-    "Dard ya Jakdan (Tightness)": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Yeh Angina (Heart issue) ya severe Acidity ho sakti hai. Isko halke mein na lein.<br><br><b>🚨 Advice:</b> Kripya turant doctor se sampark karein.",
-        dept: "Cardiology", options: ["🔄 Naya Checkup"]
-    },
-    "Lagaatar Khansi (Cough)": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Yeh Bronchitis, Asthma ya chhati ka infection ho sakta hai.<br><br><b>💡 Advice:</b> Thandi cheezein na khayein aur bhaap (steam) lein.",
-        dept: "Pulmonology", options: ["🔄 Naya Checkup"]
-    },
-    "🍕 Pet (Stomach)": {
-        msg: "Pet mein kya dikkat aa rahi hai?",
-        options: ["Tez Dard ya Marod", "Ulti aur Dast (Diarrhea)"]
-    },
-    "Tez Dard ya Marod": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Yeh Gastritis, Appendix, ya Pathri (Kidney Stone) ka dard ho sakta hai.<br><br><b>💡 Advice:</b> Gunguna paani piyein aur bahar ka masaledar khana chhod dein.",
-        dept: "Gastroenterology", options: ["🔄 Naya Checkup"]
-    },
-    "Ulti aur Dast (Diarrhea)": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Yeh pakka Food Poisoning ya pet ka infection hai.<br><br><b>💡 Advice:</b> ORS ka ghol piyein taaki body mein paani ki kami (dehydration) na ho.",
-        dept: "General Medicine", options: ["🔄 Naya Checkup"]
-    },
-    "🤒 Bukhar (Fever)": {
-        msg: "Bukhar kaisa hai?",
-        options: ["Halka Bukhar aur Sardi", "Tez Bukhar aur Badan Dard"]
-    },
-    "Halka Bukhar aur Sardi": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Yeh normal Viral Fever ya Sardi-Zukam ho sakta hai.<br><br><b>💡 Advice:</b> Aaram karein aur apna temperature check karte rahein.",
-        dept: "General Medicine", options: ["🔄 Naya Checkup"]
-    },
-    "Tez Bukhar aur Badan Dard": {
-        msg: "<b>🩺 Probable Diagnosis:</b> Yeh Dengue, Malaria ya Typhoid ke lakshan ho sakte hain.<br><br><b>💡 Advice:</b> Bina Blood Test ke koi heavy dawai/antibiotic khud se na lein.",
-        dept: "General Medicine", options: ["🔄 Naya Checkup"]
-    },
+    "🇮🇳 Hindi/Hinglish": { msg: "Aapko kis hisse mein pareshani mehsoos ho rahi hai?", options: ["🤕 Sir (Head)", "🫀 Chaati (Chest)", "🍕 Pet (Stomach)", "🤒 Bukhar (Fever)"] },
+    "🤕 Sir (Head)": { msg: "Sir mein exactly kaisa feel ho raha hai?", options: ["Tez dard (Throbbing)", "Chakkar aana (Dizziness)"] },
+    "Tez dard (Throbbing)": { msg: "<b>🩺 Probable Diagnosis:</b> Yeh Migraine ya Tension Headache ho sakta hai.<br><br><b>💡 Advice:</b> Shanti wale andhere kamre mein aaram karein aur paani piyein.", dept: "Neurology", options: ["🔄 Naya Checkup"] },
+    "Chakkar aana (Dizziness)": { msg: "<b>🩺 Probable Diagnosis:</b> Yeh Vertigo (chakkar) ya Low BP ki wajah se ho sakta hai.<br><br><b>💡 Advice:</b> Turant baith jayein ya let jayein taaki aap girein nahi.", dept: "Neurology", options: ["🔄 Naya Checkup"] },
+    "🫀 Chaati (Chest)": { msg: "Chaati (Chest) mein kya problem ho rahi hai?", options: ["Dard ya Jakdan (Tightness)", "Lagaatar Khansi (Cough)"] },
+    "Dard ya Jakdan (Tightness)": { msg: "<b>🩺 Probable Diagnosis:</b> Yeh Angina (Heart issue) ya severe Acidity ho sakti hai. Isko halke mein na lein.<br><br><b>🚨 Advice:</b> Kripya turant doctor se sampark karein.", dept: "Cardiology", options: ["🔄 Naya Checkup"] },
+    "Lagaatar Khansi (Cough)": { msg: "<b>🩺 Probable Diagnosis:</b> Yeh Bronchitis, Asthma ya chhati ka infection ho sakta hai.<br><br><b>💡 Advice:</b> Thandi cheezein na khayein aur bhaap (steam) lein.", dept: "Pulmonology", options: ["🔄 Naya Checkup"] },
+    "🍕 Pet (Stomach)": { msg: "Pet mein kya dikkat aa rahi hai?", options: ["Tez Dard ya Marod", "Ulti aur Dast (Diarrhea)"] },
+    "Tez Dard ya Marod": { msg: "<b>🩺 Probable Diagnosis:</b> Yeh Gastritis, Appendix, ya Pathri (Kidney Stone) ka dard ho sakta hai.<br><br><b>💡 Advice:</b> Gunguna paani piyein aur bahar ka masaledar khana chhod dein.", dept: "Gastroenterology", options: ["🔄 Naya Checkup"] },
+    "Ulti aur Dast (Diarrhea)": { msg: "<b>🩺 Probable Diagnosis:</b> Yeh pakka Food Poisoning ya pet ka infection hai.<br><br><b>💡 Advice:</b> ORS ka ghol piyein taaki body mein paani ki kami (dehydration) na ho.", dept: "General Medicine", options: ["🔄 Naya Checkup"] },
+    "🤒 Bukhar (Fever)": { msg: "Bukhar kaisa hai?", options: ["Halka Bukhar aur Sardi", "Tez Bukhar aur Badan Dard"] },
+    "Halka Bukhar aur Sardi": { msg: "<b>🩺 Probable Diagnosis:</b> Yeh normal Viral Fever ya Sardi-Zukam ho sakta hai.<br><br><b>💡 Advice:</b> Aaram karein aur apna temperature check karte rahein.", dept: "General Medicine", options: ["🔄 Naya Checkup"] },
+    "Tez Bukhar aur Badan Dard": { msg: "<b>🩺 Probable Diagnosis:</b> Yeh Dengue, Malaria ya Typhoid ke lakshan ho sakte hain.<br><br><b>💡 Advice:</b> Bina Blood Test ke koi heavy dawai/antibiotic khud se na lein.", dept: "General Medicine", options: ["🔄 Naya Checkup"] },
 
-    // Universal Restarts
     "🔄 Restart": { msg: "Let's start over. Please choose your language:", options: ["🇬🇧 English", "🇮🇳 Hindi/Hinglish"] },
     "🔄 Naya Checkup": { msg: "Chaliye dobara shuru karte hain. Apni bhasha chunein:", options: ["🇬🇧 English", "🇮🇳 Hindi/Hinglish"] }
 };
 
-// 🤖 🌟 CLICK-BASED CHAT ENGINE ROUTE (UNTOUCHED LOGIC)
-app.post('/api/ai-chat', (req, res) => {
+// 🤖 🌟 SECURE CLICK-BASED CHAT ENGINE (Added authenticate middleware)
+app.post('/api/ai-chat', authenticate, (req, res) => {
     let { message } = req.body;
     
-    // Fallback if message is empty or unrecognized
     if (!message || !symptomTree[message]) {
         message = "start";
     }
@@ -186,7 +105,7 @@ app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), (req, res)
     res.json({ score: 100, biomarkers: [{name: "Offline Check", val: "N/A", status: "Manual System Active", color: "blue"}], insights: ["Automated PDF scanning is disabled. Please consult the doctor directly."], diet: [] });
 });
 
-// 🛡️ AUTH, BOOKING & DASHBOARDS (UNTOUCHED & SAFE)
+// 🛡️ AUTH, BOOKING & DASHBOARDS
 app.post('/api/auth/register', async (req, res) => {
     try {
         const hash = await bcrypt.hash(req.body.password, 10);

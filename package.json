@@ -19,6 +19,7 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.3.0",
     "mysql2": "^3.24.3",
+    "node-nlp": "^5.0.0-alpha.5",
     "pg": "^8.23.0"
   }
 }

@@ -21,7 +21,6 @@
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        /* 🌟 NEW: RakshitPlus Click-Based Chat Options Styling (Dark Theme Optimized) */
         .options-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
         .chat-option-btn { 
             background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; 
@@ -120,7 +119,7 @@
         </div>
         
         <div id="chat-messages" class="relative flex-1 p-4 chat-scroll overflow-y-auto bg-[#0f172a] flex flex-col gap-4">
-            <!-- Messages will be injected here dynamically by JS -->
+            <!-- Messages dynamically injected -->
         </div>
 
         <div id="typing-indicator" class="hidden p-4 bg-[#0f172a]">
@@ -135,16 +134,15 @@
         </div>
 
         <div class="p-3 bg-slate-900 border-t border-slate-700 flex flex-col gap-2">
-            <!-- 🌟 NEW: The old manual input box is hidden because we use buttons now -->
             <div id="chat-input-container" class="hidden">
-                <input type="text" id="chat-input" placeholder="Type your symptoms here...">
+                <input type="text" id="chat-input">
                 <button id="chat-send-btn">Send</button>
             </div>
             <p class="text-center text-[10px] text-slate-400 font-medium tracking-wide">Select an option above to diagnose symptoms.</p>
         </div>
     </div>
 
-    <!-- 🌟 FLOATING ACTION WIDGET & LABEL -->
+    <!-- 🌟 FLOATING ACTION WIDGET -->
     <div class="fixed bottom-6 right-4 md:right-8 z-40 flex flex-col items-center gap-2">
         <button id="ai-widget-toggle" class="relative group focus:outline-none flex flex-col items-center">
             <div class="absolute inset-0 bg-blue-500 rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
@@ -165,7 +163,7 @@
     <div id="loginModal" class="fixed inset-0 modal-bg z-[100] hidden flex items-center justify-center opacity-0 transition-opacity p-4">
         <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform">
             <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
-            <h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">Welcome Back</h2>
+            <h2 id="loginTitle" class="text-2xl md:text-3xl font-black text-slate-900 mb-2">Welcome Back</h2>
             <form id="loginForm" class="space-y-4 md:space-y-5 mt-6">
                 <input type="email" id="log-email" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="hello@example.com">
                 <input type="password" id="log-password" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="••••••••">
@@ -231,23 +229,35 @@
             } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; }
         });
 
-        // --- 🌟 NEW CLICK-BASED CHAT LOGIC ---
+        // --- 🌟 SECURE & AUDIO ENABLED CHAT LOGIC ---
         const aiToggleBtn = document.getElementById('ai-widget-toggle');
         const aiChatWindow = document.getElementById('ai-chat-window');
         const closeAiChatBtn = document.getElementById('close-ai-chat');
         const chatMessages = document.getElementById('chat-messages');
         const typingIndicator = document.getElementById('typing-indicator');
 
+        // 🎶 Notification Sound Object
+        const botPopSound = new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg');
+        botPopSound.volume = 0.6;
+
         let isChatInitialized = false;
 
         aiToggleBtn.addEventListener('click', () => {
+            // 🔒 SECURITY CHECK: Login Mandatory for Chat
+            const token = localStorage.getItem('rakshitplus_jwt');
+            if (!token) {
+                alert("Please login to access the RakshitPlus Virtual Doctor.");
+                document.getElementById('loginTitle').innerText = "Login Required";
+                openModal('loginModal');
+                return;
+            }
+
             if(aiChatWindow.classList.contains('hidden')) {
                 aiChatWindow.classList.remove('hidden');
                 aiChatWindow.classList.add('flex');
                 const badge = aiToggleBtn.querySelector('.animate-ping');
                 if(badge) badge.parentElement.remove(); 
                 
-                // Initialize decision tree when opened first time
                 if(!isChatInitialized) {
                     chatMessages.innerHTML = '';
                     fetchAIResponse("start");
@@ -266,7 +276,6 @@
 
         function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
 
-        // Helper to insert messages into chat UI cleanly
         function appendMessageHTML(htmlContent, isUser = false) {
             chatMessages.innerHTML += `
                 <div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} bubble-enter relative z-10">
@@ -276,23 +285,32 @@
                     </div>
                 </div>`;
             scrollToBottom();
+            
+            // 🎶 Play Sound ONLY when Bot replies
+            if (!isUser) {
+                botPopSound.play().catch(e => console.log("Audio autoplay blocked by browser"));
+            }
         }
 
-        // Handle button clicks
         function handleOptionClick(selectedOption) {
             appendMessageHTML(selectedOption, true);
             fetchAIResponse(selectedOption);
         }
 
-        // Fetch Next Node in Decision Tree
         async function fetchAIResponse(userMessage) {
             typingIndicator.classList.remove('hidden');
             scrollToBottom();
 
+            // 🔒 SENDING JWT TOKEN FOR SECURITY
+            const token = localStorage.getItem('rakshitplus_jwt');
+
             try {
                 const res = await fetch('/api/ai-chat', {
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
                     body: JSON.stringify({ message: userMessage })
                 });
                 
@@ -316,11 +334,11 @@
 
                     appendMessageHTML(botResponseHTML, false);
                 } else {
-                    throw new Error("Server Error");
+                    throw new Error(data.error || "Server Error");
                 }
             } catch(e) {
                 typingIndicator.classList.add('hidden');
-                appendMessageHTML(`<span class="text-rose-400 font-bold">⚠️ System offline. Please refresh the page.</span>`, false);
+                appendMessageHTML(`<span class="text-rose-400 font-bold">⚠️ ${e.message}</span>`, false);
             }
         }
     </script>
