@@ -86,29 +86,18 @@
         </div>
     </div>
 
-    <!-- 🛑 GOD MODE DEBUG SCRIPT -->
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
 
         async function loadProfile() {
-            if(!docId) {
-                return document.getElementById('loader').innerHTML = `<h2 class="text-red-500 font-bold text-xl">Invalid Profile URL: ID is missing!</h2>`;
-            }
+            if(!docId) return alert("Invalid Profile URL");
             
             try {
-                // Backend se data mangwa rahe hain
                 const res = await fetch(`/api/doctors/${docId}`);
+                if(!res.ok) throw new Error("Doctor not found");
                 
-                // Response ko pehle raw text mein read karenge
-                const responseText = await res.text(); 
-                
-                if(!res.ok) {
-                    throw new Error(`[Status ${res.status}] Backend Reply: ${responseText}`);
-                }
-                
-                // Sab kuch thik hai toh JSON banakar UI update karenge
-                const doc = JSON.parse(responseText);
+                const doc = await res.json();
                 
                 document.getElementById('doc-name').innerText = doc.name;
                 document.getElementById('doc-spec').innerText = doc.specialization;
@@ -125,14 +114,13 @@
                 document.getElementById('profileContainer').classList.remove('hidden');
 
             } catch(e) {
-                // 🛑 SCREEN PAR ERROR CHHAP DENGE
+                // UI Restored: Clean "Doctor Unavailable" message
                 document.getElementById('loader').innerHTML = `
                     <div class="flex flex-col items-center justify-center pt-10 px-4">
-                        <div class="bg-rose-100 border-2 border-rose-500 p-6 rounded-xl shadow-lg w-full max-w-2xl text-left">
-                            <h3 class="text-rose-700 font-black text-xl mb-2">🛑 SYSTEM X-RAY REPORT</h3>
-                            <p class="text-rose-900 font-mono text-sm break-words">${e.message}</p>
-                            <p class="mt-4 text-xs font-bold text-slate-500 uppercase">Aapko ye error copy karke AI ko bhejna hai.</p>
-                        </div>
+                        <span class="text-6xl mb-4">🩺</span>
+                        <h2 class="text-2xl md:text-3xl font-black text-slate-800 mb-2">Doctor Unavailable</h2>
+                        <p class="text-slate-500 font-medium mb-6">This doctor's profile has been removed or no longer exists in our system.</p>
+                        <a href="doctors.html" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition">View Available Doctors</a>
                     </div>
                 `;
             }

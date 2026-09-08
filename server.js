@@ -50,7 +50,7 @@ app.get('/api/user/profile', authenticate, async (req, res) => {
     }
 });
 
-// 🧠 ULTIMATE DEEP DIAGNOSIS TREE (Unchanged)
+// 🧠 ULTIMATE DEEP DIAGNOSIS TREE
 const symptomTree = {
     "start": { msg: "Welcome to RakshitPlus AI. I am your virtual doctor. 👨‍⚕️<br><br>Please choose your language / Apni bhasha chunein:", options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"] },
     
@@ -169,6 +169,18 @@ app.post('/api/doctor/appointment/:id/status', authenticate, async (req, res) =>
 app.get('/api/doctors', async (req, res) => { 
     try { res.json((await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE role = 'doctor'`)).rows); } catch(e) { res.json([]); }
 });
+
+
+// 🚀🚀🚀 YAHAN THA WO MISSING ROUTE JO MENE WAPAS LAGA DIYA HAI 🚀🚀🚀
+app.get(['/api/doctor/:id', '/api/doctors/:id'], async (req, res) => {
+    try {
+        const result = await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE id = $1 AND role = 'doctor'`, [req.params.id]);
+        if (result.rows.length === 0) return res.status(404).json({ error: "Doctor not found" });
+        res.json(result.rows[0]);
+    } catch(e) { res.status(500).json({ error: "Server error" }); }
+});
+// 🚀🚀🚀 ROUTE KHATAM 🚀🚀🚀
+
 
 // 🌟 ADMIN ROUTES (CREATE, READ, DELETE)
 app.get('/api/admin/appointments', authenticate, async (req, res) => {
