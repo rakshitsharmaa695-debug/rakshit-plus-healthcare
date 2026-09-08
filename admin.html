@@ -14,10 +14,11 @@
 </head>
 <body class="flex flex-col md:flex-row h-screen overflow-hidden text-slate-800">
 
-    <!-- Mobile Header & Nav (🌟 NEW MOBILE FIX) -->
+    <!-- Mobile Header & Nav -->
     <div class="md:hidden flex flex-col w-full z-50 shadow-sm">
         <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center">
-            <h1 class="font-black text-xl text-white">Rakshit<span class="text-slate-400">Admin</span></h1>
+            <!-- 🌟 FIX: Name changed to Admin Panel -->
+            <h1 class="font-black text-xl text-white">Admin Panel</h1>
             <button onclick="logout()" class="text-xs bg-rose-500 text-white px-3 py-1.5 rounded-lg font-bold">Exit</button>
         </header>
         <!-- Horizontal Scrollable Menu For Mobile -->
@@ -31,8 +32,9 @@
     <!-- Desktop Sidebar -->
     <aside class="w-64 bg-slate-900 text-white flex flex-col hidden md:flex shrink-0">
         <div class="p-6 border-b border-slate-800">
-            <h1 class="text-2xl font-black"><span class="text-slate-400">System</span>Admin</h1>
-            <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-bold">Root Access Portal</p>
+            <!-- 🌟 FIX: Name changed to Admin Panel -->
+            <h1 class="text-2xl font-black">Admin Panel</h1>
+            <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-bold">Root Access</p>
         </div>
         <nav class="flex-1 p-4 space-y-2">
             <a href="#" onclick="showSection('overview')" class="flex items-center gap-3 px-4 py-3 bg-blue-600 rounded-xl font-bold transition"><span>📊</span> Dashboard Overview</a>
@@ -105,27 +107,22 @@
 
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 md:p-8">
                     <form id="addDoctorForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6" enctype="multipart/form-data">
-                        
                         <div class="md:col-span-2">
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Full Name</label>
                             <input type="text" id="doc-name" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
                         </div>
-                        
                         <div>
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Email (Login ID)</label>
                             <input type="email" id="doc-email" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
                         </div>
-                        
                         <div>
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Temporary Password</label>
                             <input type="password" id="doc-password" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
                         </div>
-
                         <div class="md:col-span-2">
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Profile Photo</label>
                             <input type="file" id="doc-image" accept="image/*" class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700">
                         </div>
-
                         <div>
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Department</label>
                             <select id="doc-spec" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-bold text-sm text-slate-700">
@@ -136,27 +133,22 @@
                                 <option value="General Medicine">General Medicine</option>
                             </select>
                         </div>
-                        
                         <div>
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Qualifications</label>
                             <input type="text" id="doc-qual" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
                         </div>
-
                         <div>
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Experience</label>
                             <input type="text" id="doc-exp" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
                         </div>
-
                         <div>
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Fee (₹)</label>
                             <input type="number" id="doc-fee" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
                         </div>
-                        
                         <div class="md:col-span-2">
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">About Bio</label>
                             <textarea id="doc-about" rows="3" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"></textarea>
                         </div>
-                        
                         <div class="md:col-span-2 mt-2">
                             <button type="submit" class="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-xl font-black shadow-lg hover:bg-blue-600 transition">Save Doctor Profile</button>
                             <p id="doc-status" class="font-bold text-sm text-center mt-3 hidden"></p>
