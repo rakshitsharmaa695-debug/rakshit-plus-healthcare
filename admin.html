@@ -103,7 +103,8 @@
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-                    <form id="addDoctorForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 🌟 ENCTYPE ALLOWS FILE UPLOAD -->
+                    <form id="addDoctorForm" class="grid grid-cols-1 md:grid-cols-2 gap-6" enctype="multipart/form-data">
                         
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Full Name</label>
@@ -118,6 +119,12 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Temporary Password</label>
                             <input type="password" id="doc-password" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 font-medium" placeholder="••••••••">
+                        </div>
+
+                        <!-- 🌟 NEW: ACTUAL FILE UPLOAD BUTTON -->
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Doctor Profile Photo</label>
+                            <input type="file" id="doc-image" accept="image/*" class="w-full bg-slate-50 border border-slate-200 p-2 rounded-xl outline-none focus:border-blue-500 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                         </div>
 
                         <div>
@@ -217,6 +224,7 @@
         async function loadOverview() {
             try {
                 const res = await fetch('/api/admin/appointments', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) throw new Error("API not found");
                 const data = await res.json();
                 
                 document.getElementById('stat-patients').innerText = data.length || 0;
@@ -242,6 +250,7 @@
         async function loadDoctors() {
             try {
                 const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) throw new Error("API not found");
                 const data = await res.json();
                 
                 const docs = data.filter(u => u.role === 'doctor');
@@ -251,9 +260,12 @@
                 tbody.innerHTML = '';
                 
                 docs.forEach(doc => {
+                    // Small thumbnail preview logic if image exists
+                    let imgTag = doc.image_url ? `<img src="${doc.image_url}" class="w-8 h-8 rounded-full inline mr-2 object-cover">` : ``;
+                    
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-50">
-                            <td class="px-6 py-4 font-bold text-slate-900">${doc.name}</td>
+                            <td class="px-6 py-4 font-bold text-slate-900 flex items-center">${imgTag} ${doc.name}</td>
                             <td class="px-6 py-4 font-bold text-purple-600">${doc.specialization}</td>
                             <td class="px-6 py-4">${doc.email}</td>
                             <td class="px-6 py-4 font-medium">₹${doc.fees}</td>
@@ -263,33 +275,41 @@
             } catch (e) { console.error("Failed to load doctors."); }
         }
 
+        // 🌟 NEW: FORM DATA LOGIC FOR FILE UPLOAD
         document.getElementById('addDoctorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
             const status = document.getElementById('doc-status');
-            btn.innerText = "Saving..."; btn.disabled = true;
+            btn.innerText = "Uploading & Saving..."; btn.disabled = true;
             
             try {
+                // Using FormData to handle text AND files
+                const formData = new FormData();
+                formData.append('name', document.getElementById('doc-name').value);
+                formData.append('email', document.getElementById('doc-email').value);
+                formData.append('password', document.getElementById('doc-password').value);
+                formData.append('specialization', document.getElementById('doc-spec').value);
+                formData.append('qualification', document.getElementById('doc-qual').value);
+                formData.append('experience', document.getElementById('doc-exp').value);
+                formData.append('fees', document.getElementById('doc-fee').value);
+                formData.append('about', document.getElementById('doc-about').value);
+                
+                const photoInput = document.getElementById('doc-image');
+                if (photoInput.files.length > 0) {
+                    formData.append('doctorPhoto', photoInput.files[0]); // Attach the actual image file
+                }
+
                 const res = await fetch('/api/admin/add-doctor', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({
-                        name: document.getElementById('doc-name').value,
-                        email: document.getElementById('doc-email').value,
-                        password: document.getElementById('doc-password').value,
-                        specialization: document.getElementById('doc-spec').value,
-                        qualification: document.getElementById('doc-qual').value,
-                        experience: document.getElementById('doc-exp').value,
-                        fees: document.getElementById('doc-fee').value,
-                        about: document.getElementById('doc-about').value
-                    })
+                    headers: { 'Authorization': `Bearer ${token}` }, // NO Content-Type here, browser sets it for FormData
+                    body: formData
                 });
                 
                 if (res.ok) {
                     status.className = "text-green-600 font-bold text-sm";
-                    status.innerText = "Doctor registered successfully!";
+                    status.innerText = "Doctor & Photo registered successfully!";
                     e.target.reset();
-                    loadDoctors(); // Refresh list
+                    loadDoctors(); 
                 } else {
                     status.className = "text-rose-500 font-bold text-sm";
                     status.innerText = "Error: Email might already exist.";
@@ -301,7 +321,6 @@
             }
         });
 
-        // Initialize
         loadOverview();
         loadDoctors();
     </script>

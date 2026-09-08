@@ -33,159 +33,62 @@ const authenticate = (req, res, next) => {
     catch (err) { return res.status(401).json({ error: "Session expired. Please Login again." }); }
 };
 
+// MULTIPART FORM HANDLER (For Photo Upload)
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 ULTIMATE DEEP DIAGNOSIS TREE (Bilingual & Multi-level)
+// 🧠 ULTIMATE DEEP DIAGNOSIS TREE
 const symptomTree = {
-    "start": {
-        msg: "Welcome to RakshitPlus AI. I am your virtual doctor. 👨‍⚕️<br><br>Please choose your language / Apni bhasha chunein:",
-        options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"]
-    },
-
-    // ================= ENGLISH BRANCH =================
-    "🇬🇧 English": { msg: "Where are you experiencing discomfort?", options: ["🤕 Head", "🫀 Chest", "🍕 Stomach", "🤒 Fever"] },
+    "start": { msg: "Welcome to RakshitPlus AI. I am your virtual doctor. 👨‍⚕️<br><br>Please choose your language / Apni bhasha chunein:", options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"] },
     
-    // --- HEAD ---
+    "🇬🇧 English": { msg: "Where are you experiencing discomfort?", options: ["🤕 Head", "🫀 Chest", "🍕 Stomach", "🤒 Fever"] },
     "🤕 Head": { msg: "Can you describe the headache?", options: ["Throbbing (Like a heartbeat)", "Sharp pain / Tight band"] },
     "Throbbing (Like a heartbeat)": { msg: "How long have you had this throbbing pain?", options: ["Just started today", "For a few days now"] },
     "Sharp pain / Tight band": { msg: "How long have you had this sharp/tight pain?", options: ["Just started today", "For a few days now"] },
-    
-    "Just started today": {
-        msg: "<b>🩺 Detailed Analysis:</b> This appears to be a budding Migraine or a Dehydration headache. It is common but manageable.<br><br><b>⚠️ Causes:</b> Lack of water, poor sleep, or excessive screen time.<br><b>💡 Immediate Relief:</b> Drink 2 glasses of water, dim the lights, and rest for 30 minutes away from screens.<br><b>🚨 Red Flags:</b> If you experience blurred vision or vomiting, consult a doctor immediately.",
-        dept: "Neurology", options: ["🔄 Start Over"]
-    },
-    "For a few days now": {
-        msg: "<b>🩺 Detailed Analysis:</b> Experiencing this pain for days indicates a persistent Tension Headache or Chronic Migraine.<br><br><b>⚠️ Causes:</b> High stress, chronic sleep deprivation, or blood pressure issues.<br><b>💡 Immediate Relief:</b> Apply a cold/warm compress to your forehead and neck. Consider a mild pain reliever after eating.<br><b>🚨 Red Flags:</b> Sudden numbness, slurred speech, or unendurable pain require immediate emergency care.",
-        dept: "Neurology", options: ["🔄 Start Over"]
-    },
-
-    // --- CHEST ---
-    "🫀 Chest": { msg: "Chest issues need careful attention. What exactly are you feeling?", options: ["Heavy tightness / Pressure", "Burning sensation (Heartburn)"] },
+    "Just started today": { msg: "<b>🩺 Detailed Analysis:</b> This appears to be a budding Migraine or a Dehydration headache.<br><br><b>💡 Immediate Relief:</b> Drink 2 glasses of water, dim the lights, and rest for 30 minutes.", dept: "Neurology", options: ["🔄 Start Over"] },
+    "For a few days now": { msg: "<b>🩺 Detailed Analysis:</b> Experiencing this pain for days indicates a persistent Tension Headache or Chronic Migraine.<br><br><b>💡 Immediate Relief:</b> Apply a cold compress to your forehead.", dept: "Neurology", options: ["🔄 Start Over"] },
+    "🫀 Chest": { msg: "What exactly are you feeling?", options: ["Heavy tightness / Pressure", "Burning sensation (Heartburn)"] },
     "Heavy tightness / Pressure": { msg: "Does the pain spread anywhere else?", options: ["Radiates to Left Arm / Jaw", "Stays in the center"] },
-    
-    "Radiates to Left Arm / Jaw": {
-        msg: "<b>🩺 Detailed Analysis:</b> This is a highly critical symptom pattern. Pain radiating to the left arm or jaw is a classic sign of Cardiac Distress (Angina or Heart Attack).<br><br><b>⚠️ Causes:</b> Blocked arteries or severe cardiac stress.<br><b>🚨 IMMEDIATE ACTION:</b> Do not wait. Chew an Aspirin (if not allergic) and go to the nearest Emergency Room (ER) immediately.",
-        dept: "Cardiology", options: ["🔄 Start Over"]
-    },
-    "Stays in the center": {
-        msg: "<b>🩺 Detailed Analysis:</b> Central chest pressure could be early Angina, severe Muscular spasm, or panic/anxiety attack.<br><br><b>⚠️ Causes:</b> Heavy lifting, high stress, or underlying heart conditions.<br><b>💡 Immediate Relief:</b> Sit down, loosen your clothes, and take slow, deep breaths.<br><b>🚨 Red Flags:</b> If it lasts more than 15 minutes or causes sweating/dizziness, rush to the hospital.",
-        dept: "Cardiology", options: ["🔄 Start Over"]
-    },
-    "Burning sensation (Heartburn)": {
-        msg: "<b>🩺 Detailed Analysis:</b> This sounds like severe Acid Reflux (GERD). Stomach acid is pushing up into your esophagus, mimicking chest pain.<br><br><b>⚠️ Causes:</b> Spicy food, eating too late at night, or empty stomach.<br><b>💡 Immediate Relief:</b> Drink a glass of cold milk or take an antacid. Sit upright (do not lie down).<br><b>🚨 Red Flags:</b> If antacids don't work and pain increases with breathing, consult a doctor.",
-        dept: "Gastroenterology", options: ["🔄 Start Over"]
-    },
-
-    // --- STOMACH ---
+    "Radiates to Left Arm / Jaw": { msg: "<b>🩺 Detailed Analysis:</b> Pain radiating to the left arm or jaw is a classic sign of Cardiac Distress (Angina/Heart Attack).<br><br><b>🚨 IMMEDIATE ACTION:</b> Go to the nearest Emergency Room (ER) immediately.", dept: "Cardiology", options: ["🔄 Start Over"] },
+    "Stays in the center": { msg: "<b>🩺 Detailed Analysis:</b> Central chest pressure could be early Angina or panic/anxiety attack.<br><br><b>💡 Immediate Relief:</b> Sit down, loosen your clothes, and take slow, deep breaths.", dept: "Cardiology", options: ["🔄 Start Over"] },
+    "Burning sensation (Heartburn)": { msg: "<b>🩺 Detailed Analysis:</b> This sounds like severe Acid Reflux (GERD).<br><br><b>💡 Immediate Relief:</b> Drink a glass of cold milk or take an antacid. Sit upright.", dept: "Gastroenterology", options: ["🔄 Start Over"] },
     "🍕 Stomach": { msg: "What is your primary stomach issue?", options: ["Severe Cramps / Pain", "Nausea, Vomiting & Diarrhea"] },
     "Severe Cramps / Pain": { msg: "Where exactly is the pain located?", options: ["Lower Right Side", "Upper / Central Stomach"] },
-    
-    "Lower Right Side": {
-        msg: "<b>🩺 Detailed Analysis:</b> Sharp pain in the lower right abdomen is highly suspicious for Appendicitis.<br><br><b>⚠️ Causes:</b> Inflammation or infection of the appendix.<br><b>💡 Immediate Relief:</b> Do NOT eat or drink anything right now, and avoid painkillers as they may hide symptoms.<br><b>🚨 Red Flags:</b> If the pain is unbearable or accompanied by fever, rush to the ER for an ultrasound.",
-        dept: "Gastroenterology", options: ["🔄 Start Over"]
-    },
-    "Upper / Central Stomach": {
-        msg: "<b>🩺 Detailed Analysis:</b> This indicates Gastritis, Peptic Ulcers, or Indigestion.<br><br><b>⚠️ Causes:</b> High acid levels, bacterial infection (H. Pylori), or spicy food.<br><b>💡 Immediate Relief:</b> Drink warm water, eat something very light (like plain rice or toast), and rest.<br><b>🚨 Red Flags:</b> Black stool or vomiting blood requires immediate emergency care.",
-        dept: "Gastroenterology", options: ["🔄 Start Over"]
-    },
-    "Nausea, Vomiting & Diarrhea": {
-        msg: "<b>🩺 Detailed Analysis:</b> This is a classic case of Gastroenteritis (Food Poisoning or Stomach Bug).<br><br><b>⚠️ Causes:</b> Consuming contaminated food or water.<br><b>💡 Immediate Relief:</b> The biggest risk is dehydration. Sip on ORS (Oral Rehydration Solution) or electrolyte water continuously.<br><b>🚨 Red Flags:</b> If you cannot keep fluids down for 12 hours or feel extremely weak, get an IV drip.",
-        dept: "General Medicine", options: ["🔄 Start Over"]
-    },
-
-    // --- FEVER ---
+    "Lower Right Side": { msg: "<b>🩺 Detailed Analysis:</b> Sharp pain in the lower right abdomen is highly suspicious for Appendicitis.<br><br><b>🚨 Red Flags:</b> If the pain is unbearable, rush to the ER.", dept: "Gastroenterology", options: ["🔄 Start Over"] },
+    "Upper / Central Stomach": { msg: "<b>🩺 Detailed Analysis:</b> This indicates Gastritis or Peptic Ulcers.<br><br><b>💡 Immediate Relief:</b> Drink warm water and eat something very light.", dept: "Gastroenterology", options: ["🔄 Start Over"] },
+    "Nausea, Vomiting & Diarrhea": { msg: "<b>🩺 Detailed Analysis:</b> This is a classic case of Gastroenteritis (Food Poisoning).<br><br><b>💡 Immediate Relief:</b> Sip on ORS (Oral Rehydration Solution) continuously.", dept: "General Medicine", options: ["🔄 Start Over"] },
     "🤒 Fever": { msg: "What is your temperature like?", options: ["Around 100°F (Mild) with Chills", "Over 102°F (High) with Body Ache"] },
-    "Around 100°F (Mild) with Chills": {
-        msg: "<b>🩺 Detailed Analysis:</b> A mild fever with chills usually points to a common Viral Infection or Seasonal Cold.<br><br><b>⚠️ Causes:</b> Exposure to viruses or changing weather.<br><b>💡 Immediate Relief:</b> Get plenty of rest, stay warm, and drink warm fluids (like herbal tea or soup).<br><b>🚨 Red Flags:</b> If it persists beyond 3 days or you develop a severe cough, see a doctor.",
-        dept: "General Medicine", options: ["🔄 Start Over"]
-    },
-    "Over 102°F (High) with Body Ache": {
-        msg: "<b>🩺 Detailed Analysis:</b> High fever accompanied by severe muscle/joint pain is a strong indicator of Dengue, Malaria, or severe Typhoid.<br><br><b>⚠️ Causes:</b> Mosquito-borne viruses or severe bacterial infections.<br><b>💡 Immediate Relief:</b> Use a cold, wet cloth on the forehead to bring the temperature down. Take Paracetamol (if previously prescribed).<br><b>🚨 Red Flags:</b> DO NOT take Ibuprofen or Aspirin without a doctor's advice (can be dangerous in Dengue). Get a blood test ASAP.",
-        dept: "General Medicine", options: ["🔄 Start Over"]
-    },
+    "Around 100°F (Mild) with Chills": { msg: "<b>🩺 Detailed Analysis:</b> A mild fever with chills usually points to a common Viral Infection.<br><br><b>💡 Immediate Relief:</b> Get plenty of rest and stay warm.", dept: "General Medicine", options: ["🔄 Start Over"] },
+    "Over 102°F (High) with Body Ache": { msg: "<b>🩺 Detailed Analysis:</b> High fever accompanied by severe muscle pain indicates Dengue or Typhoid.<br><br><b>🚨 Red Flags:</b> DO NOT take Ibuprofen without a doctor's advice. Get a blood test ASAP.", dept: "General Medicine", options: ["🔄 Start Over"] },
 
-
-    // ================= HINGLISH BRANCH =================
     "🇮🇳 Hindi / Hinglish": { msg: "Aapko kis hisse mein pareshani mehsoos ho rahi hai?", options: ["🤕 Sir (Head)", "🫀 Chaati (Chest)", "🍕 Pet (Stomach)", "🤒 Bukhar (Fever)"] },
-    
-    // --- HEAD (Hindi) ---
     "🤕 Sir (Head)": { msg: "Sir ka dard kaisa mehsoos ho raha hai?", options: ["Dhak-dhak wala tez dard", "Chakkar aana (Spinning)"] },
     "Dhak-dhak wala tez dard": { msg: "Yeh dard kab se ho raha hai?", options: ["Aaj hi shuru hua", "Kuch dino se hai"] },
-    
-    "Aaj hi shuru hua": {
-        msg: "<b>🩺 Detailed Analysis:</b> Yeh shuruaati Migraine ya paani ki kami (Dehydration) ka dard lag raha hai.<br><br><b>⚠️ Causes:</b> Kam paani peena, neend poori na hona ya screen par zyada time bitana.<br><b>💡 Immediate Relief:</b> 2 glass paani piyein, light band karke shant kamre mein 30 minute aaram karein.<br><b>🚨 Red Flags:</b> Agar aankhon ke aage dhundla dikhe ya ulti (vomiting) aaye, toh turant doctor ko dikhayein.",
-        dept: "Neurology", options: ["🔄 Naya Checkup"]
-    },
-    "Kuch dino se hai": {
-        msg: "<b>🩺 Detailed Analysis:</b> Lagaatar dard rehna Chronic Tension Headache ya Migraine ka sanket hai.<br><br><b>⚠️ Causes:</b> Bahut zyada stress, Blood pressure ki dikkat, ya lagaatar neend na aana.<br><b>💡 Immediate Relief:</b> Maathe (forehead) par halka thanda ya garam kapda rakhein aur thoda aaram karein.<br><b>🚨 Red Flags:</b> Agar bolne mein dikkat ho ya dard bardaasht ke bahar ho, toh turant Emergency mein jaayein.",
-        dept: "Neurology", options: ["🔄 Naya Checkup"]
-    },
-
-    // --- CHEST (Hindi) ---
+    "Aaj hi shuru hua": { msg: "<b>🩺 Detailed Analysis:</b> Yeh shuruaati Migraine ya paani ki kami (Dehydration) lag raha hai.<br><br><b>💡 Immediate Relief:</b> 2 glass paani piyein aur shant kamre mein aaram karein.", dept: "Neurology", options: ["🔄 Naya Checkup"] },
+    "Kuch dino se hai": { msg: "<b>🩺 Detailed Analysis:</b> Lagaatar dard rehna Chronic Tension Headache hai.<br><br><b>💡 Immediate Relief:</b> Maathe par halka thanda kapda rakhein aur thoda aaram karein.", dept: "Neurology", options: ["🔄 Naya Checkup"] },
+    "Chakkar aana (Spinning)": { msg: "<b>🩺 Detailed Analysis:</b> Yeh Vertigo (chakkar) ya Low BP ki wajah se ho sakta hai.<br><br><b>💡 Immediate Relief:</b> Turant baith jayein ya let jayein taaki aap girein nahi.", dept: "Neurology", options: ["🔄 Naya Checkup"] },
     "🫀 Chaati (Chest)": { msg: "Chaati mein exactly kya ho raha hai?", options: ["Bhaari-pan aur Jakdan (Pressure)", "Seene mein Jalan (Heartburn)"] },
     "Bhaari-pan aur Jakdan (Pressure)": { msg: "Kya yeh dard kahin aur bhi fail raha hai?", options: ["Bayein (Left) haath ya jabde mein", "Sirf beecho-beech hai"] },
-    
-    "Bayein (Left) haath ya jabde mein": {
-        msg: "<b>🩺 Detailed Analysis:</b> Yeh ek bahut hi SERIOUS lakshan hai. Agar chaati ka dard left haath ya jabde (jaw) tak jaaye, toh yeh Heart Attack (Angina) ho sakta hai.<br><br><b>⚠️ Causes:</b> Heart ki nasso (arteries) mein blockage ya dabaav.<br><b>🚨 IMMEDIATE ACTION:</b> Bilkul intezaar na karein. Turant kisi ko bulayein aur nazdeeki Hospital (Emergency Room) mein jaayein.",
-        dept: "Cardiology", options: ["🔄 Naya Checkup"]
-    },
-    "Sirf beecho-beech hai": {
-        msg: "<b>🩺 Detailed Analysis:</b> Yeh early angina, gas ka dabaav ya panic/anxiety attack ho sakta hai.<br><br><b>⚠️ Causes:</b> Bhari saaman uthana, bahut stress, ya heart ki koi pehle ki condition.<br><b>💡 Immediate Relief:</b> Araam se baith jayein, apne kapde halke dheele karein aur lambi saansein lein.<br><b>🚨 Red Flags:</b> Agar paseena aaye ya chakkar aaye, toh turant doctor ke paas bhagein.",
-        dept: "Cardiology", options: ["🔄 Naya Checkup"]
-    },
-    "Seene mein Jalan (Heartburn)": {
-        msg: "<b>🩺 Detailed Analysis:</b> Yeh severe Acid Reflux (Acidity/GERD) hai. Pet ka acid upar aakar chaati mein jalan paida kar raha hai.<br><br><b>⚠️ Causes:</b> Bahut masaledar khana, khaali pet rehna, ya raat ko late khana.<br><b>💡 Immediate Relief:</b> Thanda doodh piyein ya koi antacid (Digene/Eno) lein. Lete nahi, seedhe baithe rahein.<br><b>🚨 Red Flags:</b> Agar dawai se bhi aaram na mile aur saans lene mein takleef ho, toh doctor ko dikhayein.",
-        dept: "Gastroenterology", options: ["🔄 Naya Checkup"]
-    },
-
-    // --- STOMACH (Hindi) ---
+    "Bayein (Left) haath ya jabde mein": { msg: "<b>🩺 Detailed Analysis:</b> Agar chaati ka dard left haath tak jaaye, toh yeh Heart Attack (Angina) ho sakta hai.<br><br><b>🚨 IMMEDIATE ACTION:</b> Turant kisi ko bulayein aur Hospital (Emergency Room) mein jaayein.", dept: "Cardiology", options: ["🔄 Naya Checkup"] },
+    "Sirf beecho-beech hai": { msg: "<b>🩺 Detailed Analysis:</b> Yeh early angina ya gas ka dabaav ho sakta hai.<br><br><b>💡 Immediate Relief:</b> Araam se baith jayein aur lambi saansein lein.", dept: "Cardiology", options: ["🔄 Naya Checkup"] },
+    "Seene mein Jalan (Heartburn)": { msg: "<b>🩺 Detailed Analysis:</b> Yeh severe Acid Reflux (Acidity) hai.<br><br><b>💡 Immediate Relief:</b> Thanda doodh piyein ya koi antacid lein. Lete nahi, seedhe baithe rahein.", dept: "Gastroenterology", options: ["🔄 Naya Checkup"] },
     "🍕 Pet (Stomach)": { msg: "Pet mein kya dikkat aa rahi hai?", options: ["Tez Dard ya Marod (Cramps)", "Ulti aur Dast (Vomiting/Loose Motions)"] },
     "Tez Dard ya Marod (Cramps)": { msg: "Dard pet ke kis hisse mein hai?", options: ["Neeche Right side mein", "Upar ya beecho-beech"] },
-    
-    "Neeche Right side mein": {
-        msg: "<b>🩺 Detailed Analysis:</b> Pet ke neeche right side mein tez dard Appendix ke infection ka lakshan hota hai.<br><br><b>⚠️ Causes:</b> Appendix mein sujan (inflammation).<br><b>💡 Immediate Relief:</b> Abhi kuch bhi khayein piyein NAHI aur na hi dard ki dawa khud se lein (warna asli dard chhip jayega).<br><b>🚨 Red Flags:</b> Agar dard bardaasht na ho aur bukhar bhi aa jaye, turant Ultrasound ke liye aspatal jayein.",
-        dept: "Gastroenterology", options: ["🔄 Naya Checkup"]
-    },
-    "Upar ya beecho-beech": {
-        msg: "<b>🩺 Detailed Analysis:</b> Yeh Gastritis, Ulcer ya gas ka dard ho sakta hai.<br><br><b>⚠️ Causes:</b> Khali pet rehna, acid zyada banna ya galat khana.<br><b>💡 Immediate Relief:</b> Gunguna paani piyein, sirf halka khana (khichdi/daliya) khayein.<br><b>🚨 Red Flags:</b> Agar potty mein khoon aaye ya dard ki wajah se paseene chootein, toh Emergency mein dikhayein.",
-        dept: "Gastroenterology", options: ["🔄 Naya Checkup"]
-    },
-    "Ulti aur Dast (Vomiting/Loose Motions)": {
-        msg: "<b>🩺 Detailed Analysis:</b> Yeh Food Poisoning ya pet ka viral infection (Gastroenteritis) hai.<br><br><b>⚠️ Causes:</b> Kharab khana ya ganda paani peena.<br><b>💡 Immediate Relief:</b> Body ka paani kam nahi hona chahiye. Thodi-thodi der mein ORS ka ghol ya Nimbu paani peete rahein.<br><b>🚨 Red Flags:</b> Agar 12 ghante baad bhi paani na pache aur chakkar aane lagein, toh Glucose (IV Drip) chadwane ke liye hospital jayein.",
-        dept: "General Medicine", options: ["🔄 Naya Checkup"]
-    },
-
-    // --- FEVER (Hindi) ---
+    "Neeche Right side mein": { msg: "<b>🩺 Detailed Analysis:</b> Pet ke neeche right side mein tez dard Appendix ka lakshan hota hai.<br><br><b>🚨 Red Flags:</b> Agar dard bardaasht na ho, turant Ultrasound karwayein.", dept: "Gastroenterology", options: ["🔄 Naya Checkup"] },
+    "Upar ya beecho-beech": { msg: "<b>🩺 Detailed Analysis:</b> Yeh Gastritis, Ulcer ya gas ka dard ho sakta hai.<br><br><b>💡 Immediate Relief:</b> Gunguna paani piyein aur halka khana khayein.", dept: "Gastroenterology", options: ["🔄 Naya Checkup"] },
+    "Ulti aur Dast (Vomiting/Loose Motions)": { msg: "<b>🩺 Detailed Analysis:</b> Yeh Food Poisoning ya viral infection hai.<br><br><b>💡 Immediate Relief:</b> ORS ka ghol ya Nimbu paani peete rahein taaki paani ki kami na ho.", dept: "General Medicine", options: ["🔄 Naya Checkup"] },
     "🤒 Bukhar (Fever)": { msg: "Bukhar kitna tez hai?", options: ["100°F ke aas-paas aur sardi", "102°F se upar aur badan dard"] },
-    "100°F ke aas-paas aur sardi": {
-        msg: "<b>🩺 Detailed Analysis:</b> Halka bukhar aur sardi (chills) normal Viral Fever ya mausam badalne ka asar hai.<br><br><b>⚠️ Causes:</b> Viral infection ya sardi lagna.<br><b>💡 Immediate Relief:</b> Kapde pehan kar aaram karein, garam soop ya haldi wala doodh piyein.<br><b>🚨 Red Flags:</b> Agar bukhar 3 din se zyada rahe ya khansi rukne ka naam na le, toh doctor se milein.",
-        dept: "General Medicine", options: ["🔄 Naya Checkup"]
-    },
-    "102°F se upar aur badan dard": {
-        msg: "<b>🩺 Detailed Analysis:</b> Itna tez bukhar aur jodon/badan mein hadd-tod dard Dengue, Malaria ya Typhoid ka sabse bada lakshan hai.<br><br><b>⚠️ Causes:</b> Machhar ke kaatne (Mosquito bite) ya infection se.<br><b>💡 Immediate Relief:</b> Bukhar kam karne ke liye maathe par thande paani ki patti rakhein. Paracetamol le sakte hain.<br><b>🚨 Red Flags:</b> Bina Blood Test karwaye Ibuprofen ya Aspirin bilkul NA khayein (Dengue mein yeh jaanleva ho sakti hain). Turant checkup karwayein.",
-        dept: "General Medicine", options: ["🔄 Naya Checkup"]
-    },
+    "100°F ke aas-paas aur sardi": { msg: "<b>🩺 Detailed Analysis:</b> Halka bukhar aur sardi normal Viral Fever hai.<br><br><b>💡 Immediate Relief:</b> Kapde pehan kar aaram karein aur garam soop piyein.", dept: "General Medicine", options: ["🔄 Naya Checkup"] },
+    "102°F se upar aur badan dard": { msg: "<b>🩺 Detailed Analysis:</b> Itna tez bukhar aur jodon mein dard Dengue ya Malaria ka lakshan hai.<br><br><b>🚨 Red Flags:</b> Bina Blood Test karwaye Ibuprofen bilkul NA khayein.", dept: "General Medicine", options: ["🔄 Naya Checkup"] },
 
-    // ================= RESTART LOGIC =================
     "🔄 Start Over": { msg: "Let's start over. Please choose your language:", options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"] },
     "🔄 Naya Checkup": { msg: "Chaliye dobara shuru karte hain. Apni bhasha chunein:", options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"] }
 };
 
-// 🤖 🌟 SECURE & DEEP CHAT ENGINE
 app.post('/api/ai-chat', authenticate, (req, res) => {
     let { message } = req.body;
-    
-    if (!message || !symptomTree[message]) {
-        message = "start";
-    }
-
+    if (!message || !symptomTree[message]) message = "start";
     const responseNode = symptomTree[message];
-    
-    return res.json({ 
-        reply: responseNode.msg, 
-        options: responseNode.options || [], 
-        department: responseNode.dept || null 
-    });
+    return res.json({ reply: responseNode.msg, options: responseNode.options || [], department: responseNode.dept || null });
 });
 
 async function aiTriageEngine(symptoms) {
@@ -194,12 +97,10 @@ async function aiTriageEngine(symptoms) {
     return "General Medicine";
 }
 
-// 🚀 LAB REPORT ANALYZER
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), (req, res) => {
-    res.json({ score: 100, biomarkers: [{name: "Offline Check", val: "N/A", status: "Manual System Active", color: "blue"}], insights: ["Automated PDF scanning is disabled. Please consult the doctor directly."], diet: [] });
+    res.json({ score: 100, biomarkers: [{name: "Offline Check", val: "N/A", status: "Manual System Active", color: "blue"}], insights: ["Automated PDF scanning disabled."], diet: [] });
 });
 
-// 🛡️ AUTH, BOOKING & DASHBOARDS
 app.post('/api/auth/register', async (req, res) => {
     try {
         const hash = await bcrypt.hash(req.body.password, 10);
@@ -259,6 +160,43 @@ app.get(['/api/doctor/:id', '/api/doctors/:id'], async (req, res) => {
         if (result.rows.length === 0) return res.status(404).json({ error: "Doctor not found" });
         res.json(result.rows[0]);
     } catch(e) { res.status(500).json({ error: "Server error" }); }
+});
+
+// 🌟 NEW: ADMIN ROUTES WITH ACTUAL PHOTO UPLOAD CAPABILITY
+app.get('/api/admin/appointments', authenticate, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({error: "Access Denied"});
+    try { res.json((await pool.query(`SELECT * FROM appointments ORDER BY id DESC`)).rows); } 
+    catch(e) { res.status(500).json({error: "Server Error"}); }
+});
+
+app.get('/api/admin/users', authenticate, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({error: "Access Denied"});
+    try { res.json((await pool.query(`SELECT id, name, email, role, specialization, fees, image_url FROM users ORDER BY id DESC`)).rows); } 
+    catch(e) { res.status(500).json({error: "Server Error"}); }
+});
+
+// Photo upload route via Multer
+app.post('/api/admin/add-doctor', authenticate, upload.single('doctorPhoto'), async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({error: "Access Denied"});
+    
+    try {
+        const hash = await bcrypt.hash(req.body.password, 10);
+        
+        // Convert uploaded photo to Base64 to store in DB
+        let imageUrl = "";
+        if (req.file) {
+            imageUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+        }
+        
+        await pool.query(
+            `INSERT INTO users (name, email, password, role, specialization, qualification, experience, fees, about, image_url) 
+             VALUES ($1, $2, $3, 'doctor', $4, $5, $6, $7, $8, $9)`, 
+            [req.body.name, req.body.email, hash, req.body.specialization, req.body.qualification, req.body.experience, req.body.fees, req.body.about, imageUrl]
+        );
+        res.status(201).json({ message: "Doctor added successfully!" });
+    } catch (error) { 
+        res.status(400).json({ error: "Email already exists or invalid data!" }); 
+    }
 });
 
 const PORT = process.env.PORT || 3000;
