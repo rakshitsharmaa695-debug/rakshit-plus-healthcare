@@ -33,7 +33,6 @@ const authenticate = (req, res, next) => {
     catch (err) { return res.status(401).json({ error: "Session expired. Please Login again." }); }
 };
 
-// MULTIPART FORM HANDLER (For Photo Upload)
 const upload = multer({ storage: multer.memoryStorage() }); 
 
 // 🧠 ULTIMATE DEEP DIAGNOSIS TREE
@@ -162,7 +161,7 @@ app.get(['/api/doctor/:id', '/api/doctors/:id'], async (req, res) => {
     } catch(e) { res.status(500).json({ error: "Server error" }); }
 });
 
-// 🌟 NEW: ADMIN ROUTES WITH ACTUAL PHOTO UPLOAD CAPABILITY
+// 🌟 ADMIN ROUTES (CREATE, READ, DELETE)
 app.get('/api/admin/appointments', authenticate, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({error: "Access Denied"});
     try { res.json((await pool.query(`SELECT * FROM appointments ORDER BY id DESC`)).rows); } 
@@ -175,28 +174,30 @@ app.get('/api/admin/users', authenticate, async (req, res) => {
     catch(e) { res.status(500).json({error: "Server Error"}); }
 });
 
-// Photo upload route via Multer
 app.post('/api/admin/add-doctor', authenticate, upload.single('doctorPhoto'), async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({error: "Access Denied"});
-    
     try {
         const hash = await bcrypt.hash(req.body.password, 10);
-        
-        // Convert uploaded photo to Base64 to store in DB
         let imageUrl = "";
         if (req.file) {
             imageUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
         }
-        
         await pool.query(
             `INSERT INTO users (name, email, password, role, specialization, qualification, experience, fees, about, image_url) 
              VALUES ($1, $2, $3, 'doctor', $4, $5, $6, $7, $8, $9)`, 
             [req.body.name, req.body.email, hash, req.body.specialization, req.body.qualification, req.body.experience, req.body.fees, req.body.about, imageUrl]
         );
         res.status(201).json({ message: "Doctor added successfully!" });
-    } catch (error) { 
-        res.status(400).json({ error: "Email already exists or invalid data!" }); 
-    }
+    } catch (error) { res.status(400).json({ error: "Email already exists or invalid data!" }); }
+});
+
+// 🌟 NEW: DELETE DOCTOR ROUTE
+app.delete('/api/admin/doctor/:id', authenticate, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({error: "Access Denied"});
+    try {
+        await pool.query(`DELETE FROM users WHERE id = $1 AND role = 'doctor'`, [req.params.id]);
+        res.json({ message: "Doctor removed successfully" });
+    } catch(e) { res.status(500).json({error: "Server Error"}); }
 });
 
 const PORT = process.env.PORT || 3000;

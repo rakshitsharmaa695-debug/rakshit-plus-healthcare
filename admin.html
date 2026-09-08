@@ -103,7 +103,6 @@
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-                    <!-- 🌟 ENCTYPE ALLOWS FILE UPLOAD -->
                     <form id="addDoctorForm" class="grid grid-cols-1 md:grid-cols-2 gap-6" enctype="multipart/form-data">
                         
                         <div class="md:col-span-2">
@@ -121,7 +120,6 @@
                             <input type="password" id="doc-password" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 font-medium" placeholder="••••••••">
                         </div>
 
-                        <!-- 🌟 NEW: ACTUAL FILE UPLOAD BUTTON -->
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Doctor Profile Photo</label>
                             <input type="file" id="doc-image" accept="image/*" class="w-full bg-slate-50 border border-slate-200 p-2 rounded-xl outline-none focus:border-blue-500 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
@@ -182,6 +180,7 @@
                                     <th class="px-6 py-4">Specialization</th>
                                     <th class="px-6 py-4">Email</th>
                                     <th class="px-6 py-4">Fee</th>
+                                    <th class="px-6 py-4 text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="doctorsList" class="divide-y divide-slate-100">
@@ -260,7 +259,6 @@
                 tbody.innerHTML = '';
                 
                 docs.forEach(doc => {
-                    // Small thumbnail preview logic if image exists
                     let imgTag = doc.image_url ? `<img src="${doc.image_url}" class="w-8 h-8 rounded-full inline mr-2 object-cover">` : ``;
                     
                     tbody.innerHTML += `
@@ -269,13 +267,39 @@
                             <td class="px-6 py-4 font-bold text-purple-600">${doc.specialization}</td>
                             <td class="px-6 py-4">${doc.email}</td>
                             <td class="px-6 py-4 font-medium">₹${doc.fees}</td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="deleteDoctor(${doc.id})" class="bg-rose-50 text-rose-600 border border-rose-200 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-rose-500 hover:text-white transition">Remove</button>
+                            </td>
                         </tr>
                     `;
                 });
             } catch (e) { console.error("Failed to load doctors."); }
         }
 
-        // 🌟 NEW: FORM DATA LOGIC FOR FILE UPLOAD
+        // 🌟 NEW: DOCTOR DELETION LOGIC
+        async function deleteDoctor(id) {
+            // Confirm from user before deleting
+            const confirmDelete = confirm("Are you sure you want to completely remove this doctor from the system?");
+            if (!confirmDelete) return;
+
+            try {
+                const res = await fetch(`/api/admin/doctor/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (res.ok) {
+                    alert("Doctor removed successfully.");
+                    loadDoctors();   // Reload list instantly
+                    loadOverview(); // Refresh total count
+                } else {
+                    alert("Failed to remove doctor.");
+                }
+            } catch (e) {
+                alert("Server error while removing doctor.");
+            }
+        }
+
         document.getElementById('addDoctorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
@@ -283,7 +307,6 @@
             btn.innerText = "Uploading & Saving..."; btn.disabled = true;
             
             try {
-                // Using FormData to handle text AND files
                 const formData = new FormData();
                 formData.append('name', document.getElementById('doc-name').value);
                 formData.append('email', document.getElementById('doc-email').value);
@@ -296,12 +319,12 @@
                 
                 const photoInput = document.getElementById('doc-image');
                 if (photoInput.files.length > 0) {
-                    formData.append('doctorPhoto', photoInput.files[0]); // Attach the actual image file
+                    formData.append('doctorPhoto', photoInput.files[0]);
                 }
 
                 const res = await fetch('/api/admin/add-doctor', {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }, // NO Content-Type here, browser sets it for FormData
+                    headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
                 
