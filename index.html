@@ -51,6 +51,8 @@
                 <a href="doctors.html" class="hover:text-blue-600 transition-colors">Find Doctors</a>
                 <a href="contact.html" class="hover:text-blue-600 transition-colors">Contact Us</a>
             </div>
+            
+            <!-- Desktop Auth -->
             <div class="hidden md:flex items-center space-x-4">
                 <div id="authButtons" class="flex gap-3 items-center">
                     <button onclick="openModal('loginModal')" class="font-bold text-slate-600 hover:text-blue-600 px-4 py-2 transition">Login</button>
@@ -64,17 +66,22 @@
                 </div>
             </div>
         </div>
+
+        <!-- 📱 Mobile Menu -->
         <div id="mobileMenu" class="md:hidden max-h-0 opacity-0 overflow-hidden flex flex-col items-center gap-4 py-0 bg-white/95 rounded-2xl shadow-xl mt-2 w-full text-center border-t border-slate-100 transition-all">
             <a href="index.html" class="text-blue-600 font-bold w-full py-2 mt-2">Home</a>
             <a href="doctors.html" class="font-bold text-slate-600 w-full py-2">Find Doctors</a>
             <a href="contact.html" class="font-bold text-slate-600 w-full py-2">Contact Us</a>
+            
             <div id="mobileAuthButtons" class="flex flex-col w-full px-6 pb-4 gap-3">
-                <button onclick="openModal('loginModal')" class="font-bold text-slate-600 border border-slate-200 py-2 rounded-xl w-full">Login</button>
+                <button onclick="openModal('loginModal'); document.getElementById('mobileMenuBtn').click();" class="font-bold text-slate-600 border border-slate-200 py-2 rounded-xl w-full">Login</button>
                 <a href="booking.html" class="bg-blue-600 text-white py-2.5 rounded-xl font-bold shadow-lg w-full">Book Consult</a>
             </div>
             <div id="mobileUserProfileBtn" class="hidden flex-col w-full px-6 pb-4 gap-3">
-                <a href="dashboard.html" id="mobilePatientDashboardBtn" class="hidden bg-slate-900 text-white py-2 rounded-xl text-sm font-bold shadow-md w-full">🏥 Dashboard</a>
-                <button onclick="logout()" class="text-sm font-bold text-slate-400 border py-2 rounded-xl w-full">Logout</button>
+                <a href="admin.html" id="adminPortalBtnMobile" class="hidden bg-red-600 text-white py-2.5 rounded-xl text-sm font-bold shadow-md w-full">🛡️ Admin Portal</a>
+                <a href="doctor-dashboard.html" id="doctorDashboardBtnMobile" class="hidden bg-purple-600 text-white py-2.5 rounded-xl text-sm font-bold shadow-md w-full">👨‍⚕️ Doctor Portal</a>
+                <a href="dashboard.html" id="patientDashboardBtnMobile" class="hidden bg-slate-900 text-white py-2.5 rounded-xl text-sm font-bold shadow-md w-full">🏥 My Dashboard</a>
+                <button onclick="logout()" class="text-sm font-bold text-slate-400 border py-2.5 rounded-xl w-full">Logout Securely</button>
             </div>
         </div>
     </nav>
@@ -205,16 +212,33 @@
         function closeModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(()=>{m.classList.add('hidden');},300); }
         function switchModal(c, o) { closeModal(c); setTimeout(()=>openModal(o), 300); }
 
+        const toggleUI = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
+
         function checkAuth() {
-            const token = localStorage.getItem('rakshitplus_jwt');
-            const role = localStorage.getItem('rakshitplus_role');
-            if (token) {
-                document.getElementById('authButtons')?.classList.add('hidden');
-                document.getElementById('userProfileBtn')?.classList.remove('hidden');
-                if (role === 'admin') { document.getElementById('adminPortalBtn')?.classList.remove('hidden'); }
-                else if (role === 'doctor') { document.getElementById('doctorDashboardBtn')?.classList.remove('hidden'); }
-                else { document.getElementById('patientDashboardBtn')?.classList.remove('hidden'); }
-            }
+            try {
+                const token = localStorage.getItem('rakshitplus_jwt');
+                const role = localStorage.getItem('rakshitplus_role');
+                
+                // Reset all first
+                toggleUI('adminPortalBtn', false); toggleUI('doctorDashboardBtn', false); toggleUI('patientDashboardBtn', false);
+                toggleUI('adminPortalBtnMobile', false); toggleUI('doctorDashboardBtnMobile', false); toggleUI('patientDashboardBtnMobile', false);
+                
+                if (token) {
+                    toggleUI('authButtons', false); toggleUI('userProfileBtn', true); 
+                    toggleUI('mobileAuthButtons', false); toggleUI('mobileUserProfileBtn', true);
+                    
+                    if(role === 'admin') { 
+                        toggleUI('adminPortalBtn', true); toggleUI('adminPortalBtnMobile', true); 
+                    } else if (role === 'doctor') {
+                        toggleUI('doctorDashboardBtn', true); toggleUI('doctorDashboardBtnMobile', true);
+                    } else { 
+                        toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true); 
+                    }
+                } else {
+                    toggleUI('authButtons', true); toggleUI('userProfileBtn', false); 
+                    toggleUI('mobileAuthButtons', true); toggleUI('mobileUserProfileBtn', false);
+                }
+            } catch(e) {}
         }
         function logout() { localStorage.removeItem('rakshitplus_jwt'); localStorage.removeItem('rakshitplus_role'); window.location.reload(); }
         document.addEventListener('DOMContentLoaded', checkAuth);
@@ -317,7 +341,6 @@
                     <button onclick="submitChatBooking()" id="chatBookBtn" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold shadow-md hover:bg-blue-500 transition">Confirm Booking 🚀</button>
                 </div>
             `;
-            // Append as AI message so it looks like a system prompt
             appendMessageHTML(formHtml, false);
         }
 
@@ -333,7 +356,7 @@
                 gender: document.getElementById('chat-book-gender').value,
                 symptoms: "Assessed via AI Chatbot", 
                 date: `${document.getElementById('chat-book-date').value} | ${document.getElementById('chat-book-time').value}`,
-                doctor_id: null // Let backend assign based on symptoms
+                doctor_id: null
             };
 
             if(!payload.patient_name || !payload.contact || !document.getElementById('chat-book-date').value || !document.getElementById('chat-book-time').value || !payload.age || !payload.gender) {
@@ -373,13 +396,10 @@
 
         function handleOptionClick(selectedOption) {
             appendMessageHTML(selectedOption, true);
-            
-            // 🌟 INTERCEPT "BOOK APPOINTMENT" CLICK
             if (selectedOption === '📅 Book Appointment' || selectedOption === '📅 Doctor Book Karein') {
                 showInChatBookingForm();
                 return;
             }
-
             fetchAIResponse(selectedOption);
         }
 
