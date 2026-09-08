@@ -225,7 +225,7 @@
                 const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('log-email').value, password: document.getElementById('log-password').value }) });
                 const msg = document.getElementById('logMsg'); msg.classList.remove('hidden'); const data = await res.json();
                 if(res.ok) { localStorage.setItem('rakshitplus_jwt', data.token); localStorage.setItem('rakshitplus_role', data.role); window.location.reload(); } 
-                else { msg.className = "mt-4 text-rose-500"; msg.innerText = data.error; }
+                else { msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; }
             } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; }
         });
 
@@ -243,11 +243,14 @@
         let isChatInitialized = false;
 
         aiToggleBtn.addEventListener('click', () => {
-            // 🔒 SECURITY CHECK: Login Mandatory for Chat
+            // 🔒 UI SECURITY CHECK: No native alert, smooth modal injection
             const token = localStorage.getItem('rakshitplus_jwt');
             if (!token) {
-                alert("Please login to access the RakshitPlus Virtual Doctor.");
                 document.getElementById('loginTitle').innerText = "Login Required";
+                const logMsg = document.getElementById('logMsg');
+                logMsg.innerText = "Please login to access the Virtual Doctor.";
+                logMsg.className = "mt-4 text-center text-sm font-bold text-rose-500";
+                logMsg.classList.remove('hidden');
                 openModal('loginModal');
                 return;
             }
