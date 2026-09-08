@@ -35,7 +35,22 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
-// 🧠 ULTIMATE DEEP DIAGNOSIS TREE
+// 🌟 NEW: GET USER PROFILE ROUTE (For Dashboards)
+app.get('/api/user/profile', authenticate, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT id, name, email, role, specialization, image_url, experience, qualification, about, fees, created_at 
+             FROM users WHERE id = $1`, 
+            [req.user.id]
+        );
+        if (result.rows.length === 0) return res.status(404).json({ error: "User not found" });
+        res.json(result.rows[0]);
+    } catch (e) {
+        res.status(500).json({ error: "Server Error" });
+    }
+});
+
+// 🧠 ULTIMATE DEEP DIAGNOSIS TREE (Unchanged)
 const symptomTree = {
     "start": { msg: "Welcome to RakshitPlus AI. I am your virtual doctor. 👨‍⚕️<br><br>Please choose your language / Apni bhasha chunein:", options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"] },
     
@@ -100,6 +115,7 @@ app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), (req, res)
     res.json({ score: 100, biomarkers: [{name: "Offline Check", val: "N/A", status: "Manual System Active", color: "blue"}], insights: ["Automated PDF scanning disabled."], diet: [] });
 });
 
+// AUTHENTICATION ROUTES
 app.post('/api/auth/register', async (req, res) => {
     try {
         const hash = await bcrypt.hash(req.body.password, 10);
@@ -117,6 +133,7 @@ app.post('/api/auth/login', async (req, res) => {
     } catch(e) { res.status(500).json({ error: "Server error." }); }
 });
 
+// APPOINTMENT ROUTES
 app.post('/api/appointments', authenticate, async (req, res) => {
     const { patient_name, age, gender, contact, symptoms, date, doctor_id } = req.body;
     try {
@@ -153,14 +170,6 @@ app.get('/api/doctors', async (req, res) => {
     try { res.json((await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE role = 'doctor'`)).rows); } catch(e) { res.json([]); }
 });
 
-app.get(['/api/doctor/:id', '/api/doctors/:id'], async (req, res) => {
-    try {
-        const result = await pool.query(`SELECT id, name, specialization, email, image_url, experience, qualification, about, fees FROM users WHERE id = $1 AND role = 'doctor'`, [req.params.id]);
-        if (result.rows.length === 0) return res.status(404).json({ error: "Doctor not found" });
-        res.json(result.rows[0]);
-    } catch(e) { res.status(500).json({ error: "Server error" }); }
-});
-
 // 🌟 ADMIN ROUTES (CREATE, READ, DELETE)
 app.get('/api/admin/appointments', authenticate, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({error: "Access Denied"});
@@ -179,19 +188,15 @@ app.post('/api/admin/add-doctor', authenticate, upload.single('doctorPhoto'), as
     try {
         const hash = await bcrypt.hash(req.body.password, 10);
         let imageUrl = "";
-        if (req.file) {
-            imageUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
-        }
+        if (req.file) { imageUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`; }
         await pool.query(
-            `INSERT INTO users (name, email, password, role, specialization, qualification, experience, fees, about, image_url) 
-             VALUES ($1, $2, $3, 'doctor', $4, $5, $6, $7, $8, $9)`, 
+            `INSERT INTO users (name, email, password, role, specialization, qualification, experience, fees, about, image_url) VALUES ($1, $2, $3, 'doctor', $4, $5, $6, $7, $8, $9)`, 
             [req.body.name, req.body.email, hash, req.body.specialization, req.body.qualification, req.body.experience, req.body.fees, req.body.about, imageUrl]
         );
         res.status(201).json({ message: "Doctor added successfully!" });
     } catch (error) { res.status(400).json({ error: "Email already exists or invalid data!" }); }
 });
 
-// 🌟 NEW: DELETE DOCTOR ROUTE
 app.delete('/api/admin/doctor/:id', authenticate, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({error: "Access Denied"});
     try {
