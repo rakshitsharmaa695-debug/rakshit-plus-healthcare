@@ -6,7 +6,6 @@
     <title>RakshitPlus - Smart Booking</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- 🚀 QR CODE LIBRARY RESTORED -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
@@ -14,106 +13,90 @@
         
         @keyframes popIn { 0% { opacity: 0; transform: scale(0.95) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
         .chat-bubble { animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        
         .chat-scroll::-webkit-scrollbar { width: 6px; }
         .chat-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="text-slate-800 antialiased">
 
-    <!-- 🚀 UNIVERSAL NAVBAR -->
     <nav class="fixed w-full top-0 z-50 glass-nav border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 md:py-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group z-50">
                 <img src="1000022082.png" alt="RakshitPlus Logo" class="h-10 md:h-12 object-contain group-hover:scale-105 transition-transform duration-300">
             </a>
-            <div class="flex items-center gap-4">
-                <a href="dashboard.html" class="text-sm font-bold text-slate-500 hover:text-blue-600 transition">My Dashboard</a>
-                <button onclick="logout()" class="text-sm font-bold text-rose-500 border border-rose-200 px-4 py-2 rounded-xl hover:bg-rose-50 transition">Logout</button>
+            <div class="flex items-center gap-3">
+                <a href="dashboard.html" class="text-xs md:text-sm font-bold text-slate-500 hover:text-blue-600 transition">My Dashboard</a>
+                <button onclick="logout()" class="text-xs md:text-sm font-bold text-rose-500 border border-rose-200 px-3 md:px-4 py-1.5 md:py-2 rounded-xl hover:bg-rose-50 transition">Logout</button>
             </div>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-4 md:px-8 pt-32 pb-20 flex flex-col lg:flex-row gap-8 lg:gap-12">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-10 flex flex-col lg:flex-row gap-6 lg:gap-12">
         
-        <!-- 🌟 LEFT SIDE: CONVERSATIONAL BOOKING -->
-        <div class="lg:w-2/3 bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden flex flex-col h-[650px]">
+        <!-- 🌟 RESPONSIVE CHAT WINDOW -->
+        <div class="lg:w-2/3 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden flex flex-col h-[450px] md:h-[650px]">
             
-            <!-- 🌟 UPDATED CHAT HEADER -->
-            <div class="bg-slate-50 border-b border-slate-200 p-4 md:p-5 flex items-center justify-between z-10 shadow-sm">
+            <div class="bg-slate-50 border-b border-slate-200 p-3 md:p-5 flex items-center justify-between z-10 shadow-sm shrink-0">
                 <div class="flex items-center gap-3 md:gap-4">
                     <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-md border border-slate-100 shrink-0 p-1">
                         <img src="1000022082.png" alt="AI" class="w-full h-full object-contain">
                     </div>
                     <div class="flex flex-col">
-                        <h2 class="font-black text-slate-900 text-base md:text-lg leading-tight">Virtual Booking Assistant</h2>
+                        <h2 class="font-black text-slate-900 text-sm md:text-lg leading-tight">Virtual Booking Assistant</h2>
                         <span class="text-[10px] md:text-[11px] text-blue-500 font-bold mb-0.5 tracking-wide">Powered By RakshitPlus AI</span>
                         <p class="text-[10px] md:text-xs font-bold text-green-500 flex items-center gap-1 mt-0.5"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse"></span> Online</p>
                     </div>
                 </div>
                 <div id="doctorBadge" class="hidden bg-purple-50 text-purple-700 px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-bold border border-purple-200 shrink-0 text-center uppercase tracking-wide">
-                    Direct Booking
+                    Direct<br class="md:hidden"> Booking
                 </div>
             </div>
 
-            <!-- Chat Messages Area -->
-            <div id="chatBox" class="flex-1 p-6 overflow-y-auto chat-scroll bg-slate-50 space-y-5">
-                <!-- Messages will be injected here via JS -->
+            <div id="chatBox" class="flex-1 p-4 md:p-6 overflow-y-auto chat-scroll bg-slate-50 space-y-4 md:space-y-5">
+                <!-- Messages -->
             </div>
 
-            <!-- Chat Input Area -->
-            <div id="inputBox" class="bg-white border-t border-slate-200 p-4 md:p-5">
-                <!-- Interactive inputs will appear here -->
+            <div id="inputBox" class="bg-white border-t border-slate-200 p-3 md:p-5 shrink-0">
+                <!-- Inputs -->
             </div>
-
         </div>
         
-        <!-- 🌟 RIGHT SIDE: DIGITAL TICKET & QR CODE TRACKER -->
-        <div class="lg:w-1/3 bg-slate-900 rounded-[2rem] p-6 md:p-10 text-center shadow-2xl relative overflow-hidden flex flex-col justify-center min-h-[400px]">
+        <!-- 🌟 RESPONSIVE QR TICKET -->
+        <div class="lg:w-1/3 bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 text-center shadow-2xl relative overflow-hidden flex flex-col justify-center min-h-[350px] md:min-h-[400px]">
             <div class="absolute inset-0 bg-blue-500 opacity-20 blur-3xl rounded-full"></div>
             
-            <!-- Placeholder State -->
-            <div id="qrPlaceholder" class="relative z-10 w-full py-10">
-                <div class="w-20 h-20 bg-slate-800 text-slate-400 border border-slate-700 rounded-full mx-auto mb-6 flex items-center justify-center text-4xl shadow-inner">🎫</div>
-                <h3 class="font-black text-white text-xl md:text-2xl mb-2">Digital Ticket</h3>
-                <p class="text-slate-400 text-sm font-medium">Answer the assistant's questions to generate your Smart Queue Pass & QR Code.</p>
+            <div id="qrPlaceholder" class="relative z-10 w-full py-6 md:py-10">
+                <div class="w-16 h-16 md:w-20 md:h-20 bg-slate-800 text-slate-400 border border-slate-700 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl md:text-4xl shadow-inner">🎫</div>
+                <h3 class="font-black text-white text-lg md:text-2xl mb-2">Digital Ticket</h3>
+                <p class="text-slate-400 text-xs md:text-sm font-medium">Answer questions to generate pass.</p>
             </div>
             
-            <!-- Success State -->
             <div id="successResult" class="hidden relative z-10 w-full flex flex-col items-center text-white">
-                <div class="bg-green-500/20 text-green-400 px-4 py-2 rounded-full text-sm font-bold mb-6 flex items-center gap-2 border border-green-500/50">
+                <div class="bg-green-500/20 text-green-400 px-3 py-1.5 rounded-full text-xs md:text-sm font-bold mb-4 flex items-center gap-2 border border-green-500/50">
                     <span>✓</span> Booking Confirmed
                 </div>
                 
-                <!-- The Legendary QR Code -->
-                <div class="bg-white p-4 rounded-[1.5rem] shadow-xl mb-6">
+                <div class="bg-white p-3 md:p-4 rounded-[1.5rem] shadow-xl mb-4">
                     <div id="qrcode"></div>
                 </div>
                 
-                <h4 class="text-xl md:text-2xl font-black text-blue-300" id="res-dept">Department</h4>
-                <p class="text-sm text-slate-400 font-bold mb-4 uppercase tracking-widest">Assigned Department</p>
+                <h4 class="text-lg md:text-xl font-black text-blue-300" id="res-dept">Department</h4>
                 
                 <div id="res-id" class="w-full">
-                    <!-- Queue logic will be injected here -->
+                    <!-- Tracker link injected here -->
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
         const token = localStorage.getItem('rakshitplus_jwt');
-        if (!token) {
-            alert("Security Alert: Please login to book an appointment.");
-            window.location.href = 'index.html';
-        }
-
-        function logout() { localStorage.removeItem('rakshitplus_jwt'); localStorage.removeItem('rakshitplus_role'); window.location.href="index.html"; }
+        if (!token) { alert("Please login."); window.location.href = 'index.html'; }
+        function logout() { localStorage.clear(); window.location.href="index.html"; }
 
         const urlParams = new URLSearchParams(window.location.search);
         const preSelectedDocId = urlParams.get('docId');
 
-        // 🌟 CHATBOT STATE MACHINE
         const chatBox = document.getElementById('chatBox');
         const inputBox = document.getElementById('inputBox');
         
@@ -121,104 +104,73 @@
         const bookingData = { doctor_id: preSelectedDocId || null };
 
         const questions = [
-            { key: 'patient_name', type: 'text', q: "What is the patient's full name?", placeholder: "e.g. Rahul Sharma" },
+            { key: 'patient_name', type: 'text', q: "What is the patient's full name?", placeholder: "Rahul Sharma" },
             { key: 'contact', type: 'tel', q: "Please provide a valid contact number.", placeholder: "+91 98765 43210" },
-            { key: 'age', type: 'number', q: "How old is the patient?", placeholder: "Age in years" },
+            { key: 'age', type: 'number', q: "How old is the patient?", placeholder: "Age" },
             { key: 'gender', type: 'options', q: "What is the patient's gender?", opts: ['Male', 'Female', 'Other'] },
-            { key: 'symptoms', type: 'text', q: "Briefly describe the symptoms or the reason for this visit.", placeholder: "e.g. Severe headache since 2 days" },
+            { key: 'symptoms', type: 'text', q: "Briefly describe the symptoms.", placeholder: "Severe headache..." },
             { key: 'date', type: 'date', q: "When would you like to visit?" },
-            { key: 'time', type: 'options', q: "Please select a preferred time slot.", opts: ['10:00 AM', '11:30 AM', '01:00 PM', '02:30 PM', '04:00 PM', '06:00 PM'] }
+            { key: 'time', type: 'options', q: "Select a preferred time slot.", opts: ['10:00 AM', '11:30 AM', '01:00 PM', '02:30 PM'] }
         ];
 
-        function scrollToBottom() {
-            setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
-        }
+        function scrollToBottom() { setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100); }
 
         function appendBotMessage(text) {
-            const html = `
-                <div class="flex gap-3 w-full chat-bubble">
-                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md shrink-0 border border-slate-200 p-1">
+            chatBox.insertAdjacentHTML('beforeend', `
+                <div class="flex gap-2.5 w-full chat-bubble">
+                    <div class="w-6 h-6 md:w-8 md:h-8 rounded-full bg-white flex items-center justify-center shadow-md shrink-0 border border-slate-200 p-0.5">
                         <img src="1000022082.png" class="w-full h-full object-contain">
                     </div>
-                    <div class="bg-white border border-slate-200 text-slate-800 p-3.5 rounded-2xl rounded-tl-none max-w-[85%] text-sm font-medium shadow-sm leading-relaxed">
+                    <div class="bg-white border border-slate-200 text-slate-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-xs md:text-sm font-medium shadow-sm leading-relaxed">
                         ${text}
                     </div>
                 </div>
-            `;
-            chatBox.insertAdjacentHTML('beforeend', html);
+            `);
             scrollToBottom();
         }
 
         function appendUserMessage(text) {
-            const html = `
-                <div class="flex gap-3 w-full justify-end chat-bubble">
-                    <div class="bg-blue-600 text-white p-3.5 rounded-2xl rounded-tr-none max-w-[85%] text-sm font-bold shadow-md">
+            chatBox.insertAdjacentHTML('beforeend', `
+                <div class="flex w-full justify-end chat-bubble">
+                    <div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] text-xs md:text-sm font-bold shadow-md">
                         ${text}
                     </div>
                 </div>
-            `;
-            chatBox.insertAdjacentHTML('beforeend', html);
+            `);
             scrollToBottom();
         }
 
         function renderInput() {
-            if (currentStep >= questions.length) {
-                inputBox.innerHTML = '';
-                processBooking();
-                return;
-            }
-
+            if (currentStep >= questions.length) { inputBox.innerHTML = ''; processBooking(); return; }
             const step = questions[currentStep];
             inputBox.innerHTML = '';
 
-            if (step.type === 'text' || step.type === 'tel' || step.type === 'number' || step.type === 'date') {
-                let minAttr = '';
-                if(step.type === 'date') {
-                    const today = new Date().toISOString().split('T')[0];
-                    minAttr = `min="${today}"`;
-                }
-
+            if (['text', 'tel', 'number', 'date'].includes(step.type)) {
+                let minAttr = step.type === 'date' ? `min="${new Date().toISOString().split('T')[0]}"` : '';
                 inputBox.innerHTML = `
-                    <div class="flex gap-3">
-                        <input type="${step.type}" id="chat-input" placeholder="${step.placeholder || ''}" ${minAttr} class="flex-1 bg-slate-50 border border-slate-300 p-3.5 rounded-xl outline-none focus:border-blue-600 font-bold text-slate-800 shadow-inner">
-                        <button onclick="submitAnswer()" class="bg-blue-600 text-white px-6 py-3.5 rounded-xl font-black shadow-lg hover:bg-slate-900 transition flex items-center justify-center">➤</button>
+                    <div class="flex gap-2">
+                        <input type="${step.type}" id="chat-input" placeholder="${step.placeholder || ''}" ${minAttr} class="flex-1 bg-slate-50 border border-slate-300 p-3 md:p-3.5 rounded-xl outline-none focus:border-blue-600 font-bold text-sm shadow-inner">
+                        <button onclick="submitAnswer()" class="bg-blue-600 text-white px-5 rounded-xl font-black shadow-lg hover:bg-slate-900 transition">➤</button>
                     </div>
                 `;
-                
-                const inputEl = document.getElementById('chat-input');
-                inputEl.focus();
+                const inputEl = document.getElementById('chat-input'); inputEl.focus();
                 inputEl.addEventListener('keypress', (e) => { if(e.key === 'Enter') submitAnswer(); });
-
             } else if (step.type === 'options') {
-                let btns = step.opts.map(opt => `
-                    <button onclick="submitAnswer('${opt}')" class="bg-white border-2 border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-bold hover:border-blue-600 hover:text-blue-600 transition shadow-sm">${opt}</button>
-                `).join('');
-                
+                let btns = step.opts.map(opt => `<button onclick="submitAnswer('${opt}')" class="bg-white border-2 border-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold hover:border-blue-600 hover:text-blue-600 transition shadow-sm">${opt}</button>`).join('');
                 inputBox.innerHTML = `<div class="flex flex-wrap gap-2 w-full justify-center md:justify-start">${btns}</div>`;
             }
         }
 
         function submitAnswer(predefinedValue = null) {
             const step = questions[currentStep];
-            let value = predefinedValue;
-            
-            if (!value && document.getElementById('chat-input')) {
-                value = document.getElementById('chat-input').value.trim();
-            }
-
-            if (!value) return alert("Please provide an answer.");
-
+            let value = predefinedValue || document.getElementById('chat-input')?.value.trim();
+            if (!value) return;
             bookingData[step.key] = value;
             appendUserMessage(value);
             currentStep++;
-
             setTimeout(() => {
-                if(currentStep < questions.length) {
-                    appendBotMessage(questions[currentStep].q);
-                    renderInput();
-                } else {
-                    renderInput(); 
-                }
+                if(currentStep < questions.length) { appendBotMessage(questions[currentStep].q); renderInput(); } 
+                else { renderInput(); }
             }, 400);
         }
 
@@ -226,84 +178,38 @@
             if(preSelectedDocId) {
                 document.getElementById('doctorBadge').classList.remove('hidden');
                 try {
-                    const res = await fetch(`/api/doctors/${preSelectedDocId}`);
-                    const doc = await res.json();
-                    appendBotMessage(`Hello! I see you want to book an appointment with <b>${doc.name}</b>. Let's get the patient's details sorted quickly.`);
-                } catch(e) {
-                    appendBotMessage(`Hello! Let's get your appointment booked.`);
-                }
-            } else {
-                appendBotMessage(`Hello! Let's get your appointment booked. RakshitPlus AI will automatically assign you to the best specialist.`);
-            }
-
-            setTimeout(() => {
-                appendBotMessage(questions[0].q);
-                renderInput();
-            }, 600);
+                    const doc = await (await fetch(`/api/doctors/${preSelectedDocId}`)).json();
+                    appendBotMessage(`Hello! I see you want to book an appointment with <b>${doc.name}</b>. Let's get the patient's details.`);
+                } catch(e) { appendBotMessage(`Hello! Let's get your appointment booked.`); }
+            } else { appendBotMessage(`Hello! Let's get your appointment booked. AI will assign the best specialist.`); }
+            setTimeout(() => { appendBotMessage(questions[0].q); renderInput(); }, 600);
         }
 
-        // 🌟 FINAL API CALL & QR CODE GENERATION
         async function processBooking() {
-            appendBotMessage("<span class='animate-pulse text-blue-600 font-bold'>Processing your appointment and generating Smart Queue Pass... ⏳</span>");
-
-            const finalDateTime = `${bookingData.date} | ${bookingData.time}`;
-            
-            const payload = {
-                patient_name: bookingData.patient_name,
-                contact: bookingData.contact,
-                age: bookingData.age,
-                gender: bookingData.gender,
-                symptoms: bookingData.symptoms,
-                date: finalDateTime,
-                doctor_id: bookingData.doctor_id
-            };
+            appendBotMessage("<span class='animate-pulse text-blue-600 font-bold'>Processing and generating Pass... ⏳</span>");
+            const payload = { ...bookingData, date: `${bookingData.date} | ${bookingData.time}` };
+            delete payload.time;
 
             try {
-                const res = await fetch('/api/appointments', {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(payload)
-                });
-                
+                const res = await fetch('/api/appointments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
                 const data = await res.json();
-                
                 if (res.status === 201) {
-                    appendBotMessage(`🎉 <b>Booking Complete!</b><br>Please look at the <b>Digital Ticket</b> generated on the right side of your screen. You can scan the QR code to track your live queue status.`);
-                    
-                    const qRes = await fetch(`/api/queue/${data.id}`);
-                    const qData = await qRes.json();
-                    
-                    document.getElementById('qrPlaceholder').classList.add('hidden'); 
-                    document.getElementById('successResult').classList.remove('hidden');
-                    
+                    appendBotMessage(`🎉 <b>Booking Complete!</b><br>Check the <b>Digital Ticket</b> generated below/aside.`);
+                    document.getElementById('qrPlaceholder').classList.add('hidden'); document.getElementById('successResult').classList.remove('hidden');
                     const trackingUrl = `${window.location.origin}/tracking.html?id=${data.id}`;
                     document.getElementById('qrcode').innerHTML = ""; 
-                    new QRCode(document.getElementById("qrcode"), { 
-                        text: trackingUrl, width: 150, height: 150, 
-                        colorDark : "#0f172a", colorLight : "#ffffff" 
-                    });
-                    
+                    // Dynamic QR size for phone
+                    const qrSize = window.innerWidth < 768 ? 120 : 150;
+                    new QRCode(document.getElementById("qrcode"), { text: trackingUrl, width: qrSize, height: qrSize, colorDark : "#0f172a", colorLight : "#ffffff" });
                     document.getElementById('res-dept').innerText = data.dept;
                     document.getElementById('res-id').innerHTML = `
-                        <div class="mt-4 bg-slate-800 border border-slate-700 p-5 rounded-2xl text-left w-full shadow-inner">
-                            <div class="flex justify-between items-center mb-1">
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Live Queue Status</p>
-                                <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse border-2 border-slate-800"></span>
-                            </div>
-                            <p class="text-slate-300 font-medium text-base mt-2">Patients Ahead: <span class="font-black text-white text-3xl ml-2">${qData.patientsAhead}</span></p>
-                        </div>
-                        <a href="${trackingUrl}" target="_blank" class="mt-6 block w-full bg-white text-slate-900 py-3.5 rounded-xl text-sm font-black hover:bg-blue-50 transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">Open Live Tracker ➤</a>
+                        <a href="${trackingUrl}" target="_blank" class="mt-4 block w-full bg-white text-slate-900 py-3 rounded-xl text-xs md:text-sm font-black hover:bg-blue-50 transition shadow-lg">Open Live Tracker ➤</a>
                     `;
-                } else { 
-                    appendBotMessage(`⚠️ Error: ${data.error}. Please refresh and try again.`); 
-                }
-            } catch(err) { 
-                appendBotMessage(`⚠️ Server error. Please check your internet connection.`); 
-            }
+                } else { appendBotMessage(`⚠️ Error: ${data.error}`); }
+            } catch(err) { appendBotMessage(`⚠️ Network error.`); }
         }
 
         document.addEventListener('DOMContentLoaded', startChat);
-
     </script>
 </body>
 </html>
