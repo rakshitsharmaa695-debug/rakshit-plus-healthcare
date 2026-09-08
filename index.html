@@ -229,21 +229,19 @@
             } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; }
         });
 
-        // --- 🌟 SECURE & AUDIO ENABLED CHAT LOGIC ---
+        // --- 🌟 ADVANCED CONVERSATIONAL BOOKING LOGIC ---
         const aiToggleBtn = document.getElementById('ai-widget-toggle');
         const aiChatWindow = document.getElementById('ai-chat-window');
         const closeAiChatBtn = document.getElementById('close-ai-chat');
         const chatMessages = document.getElementById('chat-messages');
         const typingIndicator = document.getElementById('typing-indicator');
 
-        // 🎶 Notification Sound Object
         const botPopSound = new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg');
         botPopSound.volume = 0.6;
 
         let isChatInitialized = false;
 
         aiToggleBtn.addEventListener('click', () => {
-            // 🔒 UI SECURITY CHECK: No native alert, smooth modal injection
             const token = localStorage.getItem('rakshitplus_jwt');
             if (!token) {
                 document.getElementById('loginTitle').innerText = "Login Required";
@@ -288,32 +286,112 @@
                     </div>
                 </div>`;
             scrollToBottom();
+            if (!isUser) botPopSound.play().catch(e => console.log("Audio autoplay blocked"));
+        }
+
+        // 🌟 INJECT IN-CHAT BOOKING FORM
+        function showInChatBookingForm() {
+            const today = new Date().toISOString().split('T')[0];
+            const formHtml = `
+                <div class="bg-slate-700 border border-slate-600 p-4 rounded-xl mt-2 w-full shadow-lg" id="chatBookingFormBox">
+                    <p class="font-black text-white mb-3 text-center border-b border-slate-600 pb-2">🏥 Quick Appointment</p>
+                    <input type="text" id="chat-book-name" placeholder="Patient Name" class="w-full mb-3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
+                    <input type="tel" id="chat-book-phone" placeholder="Contact Number" class="w-full mb-3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
+                    <div class="flex gap-2 mb-3">
+                        <input type="number" id="chat-book-age" placeholder="Age" class="w-1/3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
+                        <select id="chat-book-gender" class="w-2/3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
+                            <option value="" disabled selected>Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2 mb-3">
+                        <input type="date" id="chat-book-date" min="${today}" class="w-1/2 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
+                        <select id="chat-book-time" class="w-1/2 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
+                            <option value="" disabled selected>Time</option>
+                            <option value="10:00 AM">10:00 AM</option>
+                            <option value="01:00 PM">01:00 PM</option>
+                            <option value="04:00 PM">04:00 PM</option>
+                        </select>
+                    </div>
+                    <button onclick="submitChatBooking()" id="chatBookBtn" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold shadow-md hover:bg-blue-500 transition">Confirm Booking 🚀</button>
+                </div>
+            `;
+            // Append as AI message so it looks like a system prompt
+            appendMessageHTML(formHtml, false);
+        }
+
+        // 🌟 SUBMIT IN-CHAT BOOKING
+        async function submitChatBooking() {
+            const btn = document.getElementById('chatBookBtn');
+            const token = localStorage.getItem('rakshitplus_jwt');
             
-            // 🎶 Play Sound ONLY when Bot replies
-            if (!isUser) {
-                botPopSound.play().catch(e => console.log("Audio autoplay blocked by browser"));
+            const payload = {
+                patient_name: document.getElementById('chat-book-name').value,
+                contact: document.getElementById('chat-book-phone').value,
+                age: document.getElementById('chat-book-age').value,
+                gender: document.getElementById('chat-book-gender').value,
+                symptoms: "Assessed via AI Chatbot", 
+                date: `${document.getElementById('chat-book-date').value} | ${document.getElementById('chat-book-time').value}`,
+                doctor_id: null // Let backend assign based on symptoms
+            };
+
+            if(!payload.patient_name || !payload.contact || !document.getElementById('chat-book-date').value || !document.getElementById('chat-book-time').value || !payload.age || !payload.gender) {
+                alert("Please fill all details correctly.");
+                return;
+            }
+
+            btn.innerText = "Processing..."; btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/appointments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+                
+                if(res.ok) {
+                    const data = await res.json();
+                    document.getElementById('chatBookingFormBox').innerHTML = `
+                        <div class="text-center py-4">
+                            <span class="text-4xl">✅</span>
+                            <p class="font-black text-green-400 mt-2 text-lg">Booking Confirmed!</p>
+                            <p class="text-slate-300 text-sm mt-1">Appt ID: #${data.id}</p>
+                            <a href="dashboard.html" class="block mt-4 bg-slate-900 text-white px-4 py-2 rounded font-bold border border-slate-600 hover:bg-blue-600 transition">Go to Dashboard</a>
+                        </div>
+                    `;
+                    scrollToBottom();
+                } else {
+                    alert("Failed to book.");
+                    btn.innerText = "Confirm Booking 🚀"; btn.disabled = false;
+                }
+            } catch(e) {
+                alert("Error booking appointment.");
+                btn.innerText = "Confirm Booking 🚀"; btn.disabled = false;
             }
         }
 
         function handleOptionClick(selectedOption) {
             appendMessageHTML(selectedOption, true);
+            
+            // 🌟 INTERCEPT "BOOK APPOINTMENT" CLICK
+            if (selectedOption === '📅 Book Appointment' || selectedOption === '📅 Doctor Book Karein') {
+                showInChatBookingForm();
+                return;
+            }
+
             fetchAIResponse(selectedOption);
         }
 
         async function fetchAIResponse(userMessage) {
             typingIndicator.classList.remove('hidden');
             scrollToBottom();
-
-            // 🔒 SENDING JWT TOKEN FOR SECURITY
             const token = localStorage.getItem('rakshitplus_jwt');
 
             try {
                 const res = await fetch('/api/ai-chat', {
                     method: 'POST', 
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` 
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ message: userMessage })
                 });
                 
@@ -336,9 +414,7 @@
                     }
 
                     appendMessageHTML(botResponseHTML, false);
-                } else {
-                    throw new Error(data.error || "Server Error");
-                }
+                } else { throw new Error(data.error || "Server Error"); }
             } catch(e) {
                 typingIndicator.classList.add('hidden');
                 appendMessageHTML(`<span class="text-rose-400 font-bold">⚠️ ${e.message}</span>`, false);
