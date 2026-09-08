@@ -66,7 +66,6 @@
                         </div>
 
                         <div class="flex w-full">
-                            <!-- 🚀 BUG FIXED HERE: URL now points to booking.html -->
                             <a id="bookBtn" href="#" class="w-full bg-slate-900 text-white py-3 md:py-4 rounded-xl text-base md:text-lg font-bold shadow-xl hover:bg-blue-600 transition flex items-center justify-center gap-2">
                                 📅 Book Appointment Now
                             </a>
@@ -106,16 +105,25 @@
                 document.getElementById('doc-exp').innerText = doc.experience || "5+ Years";
                 document.getElementById('doc-fee').innerText = `₹${doc.fees || 500}`;
                 document.getElementById('doc-about').innerText = doc.about || "Specialized in providing comprehensive healthcare.";
-                document.getElementById('doc-image').src = doc.image_url;
                 
-                // 🚀 FIXED: Dynamic URL generation
+                // Set fallback image if doctor has no photo
+                document.getElementById('doc-image').src = doc.image_url || 'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=400';
+                
                 document.getElementById('bookBtn').href = `booking.html?docId=${doc.id}`;
                 
                 document.getElementById('loader').classList.add('hidden');
                 document.getElementById('profileContainer').classList.remove('hidden');
 
             } catch(e) {
-                document.getElementById('loader').innerHTML = `<h2 class="text-xl md:text-2xl font-bold text-red-500">Doctor Profile Not Found</h2>`;
+                // 🌟 NEW: Premium Error State
+                document.getElementById('loader').innerHTML = `
+                    <div class="flex flex-col items-center justify-center pt-10 px-4">
+                        <span class="text-6xl mb-4">🩺</span>
+                        <h2 class="text-2xl md:text-3xl font-black text-slate-800 mb-2">Doctor Unavailable</h2>
+                        <p class="text-slate-500 font-medium mb-6">This doctor's profile has been removed or no longer exists in our system.</p>
+                        <a href="doctors.html" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition">View Available Doctors</a>
+                    </div>
+                `;
             }
         }
 
