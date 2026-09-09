@@ -13,7 +13,6 @@
 
     <nav class="fixed w-full top-0 z-50 glass-nav border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 md:py-4 flex justify-between items-center">
-            <!-- 🌟 Premium Text Logo -->
             <a href="index.html" class="flex items-center gap-2 group z-50">
                 <div class="bg-blue-600 text-white w-9 h-9 md:w-11 md:h-11 flex items-center justify-center rounded-xl font-black text-lg md:text-xl shadow-lg group-hover:bg-slate-900 transition">SC</div>
                 <span class="font-black text-xl md:text-2xl tracking-tight text-slate-900 group-hover:text-blue-600 transition">Smart<span class="text-blue-600 group-hover:text-slate-900">Care</span></span>
@@ -48,13 +47,10 @@
         const urlParams = new URLSearchParams(window.location.search); const preSelectedDocId = urlParams.get('docId');
         const chatBox = document.getElementById('chatBox'); const inputBox = document.getElementById('inputBox');
         let currentStep = 0; const bookingData = { doctor_id: preSelectedDocId || null };
-        const questions = [{ key: 'patient_name', type: 'text', q: "What is the patient's full name?", placeholder: "Rahul Sharma" }, { key: 'contact', type: 'tel', q: "Please provide a valid contact number.", placeholder: "+91 98765 43210" }, { key: 'age', type: 'number', q: "How old is the patient?", placeholder: "Age" }, { key: 'gender', type: 'options', q: "What is the patient's gender?", opts: ['Male', 'Female', 'Other'] }, { key: 'symptoms', type: 'text', q: "Briefly describe the symptoms.", placeholder: "Severe headache..." }, { key: 'date', type: 'date', q: "When would you like to visit?" }, { key: 'time', type: 'options', q: "Select a preferred time slot.", opts: ['10:00 AM', '11:30 AM', '01:00 PM', '02:30 PM'] }];
+        const questions = [{ key: 'patient_name', type: 'text', q: "What is the patient's full name?", placeholder: "Rahul Sharma" }, { key: 'contact', type: 'tel', q: "Please provide a valid contact number.", placeholder: "9876543210" }, { key: 'age', type: 'number', q: "How old is the patient?", placeholder: "Age" }, { key: 'gender', type: 'options', q: "What is the patient's gender?", opts: ['Male', 'Female', 'Other'] }, { key: 'symptoms', type: 'text', q: "Briefly describe the symptoms.", placeholder: "Severe headache..." }, { key: 'date', type: 'date', q: "When would you like to visit?" }, { key: 'time', type: 'options', q: "Select a preferred time slot.", opts: ['10:00 AM', '11:30 AM', '01:00 PM', '02:30 PM'] }];
 
         function scrollToBottom() { setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100); }
-        function appendBotMessage(text) { 
-            // 🌟 Replaced photo with clean emoji avatar
-            chatBox.insertAdjacentHTML('beforeend', `<div class="flex gap-2.5 w-full chat-bubble"><div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white text-blue-600 flex items-center justify-center text-xl shadow-md shrink-0 border border-slate-200">🤖</div><div class="bg-white border border-slate-200 text-slate-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-xs md:text-sm font-medium shadow-sm leading-relaxed">${text}</div></div>`); scrollToBottom(); 
-        }
+        function appendBotMessage(text) { chatBox.insertAdjacentHTML('beforeend', `<div class="flex gap-2.5 w-full chat-bubble"><div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white text-blue-600 flex items-center justify-center text-xl shadow-md shrink-0 border border-slate-200">🤖</div><div class="bg-white border border-slate-200 text-slate-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-xs md:text-sm font-medium shadow-sm leading-relaxed">${text}</div></div>`); scrollToBottom(); }
         function appendUserMessage(text) { chatBox.insertAdjacentHTML('beforeend', `<div class="flex w-full justify-end chat-bubble"><div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] text-xs md:text-sm font-bold shadow-md">${text}</div></div>`); scrollToBottom(); }
 
         function renderInput() {
@@ -63,7 +59,26 @@
             else if (step.type === 'options') { let btns = step.opts.map(opt => `<button onclick="submitAnswer('${opt}')" class="bg-white border-2 border-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold hover:border-blue-600 hover:text-blue-600 transition shadow-sm">${opt}</button>`).join(''); inputBox.innerHTML = `<div class="flex flex-wrap gap-2 w-full justify-center md:justify-start">${btns}</div>`; }
         }
 
-        function submitAnswer(predefinedValue = null) { let value = predefinedValue || document.getElementById('chat-input')?.value.trim(); if (!value) return; bookingData[questions[currentStep].key] = value; appendUserMessage(value); currentStep++; setTimeout(() => { if(currentStep < questions.length) { appendBotMessage(questions[currentStep].q); renderInput(); } else { renderInput(); } }, 400); }
+        function submitAnswer(predefinedValue = null) { 
+            let value = predefinedValue || document.getElementById('chat-input')?.value.trim(); 
+            if (!value) return; 
+
+            // 🛡️ STRICT VALIDATION SHIELD
+            const step = questions[currentStep];
+            if (step.key === 'patient_name' && value.length < 3) return alert("⚠️ Please enter a valid name (at least 3 characters).");
+            if (step.key === 'contact' && !/^[0-9]{10}$/.test(value)) return alert("⚠️ Please enter a valid 10-digit mobile number.");
+            if (step.key === 'age' && (isNaN(value) || value <= 0 || value > 120)) return alert("⚠️ Please enter a valid age (1-120).");
+            if (step.key === 'symptoms' && value.length < 4) return alert("⚠️ Please describe symptoms in a bit more detail.");
+            if (step.key === 'date') {
+                const selected = new Date(value); const today = new Date(); today.setHours(0,0,0,0);
+                if(selected < today) return alert("⚠️ Please select today or a future date.");
+            }
+
+            bookingData[step.key] = value; 
+            appendUserMessage(value); 
+            currentStep++; 
+            setTimeout(() => { if(currentStep < questions.length) { appendBotMessage(questions[currentStep].q); renderInput(); } else { renderInput(); } }, 400); 
+        }
 
         async function startChat() { if(preSelectedDocId) { document.getElementById('doctorBadge').classList.remove('hidden'); try { const doc = await (await fetch(`/api/doctors/${preSelectedDocId}`)).json(); appendBotMessage(`Hello! I see you want to book an appointment with <b>${doc.name}</b>. Let's get the patient's details.`); } catch(e) { appendBotMessage(`Hello! Let's get your appointment booked.`); } } else { appendBotMessage(`Hello! Let's get your appointment booked. SmartCare AI will assign the best specialist.`); } setTimeout(() => { appendBotMessage(questions[0].q); renderInput(); }, 600); }
 
