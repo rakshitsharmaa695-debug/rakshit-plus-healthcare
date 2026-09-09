@@ -28,6 +28,7 @@
             <a href="contact.html" class="hover:text-blue-600 transition">Contact Us</a>
         </div>
         
+        <!-- Desktop Auth -->
         <div class="hidden md:flex items-center space-x-4">
             <div id="authButtons" class="flex gap-4">
                 <button onclick="openModal('loginModal')" class="font-semibold text-blue-600 border-2 border-blue-600 px-5 py-2 rounded-lg transition hover:bg-blue-50">Login</button>
@@ -51,10 +52,12 @@
         <a href="doctors.html" class="text-2xl font-bold text-blue-600 border-b border-slate-100 py-4">Find Doctors</a>
         <a href="about.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 hover:text-blue-600">About Us</a>
         <a href="contact.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 hover:text-blue-600">Contact Us</a>
+        
         <div id="authButtonsMobile" class="mt-8 flex flex-col gap-4 pb-10">
             <button onclick="openModal('loginModal'); toggleMobileMenu()" class="w-full font-bold text-blue-600 border-2 border-blue-600 px-5 py-4 rounded-xl text-lg">Login to Account</button>
             <a href="booking.html" class="w-full text-center bg-blue-600 text-white px-5 py-4 rounded-xl font-bold shadow-lg text-lg">Book Appointment Now</a>
         </div>
+        
         <div id="userProfileBtnMobile" class="hidden mt-8 flex flex-col gap-4 pb-10">
             <a href="admin.html" id="adminPortalBtnMobile" class="hidden text-center bg-purple-600 text-white px-5 py-4 rounded-xl font-bold shadow-md text-lg">⚙️ Admin Portal</a>
             <a href="dashboard.html" id="patientDashboardBtnMobile" class="hidden text-center bg-slate-900 text-white px-5 py-4 rounded-xl font-bold shadow-lg text-lg">🏥 My Dashboard</a>
@@ -101,6 +104,22 @@
                 <button type="submit" class="w-full bg-blue-600 text-white p-3.5 md:p-4 rounded-xl font-bold shadow-md hover:bg-slate-900 transition">Login</button>
             </form>
             <p id="logMsg" class="mt-4 text-center text-sm font-bold hidden"></p>
+            <p class="text-center text-xs md:text-sm text-slate-500 font-medium mt-6 md:mt-8">New to RakshitPlus? <button onclick="switchModal('loginModal', 'registerModal')" class="text-blue-600 font-bold hover:underline">Create an account</button></p>
+        </div>
+    </div>
+
+    <div id="registerModal" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center opacity-0 transition-opacity p-4">
+        <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform">
+            <button onclick="closeModal('registerModal')" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
+            <h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">Create Account</h2>
+            <form id="registerForm" class="space-y-4 md:space-y-5 mt-6">
+                <input type="text" id="reg-name" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="John Doe">
+                <input type="email" id="reg-email" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="john@example.com">
+                <input type="password" id="reg-password" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="••••••••">
+                <button type="submit" class="w-full bg-slate-900 text-white p-3 md:p-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition mt-2">Sign Up Now</button>
+            </form>
+            <p id="regMsg" class="mt-4 text-center text-sm font-bold hidden"></p>
+            <p class="text-center text-xs md:text-sm text-slate-500 font-medium mt-6 md:mt-8">Already registered? <button onclick="switchModal('registerModal', 'loginModal')" class="text-blue-600 font-bold hover:underline">Login here</button></p>
         </div>
     </div>
 
@@ -108,6 +127,7 @@
         function toggleMobileMenu() { const m = document.getElementById('mobileMenu'); m.classList.contains('hidden') ? (m.classList.remove('hidden'), m.classList.add('flex')) : (m.classList.add('hidden'), m.classList.remove('flex')); }
         function openModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.remove('hidden'); setTimeout(()=>{m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95');},10); }
         function closeModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(()=>{m.classList.add('hidden');},300); }
+        function switchModal(c, o) { closeModal(c); setTimeout(()=>openModal(o), 300); }
         const toggleUI = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
 
         function checkAuth() {
@@ -127,16 +147,54 @@
         function logout() { localStorage.removeItem('rakshitplus_jwt'); localStorage.removeItem('rakshitplus_role'); window.location.reload(); }
         document.addEventListener('DOMContentLoaded', checkAuth);
 
+        // 🌟 LOGIN LOGIC
         document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
             e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Verifying..."; btn.disabled = true; 
             try {
                 const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('log-email').value, password: document.getElementById('log-password').value }) });
                 const data = await res.json();
+                const msg = document.getElementById('logMsg'); msg.classList.remove('hidden');
                 if(res.ok) { localStorage.setItem('rakshitplus_jwt', data.token); localStorage.setItem('rakshitplus_role', data.role); window.location.reload(); } 
-                else { alert(data.error); }
+                else { msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; }
             } catch (error) {} finally { btn.innerText = "Login"; btn.disabled = false; }
         });
 
+        // 🌟 REGISTER LOGIC
+        document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const btn = e.target.querySelector('button'); 
+            btn.innerText = "Creating Account..."; btn.disabled = true;
+            try {
+                const res = await fetch('/api/auth/register', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ 
+                        name: document.getElementById('reg-name').value, 
+                        email: document.getElementById('reg-email').value, 
+                        password: document.getElementById('reg-password').value 
+                    }) 
+                });
+                
+                const msg = document.getElementById('regMsg'); 
+                msg.classList.remove('hidden');
+                
+                if(res.ok) { 
+                    msg.className = "mt-4 text-green-600 text-center text-sm font-bold"; 
+                    msg.innerText = "Account Created! Redirecting to login...";
+                    setTimeout(() => switchModal('registerModal', 'loginModal'), 1500);
+                } else { 
+                    const data = await res.json();
+                    msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; 
+                    msg.innerText = data.error || "Failed to register."; 
+                }
+            } catch (error) { 
+                console.error(error); 
+            } finally { 
+                btn.innerText = "Sign Up Now"; btn.disabled = false; 
+            }
+        });
+
+        // 🚀 DOCTORS FETCH LOGIC
         let allDoctors = [];
 
         async function fetchDoctors() {
