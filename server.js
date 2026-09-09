@@ -22,6 +22,12 @@ const initDB = async () => {
         await pool.query(`CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'patient', specialization TEXT, image_url TEXT, experience TEXT, qualification TEXT, about TEXT, fees INTEGER, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
         await pool.query(`CREATE TABLE IF NOT EXISTS appointments (id SERIAL PRIMARY KEY, patient_id INTEGER, doctor_id INTEGER, patient_name TEXT, age INTEGER, gender TEXT, contact TEXT, symptoms TEXT, department TEXT, appointment_date TEXT, status TEXT DEFAULT 'Pending')`);
         
+        // 🌟 NEW: ADDING ACCURATE VITALS COLUMNS SAFELY (Mera Add Kiya Hua Code)
+        await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS blood_group TEXT DEFAULT 'N/A'`);
+        await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS heart_rate TEXT DEFAULT '--'`);
+        await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS blood_pressure TEXT DEFAULT '--/--'`);
+        await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS weight TEXT DEFAULT '--'`);
+
         // 🌟 NEW: AUTO CREATE DEFAULT ADMIN IF NOT EXISTS
         const adminCheck = await pool.query(`SELECT * FROM users WHERE email = 'admin@smartcare.com'`);
         if (adminCheck.rows.length === 0) {
@@ -44,12 +50,25 @@ const authenticate = (req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
+// 🌟 UPDATED: Fetches Vitals Data Now
 app.get('/api/user/profile', authenticate, async (req, res) => {
     try {
-        const result = await pool.query(`SELECT id, name, email, role, specialization, image_url, experience, qualification, about, fees, created_at FROM users WHERE id = $1`, [req.user.id]);
+        const result = await pool.query(`SELECT id, name, email, role, specialization, image_url, experience, qualification, about, fees, created_at, blood_group, heart_rate, blood_pressure, weight FROM users WHERE id = $1`, [req.user.id]);
         if (result.rows.length === 0) return res.status(404).json({ error: "User not found" });
         res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: "Server Error" }); }
+});
+
+// 🌟 NEW: API TO UPDATE ACCURATE VITALS (Mera Add Kiya Hua Code)
+app.post('/api/user/vitals', authenticate, async (req, res) => {
+    const { blood_group, heart_rate, blood_pressure, weight } = req.body;
+    try {
+        await pool.query(`UPDATE users SET blood_group = $1, heart_rate = $2, blood_pressure = $3, weight = $4 WHERE id = $5`, 
+        [blood_group, heart_rate, blood_pressure, weight, req.user.id]);
+        res.json({ message: "Vitals updated successfully" });
+    } catch (e) {
+        res.status(500).json({ error: "Failed to update vitals" });
+    }
 });
 
 // =======================================================
