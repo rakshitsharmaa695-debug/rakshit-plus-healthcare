@@ -11,7 +11,7 @@ app.use(express.json({ limit: '15mb' }));
 
 const JWT_SECRET = process.env.JWT_SECRET || "SmartCare_Enterprise_Secret";
 
-// 🚀 DATABASE CONNECTION (Kept exactly same so old data doesn't wipe)
+// 🚀 DATABASE CONNECTION
 const pool = new Pool({
     connectionString: "postgresql://rakshitplus_db_user:NNn5OEOt6EGL57R3LlFXIYXTV1mxT0hu@dpg-dae3etf40ujc73dlb71g-a.ohio-postgres.render.com/rakshitplus_db",
     ssl: { rejectUnauthorized: false } 
@@ -45,59 +45,58 @@ app.get('/api/user/profile', authenticate, async (req, res) => {
     } catch (e) { res.status(500).json({ error: "Server Error" }); }
 });
 
-// 🧠 ULTIMATE DEEP DIAGNOSIS TREE
-const symptomTree = {
-    "start": { msg: "Welcome to SmartCare AI. I am your virtual doctor. 👨‍⚕️<br><br>Please choose your language / Apni bhasha chunein:", options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"] },
+// 🧠 SMART NLP DIAGNOSIS ENGINE
+async function getDynamicAIResponse(userMessage) {
+    const msg = userMessage.toLowerCase();
     
-    "🇬🇧 English": { msg: "Where are you experiencing discomfort?", options: ["🤕 Head", "🫀 Chest", "🍕 Stomach", "🤒 Fever"] },
-    "🤕 Head": { msg: "Can you describe the headache?", options: ["Throbbing (Like a heartbeat)", "Sharp pain / Tight band"] },
-    "Throbbing (Like a heartbeat)": { msg: "How long have you had this throbbing pain?", options: ["Just started today", "For a few days now"] },
-    "Sharp pain / Tight band": { msg: "How long have you had this sharp/tight pain?", options: ["Just started today", "For a few days now"] },
-    "Just started today": { msg: "<b>🩺 Detailed Analysis:</b> This appears to be a budding Migraine or a Dehydration headache.<br><br><b>💡 Immediate Relief:</b> Drink 2 glasses of water, dim the lights, and rest for 30 minutes.", dept: "Neurology", options: ["📅 Book Appointment", "🔄 Start Over"] },
-    "For a few days now": { msg: "<b>🩺 Detailed Analysis:</b> Experiencing this pain for days indicates a persistent Tension Headache or Chronic Migraine.<br><br><b>💡 Immediate Relief:</b> Apply a cold compress to your forehead.", dept: "Neurology", options: ["📅 Book Appointment", "🔄 Start Over"] },
-    "🫀 Chest": { msg: "What exactly are you feeling?", options: ["Heavy tightness / Pressure", "Burning sensation (Heartburn)"] },
-    "Heavy tightness / Pressure": { msg: "Does the pain spread anywhere else?", options: ["Radiates to Left Arm / Jaw", "Stays in the center"] },
-    "Radiates to Left Arm / Jaw": { msg: "<b>🩺 Detailed Analysis:</b> Pain radiating to the left arm or jaw is a classic sign of Cardiac Distress (Angina/Heart Attack).<br><br><b>🚨 IMMEDIATE ACTION:</b> Go to the nearest Emergency Room (ER) immediately.", dept: "Cardiology", options: ["📅 Book Appointment", "🔄 Start Over"] },
-    "Stays in the center": { msg: "<b>🩺 Detailed Analysis:</b> Central chest pressure could be early Angina or panic/anxiety attack.<br><br><b>💡 Immediate Relief:</b> Sit down, loosen your clothes, and take slow, deep breaths.", dept: "Cardiology", options: ["📅 Book Appointment", "🔄 Start Over"] },
-    "Burning sensation (Heartburn)": { msg: "<b>🩺 Detailed Analysis:</b> This sounds like severe Acid Reflux (GERD).<br><br><b>💡 Immediate Relief:</b> Drink a glass of cold milk or take an antacid. Sit upright.", dept: "Gastroenterology", options: ["📅 Book Appointment", "🔄 Start Over"] },
-    "🍕 Stomach": { msg: "What is your primary stomach issue?", options: ["Severe Cramps / Pain", "Nausea, Vomiting & Diarrhea"] },
-    "Severe Cramps / Pain": { msg: "Where exactly is the pain located?", options: ["Lower Right Side", "Upper / Central Stomach"] },
-    "Lower Right Side": { msg: "<b>🩺 Detailed Analysis:</b> Sharp pain in the lower right abdomen is highly suspicious for Appendicitis.<br><br><b>🚨 Red Flags:</b> If the pain is unbearable, rush to the ER.", dept: "Gastroenterology", options: ["📅 Book Appointment", "🔄 Start Over"] },
-    "Upper / Central Stomach": { msg: "<b>🩺 Detailed Analysis:</b> This indicates Gastritis or Peptic Ulcers.<br><br><b>💡 Immediate Relief:</b> Drink warm water and eat something very light.", dept: "Gastroenterology", options: ["📅 Book Appointment", "🔄 Start Over"] },
-    "Nausea, Vomiting & Diarrhea": { msg: "<b>🩺 Detailed Analysis:</b> This is a classic case of Gastroenteritis (Food Poisoning).<br><br><b>💡 Immediate Relief:</b> Sip on ORS (Oral Rehydration Solution) continuously.", dept: "General Medicine", options: ["📅 Book Appointment", "🔄 Start Over"] },
-    "🤒 Fever": { msg: "What is your temperature like?", options: ["Around 100°F (Mild) with Chills", "Over 102°F (High) with Body Ache"] },
-    "Around 100°F (Mild) with Chills": { msg: "<b>🩺 Detailed Analysis:</b> A mild fever with chills usually points to a common Viral Infection.<br><br><b>💡 Immediate Relief:</b> Get plenty of rest and stay warm.", dept: "General Medicine", options: ["📅 Book Appointment", "🔄 Start Over"] },
-    "Over 102°F (High) with Body Ache": { msg: "<b>🩺 Detailed Analysis:</b> High fever accompanied by severe muscle pain indicates Dengue or Typhoid.<br><br><b>🚨 Red Flags:</b> DO NOT take Ibuprofen without a doctor's advice. Get a blood test ASAP.", dept: "General Medicine", options: ["📅 Book Appointment", "🔄 Start Over"] },
+    if (msg === 'start' || msg.includes('hi') || msg.includes('hello')) {
+        return { 
+            reply: "Hello! I am SmartCare's Virtual Doctor. 👨‍⚕️<br><br>Please describe your symptoms in detail. You can type exactly what you are feeling (e.g., <i>'I have a severe headache and fever'</i>).", 
+            options: ["I have chest pain", "My stomach hurts", "Severe headache"] 
+        };
+    }
+    
+    if (msg.includes('book') || msg.includes('appointment') || msg.includes('karein')) {
+        return { reply: "Great! Let's get you connected with a specialist right away.", options: ["📅 Book Appointment"] };
+    }
 
-    "🇮🇳 Hindi / Hinglish": { msg: "Aapko kis hisse mein pareshani mehsoos ho rahi hai?", options: ["🤕 Sir (Head)", "🫀 Chaati (Chest)", "🍕 Pet (Stomach)", "🤒 Bukhar (Fever)"] },
-    "🤕 Sir (Head)": { msg: "Sir ka dard kaisa mehsoos ho raha hai?", options: ["Dhak-dhak wala tez dard", "Chakkar aana (Spinning)"] },
-    "Dhak-dhak wala tez dard": { msg: "Yeh dard kab se ho raha hai?", options: ["Aaj hi shuru hua", "Kuch dino se hai"] },
-    "Aaj hi shuru hua": { msg: "<b>🩺 Detailed Analysis:</b> Yeh shuruaati Migraine ya paani ki kami (Dehydration) lag raha hai.<br><br><b>💡 Immediate Relief:</b> 2 glass paani piyein aur shant kamre mein aaram karein.", dept: "Neurology", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
-    "Kuch dino se hai": { msg: "<b>🩺 Detailed Analysis:</b> Lagaatar dard rehna Chronic Tension Headache hai.<br><br><b>💡 Immediate Relief:</b> Maathe par halka thanda kapda rakhein aur thoda aaram karein.", dept: "Neurology", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
-    "Chakkar aana (Spinning)": { msg: "<b>🩺 Detailed Analysis:</b> Yeh Vertigo (chakkar) ya Low BP ki wajah se ho sakta hai.<br><br><b>💡 Immediate Relief:</b> Turant baith jayein ya let jayein taaki aap girein nahi.", dept: "Neurology", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
-    "🫀 Chaati (Chest)": { msg: "Chaati mein exactly kya ho raha hai?", options: ["Bhaari-pan aur Jakdan (Pressure)", "Seene mein Jalan (Heartburn)"] },
-    "Bhaari-pan aur Jakdan (Pressure)": { msg: "Kya yeh dard kahin aur bhi fail raha hai?", options: ["Bayein (Left) haath ya jabde mein", "Sirf beecho-beech hai"] },
-    "Bayein (Left) haath ya jabde mein": { msg: "<b>🩺 Detailed Analysis:</b> Agar chaati ka dard left haath tak jaaye, toh yeh Heart Attack (Angina) ho sakta hai.<br><br><b>🚨 IMMEDIATE ACTION:</b> Turant kisi ko bulayein aur Hospital (Emergency Room) mein jaayein.", dept: "Cardiology", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
-    "Sirf beecho-beech hai": { msg: "<b>🩺 Detailed Analysis:</b> Yeh early angina ya gas ka dabaav ho sakta hai.<br><br><b>💡 Immediate Relief:</b> Araam se baith jayein aur lambi saansein lein.", dept: "Cardiology", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
-    "Seene mein Jalan (Heartburn)": { msg: "<b>🩺 Detailed Analysis:</b> Yeh severe Acid Reflux (Acidity) hai.<br><br><b>💡 Immediate Relief:</b> Thanda doodh piyein ya koi antacid lein. Lete nahi, seedhe baithe rahein.", dept: "Gastroenterology", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
-    "🍕 Pet (Stomach)": { msg: "Pet mein kya dikkat aa rahi hai?", options: ["Tez Dard ya Marod (Cramps)", "Ulti aur Dast (Vomiting/Loose Motions)"] },
-    "Tez Dard ya Marod (Cramps)": { msg: "Dard pet ke kis hisse mein hai?", options: ["Neeche Right side mein", "Upar ya beecho-beech"] },
-    "Neeche Right side mein": { msg: "<b>🩺 Detailed Analysis:</b> Pet ke neeche right side mein tez dard Appendix ka lakshan hota hai.<br><br><b>🚨 Red Flags:</b> Agar dard bardaasht na ho, turant Ultrasound karwayein.", dept: "Gastroenterology", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
-    "Upar ya beecho-beech": { msg: "<b>🩺 Detailed Analysis:</b> Yeh Gastritis, Ulcer ya gas ka dard ho sakta hai.<br><br><b>💡 Immediate Relief:</b> Gunguna paani piyein aur halka khana khayein.", dept: "Gastroenterology", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
-    "Ulti aur Dast (Vomiting/Loose Motions)": { msg: "<b>🩺 Detailed Analysis:</b> Yeh Food Poisoning ya viral infection hai.<br><br><b>💡 Immediate Relief:</b> ORS ka ghol ya Nimbu paani peete rahein taaki paani ki kami na ho.", dept: "General Medicine", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
-    "🤒 Bukhar (Fever)": { msg: "Bukhar kitna tez hai?", options: ["100°F ke aas-paas aur sardi", "102°F se upar aur badan dard"] },
-    "100°F ke aas-paas aur sardi": { msg: "<b>🩺 Detailed Analysis:</b> Halka bukhar aur sardi normal Viral Fever hai.<br><br><b>💡 Immediate Relief:</b> Kapde pehan kar aaram karein aur garam soop piyein.", dept: "General Medicine", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
-    "102°F se upar aur badan dard": { msg: "<b>🩺 Detailed Analysis:</b> Itna tez bukhar aur jodon mein dard Dengue ya Malaria ka lakshan hai.<br><br><b>🚨 Red Flags:</b> Bina Blood Test karwaye Ibuprofen bilkul NA khayein.", dept: "General Medicine", options: ["📅 Doctor Book Karein", "🔄 Naya Checkup"] },
+    const depts = {
+        "Cardiology": { kw: ['chest', 'heart', 'palpitation', 'breath', 'jaw', 'arm', 'sweating', 'seene', 'dil'], advice: "Sit upright, loosen tight clothing, and avoid any physical exertion." },
+        "Neurology": { kw: ['headache', 'dizzy', 'faint', 'numb', 'migraine', 'spin', 'head', 'seizure', 'sir', 'chakkar'], advice: "Lie down in a quiet, dark room. Avoid looking at bright screens." },
+        "Gastroenterology": { kw: ['stomach', 'belly', 'nausea', 'vomit', 'diarrhea', 'acid', 'pain', 'burn', 'pet', 'ulti', 'gas'], advice: "Take small sips of water. Avoid heavy, oily, or spicy meals." },
+        "Orthopedics": { kw: ['bone', 'joint', 'muscle', 'back', 'knee', 'fracture', 'sprain', 'ache', 'haddi', 'kamar', 'dard'], advice: "Rest the affected area and avoid moving it. Apply an ice pack if possible." },
+        "General Medicine": { kw: ['fever', 'cold', 'cough', 'weak', 'tired', 'chills', 'sick', 'throat', 'bukhar', 'khasi'], advice: "Stay hydrated, take plenty of rest, and monitor your body temperature." }
+    };
 
-    "🔄 Start Over": { msg: "Let's start over. Please choose your language:", options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"] },
-    "🔄 Naya Checkup": { msg: "Chaliye dobara shuru karte hain. Apni bhasha chunein:", options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"] }
-};
+    let matchedDept = "General Medicine"; 
+    let maxMatches = 0; 
+    let customAdvice = depts["General Medicine"].advice;
+    
+    for (let [dept, data] of Object.entries(depts)) {
+        let matches = data.kw.filter(kw => msg.includes(kw)).length;
+        if (matches > maxMatches) { maxMatches = matches; matchedDept = dept; customAdvice = data.advice; }
+    }
 
-app.post('/api/ai-chat', authenticate, (req, res) => {
+    const isSevere = ['severe', 'unbearable', 'extreme', 'blood', 'sudden', 'worst', 'emergency', 'tez', 'buhut', 'marod'].some(w => msg.includes(w));
+    
+    let replyText = `<b>🩺 NLP Triage Analysis:</b> Based on what you described, this appears to be related to <b>${matchedDept}</b>. `;
+    
+    if (isSevere || matchedDept === 'Cardiology') {
+        replyText += `<br><br><span style="color:#ef4444; font-weight:bold;">🚨 HIGH SEVERITY DETECTED: Your symptoms sound serious. Please seek immediate medical attention or visit an Emergency Room (ER).</span>`;
+    } else {
+        replyText += `<br><br>💡 <b>Home Advice:</b> ${customAdvice}`;
+    }
+    
+    replyText += `<br><br><i>Would you like to book a consultation for a proper checkup?</i>`;
+    
+    return { reply: replyText, dept: matchedDept, options: ["📅 Book Appointment"] };
+}
+
+app.post('/api/ai-chat', authenticate, async (req, res) => {
     let { message } = req.body;
-    if (!message || !symptomTree[message]) message = "start";
-    const responseNode = symptomTree[message];
-    return res.json({ reply: responseNode.msg, options: responseNode.options || [], department: responseNode.dept || null });
+    if (!message) message = "start";
+    const responseNode = await getDynamicAIResponse(message);
+    return res.json(responseNode);
 });
 
 async function aiTriageEngine(symptoms) {
