@@ -37,14 +37,14 @@
             </div>
             <div class="hidden md:flex items-center space-x-4">
                 <div id="authButtons" class="flex gap-3 items-center"><button onclick="openModal('loginModal')" class="font-bold text-slate-600 hover:text-blue-600 px-4 py-2 transition">Login</button><a href="booking.html" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition-all">Book Consult</a></div>
-                <div id="userProfileBtn" class="hidden flex items-center gap-3"><a href="admin.html" id="adminPortalBtn" class="hidden bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-red-700 transition">🛡️ Admin Panel</a><a href="doctor-dashboard.html" id="doctorDashboardBtn" class="hidden bg-purple-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-purple-700 transition">👨‍⚕️ Doctor Portal</a><a href="dashboard.html" id="patientDashboardBtn" class="hidden bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-blue-600 transition">🏥 Dashboard</a><button onclick="logout()" class="text-sm font-bold text-slate-400 hover:text-rose-500 transition border px-3 py-2 rounded-xl">Logout</button></div>
+                <div id="userProfileBtn" class="hidden flex items-center gap-3"><a href="dashboard.html" id="patientDashboardBtn" class="hidden bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-blue-600 transition">🏥 Dashboard</a><button onclick="logout()" class="text-sm font-bold text-slate-400 hover:text-rose-500 transition border px-3 py-2 rounded-xl">Logout</button></div>
             </div>
         </div>
 
         <div id="mobileMenu" class="md:hidden max-h-0 opacity-0 overflow-hidden flex flex-col items-center py-0 bg-white/95 rounded-2xl shadow-xl mt-2 w-full text-center border-t border-slate-100 transition-all duration-300">
             <a href="index.html" class="text-blue-600 font-bold w-full py-3 mt-2 border-b border-slate-100">Home</a><a href="doctors.html" class="font-bold text-slate-600 w-full py-3 border-b border-slate-100">Find Doctors</a><a href="about.html" class="font-bold text-slate-600 w-full py-3 border-b border-slate-100">About Us</a><a href="contact.html" class="font-bold text-slate-600 w-full py-3 mb-2">Contact Us</a>
             <div id="mobileAuthButtons" class="w-full px-6 pb-6 space-y-3"><button onclick="openModal('loginModal'); document.getElementById('mobileMenuBtn').click();" class="block font-bold text-slate-600 border border-slate-200 py-3 rounded-xl w-full">Login</button><a href="booking.html" class="block bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg w-full">Book Consult</a></div>
-            <div id="mobileUserProfileBtn" class="hidden w-full px-6 pb-6 space-y-3"><a href="admin.html" id="adminPortalBtnMobile" class="hidden block bg-red-600 text-white py-3 rounded-xl text-sm font-bold shadow-md w-full">🛡️ Admin Panel</a><a href="doctor-dashboard.html" id="doctorDashboardBtnMobile" class="hidden block bg-purple-600 text-white py-3 rounded-xl text-sm font-bold shadow-md w-full">👨‍⚕️ Doctor Portal</a><a href="dashboard.html" id="patientDashboardBtnMobile" class="hidden block bg-slate-900 text-white py-3 rounded-xl text-sm font-bold shadow-md w-full">🏥 My Dashboard</a><button onclick="logout()" class="block w-full text-sm font-bold text-slate-500 border border-slate-200 py-3 rounded-xl">Logout Securely</button></div>
+            <div id="mobileUserProfileBtn" class="hidden w-full px-6 pb-6 space-y-3"><a href="dashboard.html" id="patientDashboardBtnMobile" class="hidden block bg-slate-900 text-white py-3 rounded-xl text-sm font-bold shadow-md w-full">🏥 My Dashboard</a><button onclick="logout()" class="block w-full text-sm font-bold text-slate-500 border border-slate-200 py-3 rounded-xl">Logout Securely</button></div>
         </div>
     </nav>
 
@@ -95,7 +95,7 @@
         </div>
     </div>
 
-    <!-- 🌟 UPDATED FLOATING VIRTUAL DOCTOR WIDGET -->
+    <!-- 🌟 FLOATING WIDGET -->
     <div class="fixed bottom-6 right-4 md:right-8 z-40 flex flex-col items-center gap-2">
         <button id="ai-widget-toggle" class="relative group focus:outline-none flex flex-col items-center">
             <div class="absolute inset-0 bg-blue-500 rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
@@ -132,23 +132,60 @@
         function switchModal(c, o) { closeModal(c); setTimeout(()=>openModal(o), 300); }
         const toggleUI = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
 
+        // 🌟 SAAS AUTO-REDIRECT LOGIC ADDED HERE
         function checkAuth() {
             try {
-                const token = localStorage.getItem('smartcare_jwt'); const role = localStorage.getItem('smartcare_role');
-                toggleUI('adminPortalBtn', false); toggleUI('doctorDashboardBtn', false); toggleUI('patientDashboardBtn', false);
-                toggleUI('adminPortalBtnMobile', false); toggleUI('doctorDashboardBtnMobile', false); toggleUI('patientDashboardBtnMobile', false);
-                if (token) { toggleUI('authButtons', false); toggleUI('userProfileBtn', true); toggleUI('mobileAuthButtons', false); toggleUI('mobileUserProfileBtn', true); if(role === 'admin') { toggleUI('adminPortalBtn', true); toggleUI('adminPortalBtnMobile', true); } else if (role === 'doctor') { toggleUI('doctorDashboardBtn', true); toggleUI('doctorDashboardBtnMobile', true); } else { toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true); } } else { toggleUI('authButtons', true); toggleUI('userProfileBtn', false); toggleUI('mobileAuthButtons', true); toggleUI('mobileUserProfileBtn', false); }
+                const token = localStorage.getItem('smartcare_jwt'); 
+                const role = localStorage.getItem('smartcare_role');
+                
+                // If Doctor or Admin accesses the homepage, redirect them instantly!
+                const path = window.location.pathname;
+                const isHomepage = path.endsWith('index.html') || path === '/';
+                if (token && isHomepage) {
+                    if (role === 'admin') { window.location.href = 'admin.html'; return; }
+                    if (role === 'doctor') { window.location.href = 'doctor-dashboard.html'; return; }
+                }
+
+                toggleUI('patientDashboardBtn', false); toggleUI('patientDashboardBtnMobile', false);
+                if (token) { 
+                    toggleUI('authButtons', false); toggleUI('userProfileBtn', true); toggleUI('mobileAuthButtons', false); toggleUI('mobileUserProfileBtn', true); 
+                    if(role === 'patient') { toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true); }
+                } else { 
+                    toggleUI('authButtons', true); toggleUI('userProfileBtn', false); toggleUI('mobileAuthButtons', true); toggleUI('mobileUserProfileBtn', false); 
+                }
             } catch(e) {}
         }
+
         function logout() { localStorage.removeItem('smartcare_jwt'); localStorage.removeItem('smartcare_role'); window.location.reload(); }
         document.addEventListener('DOMContentLoaded', checkAuth);
 
-        document.getElementById('loginForm')?.addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Verifying..."; btn.disabled = true; try { const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('log-email').value, password: document.getElementById('log-password').value }) }); const msg = document.getElementById('logMsg'); msg.classList.remove('hidden'); const data = await res.json(); if(res.ok) { localStorage.setItem('smartcare_jwt', data.token); localStorage.setItem('smartcare_role', data.role); window.location.reload(); } else { msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; } } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; } });
+        // 🌟 LOGIN REDIRECT LOGIC
+        document.getElementById('loginForm')?.addEventListener('submit', async (e) => { 
+            e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Verifying..."; btn.disabled = true; 
+            try { 
+                const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('log-email').value, password: document.getElementById('log-password').value }) }); 
+                const msg = document.getElementById('logMsg'); msg.classList.remove('hidden'); 
+                const data = await res.json(); 
+                if(res.ok) { 
+                    localStorage.setItem('smartcare_jwt', data.token); 
+                    localStorage.setItem('smartcare_role', data.role); 
+                    
+                    // Directly bounce Doctors and Admins to their respective portals
+                    if(data.role === 'admin') window.location.href = 'admin.html';
+                    else if(data.role === 'doctor') window.location.href = 'doctor-dashboard.html';
+                    else window.location.reload(); // Patient stays on homepage to use services
+
+                } else { 
+                    msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; 
+                } 
+            } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; } 
+        });
+
         document.getElementById('registerForm')?.addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Creating Account..."; btn.disabled = true; try { const res = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value }) }); const msg = document.getElementById('regMsg'); msg.classList.remove('hidden'); if(res.ok) { msg.className = "mt-4 text-green-600 text-center text-sm font-bold"; msg.innerText = "Account Created! Redirecting to login..."; setTimeout(() => switchModal('registerModal', 'loginModal'), 1500); } else { const data = await res.json(); msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error || "Failed to register."; } } catch (error) { console.error(error); } finally { btn.innerText = "Sign Up Now"; btn.disabled = false; } });
 
         const aiToggleBtn = document.getElementById('ai-widget-toggle'); const aiChatWindow = document.getElementById('ai-chat-window'); const closeAiChatBtn = document.getElementById('close-ai-chat'); const chatMessages = document.getElementById('chat-messages'); const typingIndicator = document.getElementById('typing-indicator'); const botPopSound = new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg'); botPopSound.volume = 0.6; let isChatInitialized = false;
         
-        aiToggleBtn.addEventListener('click', () => { if (!localStorage.getItem('smartcare_jwt')) { document.getElementById('loginTitle').innerText = "Login Required"; const logMsg = document.getElementById('logMsg'); logMsg.innerText = "Please login to access the Virtual Doctor."; logMsg.className = "mt-4 text-center text-sm font-bold text-rose-500"; logMsg.classList.remove('hidden'); openModal('loginModal'); return; } if(aiChatWindow.classList.contains('hidden')) { aiChatWindow.classList.remove('hidden'); aiChatWindow.classList.add('flex'); const badge = aiToggleBtn.querySelector('.animate-ping'); if(badge) badge.parentElement.remove(); if(!isChatInitialized) { chatMessages.innerHTML = ''; fetchAIResponse("start"); isChatInitialized = true; } } else { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); } });
+        aiToggleBtn.addEventListener('click', () => { if (!localStorage.getItem('smartcare_jwt')) { document.getElementById('loginTitle').innerText = "Login Required"; const logMsg = document.getElementById('logMsg'); logMsg.innerText = "Please login to consult the Virtual Doctor."; logMsg.className = "mt-4 text-center text-sm font-bold text-rose-500"; logMsg.classList.remove('hidden'); openModal('loginModal'); return; } if(aiChatWindow.classList.contains('hidden')) { aiChatWindow.classList.remove('hidden'); aiChatWindow.classList.add('flex'); const badge = aiToggleBtn.querySelector('.animate-ping'); if(badge) badge.parentElement.remove(); if(!isChatInitialized) { chatMessages.innerHTML = ''; fetchAIResponse("start"); isChatInitialized = true; } } else { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); } });
         closeAiChatBtn.addEventListener('click', () => { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); });
         
         function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
