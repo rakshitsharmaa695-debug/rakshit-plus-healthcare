@@ -48,6 +48,7 @@
         </div>
     </nav>
 
+    <!-- 🌟 UPDATED HERO SECTION -->
     <main class="hero-gradient min-h-screen flex items-center relative pt-24 md:pt-20 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 md:px-8 grid lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full relative z-10">
             <div class="space-y-6 text-center lg:text-left pt-10 lg:pt-0">
@@ -55,8 +56,10 @@
                     <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                     <span class="text-xs md:text-sm font-bold text-slate-700 tracking-wide">Next-Gen Healthcare Portal</span>
                 </div>
-                <h1 class="text-4xl md:text-6xl lg:text-[76px] font-black leading-[1.05] text-slate-900 tracking-tight">Smart care, <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-400">zero waiting.</span></h1>
-                <p class="text-base md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed md:pr-8">Connect with top specialists instantly and chat with SmartCare AI for a real-time health assessment.</p>
+                <!-- ✨ NEW TEXT HERE -->
+                <h1 class="text-4xl md:text-6xl lg:text-[76px] font-black leading-[1.05] text-slate-900 tracking-tight">Welcome to <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-400">SmartCare.</span></h1>
+                <p class="text-base md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed md:pr-8">Connect with top specialists instantly and chat with our virtual doctor for a real-time health assessment.</p>
+                <!-- ✨ -->
                 <div class="pt-4 flex flex-col sm:flex-row justify-center lg:justify-start gap-4"><a href="booking.html" class="inline-flex justify-center items-center bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold shadow-xl gap-3 text-lg hover:bg-blue-600 transition-all w-full sm:w-auto">Book Consultation</a></div>
             </div>
             <div class="relative w-full h-[300px] md:h-[550px] lg:h-[650px] flex justify-center items-center mt-4 lg:mt-0">
@@ -71,7 +74,7 @@
         <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 border-b border-blue-500/30 flex justify-between items-center shadow-md z-10">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center text-xl shadow-lg flex-shrink-0">🤖</div>
-                <div class="text-left flex flex-col"><h3 class="text-white font-black text-lg leading-tight tracking-wide">Virtual Doctor</h3><span class="text-[11px] text-blue-300 font-semibold mt-0.5">Powered By SmartCare AI</span></div>
+                <div class="text-left flex flex-col"><h3 class="text-white font-black text-lg leading-tight tracking-wide">Virtual Doctor</h3><span class="text-[11px] text-blue-300 font-semibold mt-0.5">Powered By SmartCare</span></div>
             </div>
             <button id="close-ai-chat" class="text-slate-400 hover:text-white transition bg-white/10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">✖</button>
         </div>
@@ -158,13 +161,10 @@
         async function submitChatBooking() { 
             const btn = document.getElementById('chatBookBtn'); const token = localStorage.getItem('smartcare_jwt'); 
             const payload = { patient_name: document.getElementById('chat-book-name').value, contact: document.getElementById('chat-book-phone').value, age: document.getElementById('chat-book-age').value, gender: document.getElementById('chat-book-gender').value, symptoms: "Assessed via AI Chatbot", date: `${document.getElementById('chat-book-date').value} | ${document.getElementById('chat-book-time').value}`, doctor_id: null }; 
-            
-            // 🛡️ STRICT VALIDATION SHIELD
             if(payload.patient_name.length < 3) return alert("⚠️ Please enter a valid full name.");
             if(!/^[0-9]{10}$/.test(payload.contact)) return alert("⚠️ Please enter a valid 10-digit mobile number.");
             if(payload.age <= 0 || payload.age > 120) return alert("⚠️ Please enter a valid age.");
             if(!payload.gender || !document.getElementById('chat-book-date').value || !document.getElementById('chat-book-time').value) return alert("⚠️ Please fill all fields.");
-            
             btn.innerText = "Processing..."; btn.disabled = true; 
             try { const res = await fetch('/api/appointments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) }); if(res.ok) { const data = await res.json(); document.getElementById('chatBookingFormBox').innerHTML = `<div class="text-center py-4"><span class="text-4xl">✅</span><p class="font-black text-green-400 mt-2 text-lg">Booking Confirmed!</p><p class="text-slate-300 text-sm mt-1">Appt ID: #${data.id}</p><a href="dashboard.html" class="block mt-4 bg-slate-900 text-white px-4 py-2 rounded font-bold border border-slate-600 hover:bg-blue-600 transition">Go to Dashboard</a></div>`; scrollToBottom(); } else { alert("Failed to book."); btn.innerText = "Confirm Booking 🚀"; btn.disabled = false; } } catch(e) { alert("Error."); btn.innerText = "Confirm Booking 🚀"; btn.disabled = false; } 
         }
