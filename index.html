@@ -70,7 +70,7 @@
     <div id="ai-chat-window" class="hidden fixed bottom-[110px] right-4 md:right-8 z-50 w-[92vw] sm:w-[400px] bg-[#0f172a] border border-slate-700 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex-col h-[65vh] sm:h-[550px] transform transition-all">
         <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 border-b border-blue-500/30 flex justify-between items-center shadow-md z-10">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center text-xl shadow-lg flex-shrink-0">🤖</div>
+                <div class="w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center text-xl shadow-lg flex-shrink-0">🩺</div>
                 <div class="text-left flex flex-col"><h3 class="text-white font-black text-lg leading-tight tracking-wide">Virtual Doctor</h3><span class="text-[11px] text-blue-300 font-semibold mt-0.5">Powered By SmartCare</span></div>
             </div>
             <button id="close-ai-chat" class="text-slate-400 hover:text-white transition bg-white/10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">✖</button>
@@ -80,7 +80,7 @@
 
         <div id="typing-indicator" class="hidden p-4 bg-[#0f172a]">
             <div class="flex gap-2 w-full">
-                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🤖</div>
+                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div>
                 <div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex items-center gap-1 shadow-md">
                     <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
                 </div>
@@ -95,12 +95,11 @@
         </div>
     </div>
 
-    <!-- 🌟 FLOATING WIDGET -->
     <div class="fixed bottom-6 right-4 md:right-8 z-40 flex flex-col items-center gap-2">
         <button id="ai-widget-toggle" class="relative group focus:outline-none flex flex-col items-center">
             <div class="absolute inset-0 bg-blue-500 rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
             <div class="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-full shadow-[0_8px_30px_rgba(37,99,235,0.4)] flex items-center justify-center text-3xl text-white transform group-hover:scale-105 transition-all duration-300 z-10 border-2 border-white">
-                🤖
+                🩺
                 <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border border-white"></span></span>
             </div>
         </button>
@@ -132,13 +131,11 @@
         function switchModal(c, o) { closeModal(c); setTimeout(()=>openModal(o), 300); }
         const toggleUI = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
 
-        // 🌟 SAAS AUTO-REDIRECT LOGIC ADDED HERE
         function checkAuth() {
             try {
                 const token = localStorage.getItem('smartcare_jwt'); 
                 const role = localStorage.getItem('smartcare_role');
                 
-                // If Doctor or Admin accesses the homepage, redirect them instantly!
                 const path = window.location.pathname;
                 const isHomepage = path.endsWith('index.html') || path === '/';
                 if (token && isHomepage) {
@@ -159,7 +156,6 @@
         function logout() { localStorage.removeItem('smartcare_jwt'); localStorage.removeItem('smartcare_role'); window.location.reload(); }
         document.addEventListener('DOMContentLoaded', checkAuth);
 
-        // 🌟 LOGIN REDIRECT LOGIC
         document.getElementById('loginForm')?.addEventListener('submit', async (e) => { 
             e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Verifying..."; btn.disabled = true; 
             try { 
@@ -170,10 +166,9 @@
                     localStorage.setItem('smartcare_jwt', data.token); 
                     localStorage.setItem('smartcare_role', data.role); 
                     
-                    // Directly bounce Doctors and Admins to their respective portals
                     if(data.role === 'admin') window.location.href = 'admin.html';
                     else if(data.role === 'doctor') window.location.href = 'doctor-dashboard.html';
-                    else window.location.reload(); // Patient stays on homepage to use services
+                    else window.location.reload(); 
 
                 } else { 
                     msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; 
@@ -191,7 +186,7 @@
         function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
 
         function appendMessageHTML(htmlContent, isUser = false) {
-            chatMessages.innerHTML += `<div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} bubble-enter relative z-10">${!isUser ? '<div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🤖</div>' : ''}<div class="${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] text-sm shadow-md leading-relaxed">${htmlContent}</div></div>`;
+            chatMessages.innerHTML += `<div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} bubble-enter relative z-10">${!isUser ? '<div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div>' : ''}<div class="${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] text-sm shadow-md leading-relaxed">${htmlContent}</div></div>`;
             scrollToBottom(); if (!isUser) botPopSound.play().catch(e => console.log("Audio blocked"));
         }
 

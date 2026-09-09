@@ -21,6 +21,15 @@ const initDB = async () => {
     try {
         await pool.query(`CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'patient', specialization TEXT, image_url TEXT, experience TEXT, qualification TEXT, about TEXT, fees INTEGER, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
         await pool.query(`CREATE TABLE IF NOT EXISTS appointments (id SERIAL PRIMARY KEY, patient_id INTEGER, doctor_id INTEGER, patient_name TEXT, age INTEGER, gender TEXT, contact TEXT, symptoms TEXT, department TEXT, appointment_date TEXT, status TEXT DEFAULT 'Pending')`);
+        
+        // 🌟 NEW: AUTO CREATE DEFAULT ADMIN IF NOT EXISTS
+        const adminCheck = await pool.query(`SELECT * FROM users WHERE email = 'admin@smartcare.com'`);
+        if (adminCheck.rows.length === 0) {
+            const adminHash = await bcrypt.hash('admin123', 10);
+            await pool.query(`INSERT INTO users (name, email, password, role) VALUES ('System Admin', 'admin@smartcare.com', $1, 'admin')`, [adminHash]);
+            console.log("🛡️ Default Admin Account Created -> admin@smartcare.com / admin123");
+        }
+
         console.log("☁️ SmartCare Cloud DB Connected!");
     } catch (err) { console.error("DB Connection Error:", err); }
 };
@@ -85,7 +94,7 @@ async function getDeepAIResponse(userMessage, userId) {
         return { reply: "I couldn't process that. Please use clear, descriptive words so I can accurately assess your health condition." };
     }
 
-    // STEP 1: PRIMARY SYMPTOM -> Ask for Character/Impact (Apostrophes removed to prevent UI click break)
+    // STEP 1: PRIMARY SYMPTOM
     if (session.step === 'ASK_PRIMARY') {
         const depts = {
             "Cardiology": ['chest', 'heart', 'palpitation', 'breath', 'jaw', 'arm', 'sweating', 'seene', 'dil', 'bp', 'pain', 'heavy', 'tight'],
@@ -117,7 +126,7 @@ async function getDeepAIResponse(userMessage, userId) {
         };
     }
     
-    // STEP 2: IMPACT -> Ask for Triggers
+    // STEP 2: IMPACT
     if (session.step === 'ASK_IMPACT') {
         session.data.impact = msg;
         session.step = 'ASK_TRIGGERS';
@@ -127,7 +136,7 @@ async function getDeepAIResponse(userMessage, userId) {
         };
     }
 
-    // STEP 3: TRIGGERS -> Ask for Red Flags / Associated Symptoms
+    // STEP 3: TRIGGERS
     if (session.step === 'ASK_TRIGGERS') {
         session.data.triggers = msg;
         session.step = 'ASK_ASSOCIATED';
@@ -137,7 +146,7 @@ async function getDeepAIResponse(userMessage, userId) {
         };
     }
 
-    // STEP 4: FINAL CLINICAL IMPRESSION (Smart Report)
+    // STEP 4: FINAL CLINICAL IMPRESSION
     if (session.step === 'ASK_ASSOCIATED') {
         session.data.associated = msg;
         
