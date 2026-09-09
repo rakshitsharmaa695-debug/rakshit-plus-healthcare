@@ -37,27 +37,30 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 app.get('/api/user/profile', authenticate, async (req, res) => {
     try {
-        const result = await pool.query(
-            `SELECT id, name, email, role, specialization, image_url, experience, qualification, about, fees, created_at FROM users WHERE id = $1`, [req.user.id]
-        );
+        const result = await pool.query(`SELECT id, name, email, role, specialization, image_url, experience, qualification, about, fees, created_at FROM users WHERE id = $1`, [req.user.id]);
         if (result.rows.length === 0) return res.status(404).json({ error: "User not found" });
         res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: "Server Error" }); }
 });
 
-// ==========================================
-// 🧠 ULTRA-SMART NLP DIAGNOSIS ENGINE
-// ==========================================
+// =======================================================
+// 🧠 ULTIMATE DEEP CLINICAL PROFILING ENGINE
+// =======================================================
 
 const activeChats = {}; 
 
-// 🔥 Gibberish (Kachra Data) Detector Function
 function isGibberish(text) {
-    if (text.length < 3) return true; // Too short to be a real symptom
-    if (/\d{4,}/.test(text)) return true; // Contains random long numbers like 34478578
-    if (/(.)\1{3,}/i.test(text)) return true; // Repeating characters like 'yyyy' or 'hhhh'
-    if (/[bcdfghjklmnpqrstvwxz]{5,}/i.test(text)) return true; // 5 consonants in a row like 'tjftrst'
+    if (text.length < 3) return true;
+    if (/\d{4,}/.test(text)) return true;
+    if (/(.)\1{3,}/i.test(text)) return true;
+    if (/[bcdfghjklmnpqrstvwxz]{5,}/i.test(text)) return true;
     return false;
+}
+
+// Function to extract a small meaningful snippet for the final report
+function getSnippet(text) {
+    let words = text.split(' ');
+    return words.length > 6 ? words.slice(0, 6).join(' ') + "..." : text;
 }
 
 async function getDeepAIResponse(userMessage, userId) {
@@ -65,10 +68,10 @@ async function getDeepAIResponse(userMessage, userId) {
     
     // 1. Initial State / Reset
     if (!activeChats[userId] || msg === 'start' || msg === '🔄 start over' || msg === 'hi' || msg === 'hello') {
-        activeChats[userId] = { step: 'ASK_SYMPTOM', collectedDept: null };
+        activeChats[userId] = { step: 'ASK_PRIMARY', data: { primary: '', dept: '', impact: '', triggers: '', associated: '' } };
         return { 
-            reply: "Hello! I am SmartCare's Virtual Doctor. 👨‍⚕️<br><br>Let's do a proper checkup. Please describe your symptoms clearly in words. What exactly are you feeling right now?", 
-            options: ["I have a severe headache", "My chest feels heavy", "My stomach hurts"] 
+            reply: "Hello! I am SmartCare's Advanced Clinical AI. 👨‍⚕️<br><br>Let's do an in-depth assessment. <b>What brings you here today?</b> Please describe the main symptom you are feeling.", 
+            options: ["I have a severe headache", "My chest feels tight", "Stomach ache", "I have a fever"] 
         };
     }
 
@@ -76,23 +79,19 @@ async function getDeepAIResponse(userMessage, userId) {
     
     if (msg.includes('book') || msg.includes('appointment')) {
         delete activeChats[userId];
-        return { reply: "Great! Let's get you connected with a specialist right away.", options: ["📅 Book Appointment"] };
+        return { reply: "Let's get you connected with a specialist to examine this closely.", options: ["📅 Book Appointment"] };
     }
 
-    // ==========================================
-    // STEP 1: GATHER & VALIDATE INITIAL SYMPTOMS
-    // ==========================================
-    if (session.step === 'ASK_SYMPTOM') {
-        
-        // 🛡️ BLOCKER 1: Gibberish Logic
-        if (isGibberish(msg)) {
-            return { reply: "Hmm, that doesn't look like a valid symptom description to me. 🤔<br><br>Please type properly using normal words so I can understand and help you." };
-        }
-        
+    if (isGibberish(msg)) {
+        return { reply: "I couldn't process that. Please use clear, descriptive words so I can accurately assess your health condition." };
+    }
+
+    // STEP 1: PRIMARY SYMPTOM -> Ask for Character/Impact (No 1-10 Scale)
+    if (session.step === 'ASK_PRIMARY') {
         const depts = {
             "Cardiology": ['chest', 'heart', 'palpitation', 'breath', 'jaw', 'arm', 'sweating', 'seene', 'dil', 'bp', 'pain', 'heavy', 'tight'],
-            "Neurology": ['headache', 'dizzy', 'faint', 'numb', 'migraine', 'spin', 'head', 'seizure', 'sir', 'chakkar', 'vision', 'brain'],
-            "Gastroenterology": ['stomach', 'belly', 'nausea', 'vomit', 'diarrhea', 'acid', 'pain', 'burn', 'pet', 'ulti', 'gas', 'digestion', 'food'],
+            "Neurology": ['headache', 'dizzy', 'faint', 'numb', 'migraine', 'spin', 'head', 'seizure', 'sir', 'chakkar', 'vision', 'brain', 'paralysis'],
+            "Gastroenterology": ['stomach', 'belly', 'nausea', 'vomit', 'diarrhea', 'acid', 'pain', 'burn', 'pet', 'ulti', 'gas', 'digestion', 'food', 'loose'],
             "Orthopedics": ['bone', 'joint', 'muscle', 'back', 'knee', 'fracture', 'sprain', 'ache', 'haddi', 'kamar', 'dard', 'neck', 'shoulder', 'leg'],
             "General Medicine": ['fever', 'cold', 'cough', 'weak', 'tired', 'chills', 'sick', 'throat', 'bukhar', 'khasi', 'infection', 'body', 'temperature']
         };
@@ -105,48 +104,81 @@ async function getDeepAIResponse(userMessage, userId) {
             if (matches > maxMatches) { maxMatches = matches; matchedDept = dept; }
         }
         
-        // 🛡️ BLOCKER 2: No real medical keywords found (Blocks random valid words like 'ytuituttui')
         if (!matchedDept) {
-            return { reply: "I didn't detect any specific medical symptoms in your message. 🧐<br><br>Could you please clarify which body part is affected or what exactly hurts? (e.g., 'My back hurts a lot' or 'I have a high fever')" };
+            return { reply: "I need a bit more detail. Which specific body part is affected or what exact discomfort are you feeling? (e.g., 'My back hurts' or 'I feel nauseous')" };
         }
         
-        session.collectedDept = matchedDept;
-        session.step = 'ASK_DURATION_SEVERITY';
+        session.data.dept = matchedDept;
+        session.data.primary = msg;
+        session.step = 'ASK_IMPACT';
         
         return { 
-            reply: `I understand. These symptoms usually indicate an issue related to <b>${matchedDept}</b>.<br><br>To help me analyze the risk properly, <b>how long have you been experiencing this</b>, and how <b>severe</b> is the pain?`,
-            options: ["Just started today", "For a few days", "It's highly severe"]
+            reply: `I see. This points to <b>${matchedDept}</b> concerns.<br><br>Let's dive deeper. Instead of giving me a number, <b>tell me about the nature of this discomfort.</b> Is it sharp, dull, throbbing, or burning? And is it stopping you from doing your normal daily tasks?`,
+            options: ["It's sharp and limits my movement", "It's a dull, continuous ache", "It's throbbing but manageable"]
         };
     }
     
-    // ==========================================
-    // STEP 2: ANALYZE DURATION/SEVERITY & CONCLUDE
-    // ==========================================
-    if (session.step === 'ASK_DURATION_SEVERITY') {
-        
-        // 🛡️ BLOCKER 3: Stop gibberish in Step 2
-        if (isGibberish(msg)) {
-            return { reply: "I couldn't process that. Please tell me in clear words: How many days has this been happening, or how severe is the pain?" };
-        }
+    // STEP 2: IMPACT -> Ask for Triggers
+    if (session.step === 'ASK_IMPACT') {
+        session.data.impact = msg;
+        session.step = 'ASK_TRIGGERS';
+        return { 
+            reply: `Understood.<br><br><b>Does anything make it feel better or worse?</b><br>(For example: Does it increase when you eat, lie down, walk, or take a deep breath?)`,
+            options: ["It gets worse when I move", "Lying down helps", "Eating makes it worse", "Nothing changes it"]
+        };
+    }
 
-        const isSevere = ['severe', 'unbearable', 'extreme', 'blood', 'sudden', 'worst', 'emergency', 'tez', 'buhut', 'high', 'lot', 'very'].some(w => msg.includes(w));
-        const isLong = ['days', 'weeks', 'month', 'din', 'purana', 'lamba', 'long', 'time'].some(w => msg.includes(w));
+    // STEP 3: TRIGGERS -> Ask for Red Flags / Associated Symptoms
+    if (session.step === 'ASK_TRIGGERS') {
+        session.data.triggers = msg;
+        session.step = 'ASK_ASSOCIATED';
+        return { 
+            reply: `Noted. This helps narrow down the possibilities.<br><br><b>Finally, are you experiencing any other unusual signs?</b><br>(Like sudden sweating, dizziness, blurred vision, or breathing difficulty? If none, just type 'No').`,
+            options: ["No other symptoms", "Yes, feeling dizzy", "Yes, feeling breathless"]
+        };
+    }
+
+    // STEP 4: FINAL CLINICAL IMPRESSION (Smart Report)
+    if (session.step === 'ASK_ASSOCIATED') {
+        session.data.associated = msg;
         
-        let replyText = `<b>🩺 Comprehensive AI Analysis:</b><br>Suggested Department: <b>${session.collectedDept}</b><br><br>`;
+        // Advanced Semantic Flagging
+        const fullContext = `${session.data.primary} ${session.data.impact} ${session.data.triggers} ${session.data.associated}`;
+        const hasCriticalFlags = ['breath', 'faint', 'blood', 'sweat', 'vision', 'numb', 'unbearable', 'can\'t walk', 'paralyze', 'crushing'].some(w => fullContext.includes(w));
+        const impactsDailyLife = ['stop', 'limit', 'can\'t', 'bed', 'sleep', 'wake', 'ruk'].some(w => session.data.impact.includes(w));
         
-        if (isSevere || session.collectedDept === 'Cardiology') {
-            replyText += `<span style="color:#ef4444; font-weight:900; font-size:14px;">🚨 HIGH RISK DETECTED</span><br>Because your symptoms sound severe (or related to heart health), this could be a medical emergency. Do not wait or rely on home remedies. Please visit an Emergency Room (ER) immediately.`;
-        } else if (isLong) {
-            replyText += `💡 <b>Assessment:</b> Since this has been persisting for a while, it may be turning into a chronic condition. Please do not ignore it. It is highly advised to book a proper medical checkup.`;
+        // Generating Smart Differentials based on Dept
+        const differentials = {
+            "Cardiology": "Angina Pectoris, Costochondritis, or Arrhythmia",
+            "Neurology": "Migraine, Tension Cephalgia, or Vestibular Disturbance",
+            "Gastroenterology": "Gastritis, Peptic Ulcer Disease, or Gastroenteritis",
+            "Orthopedics": "Musculoskeletal Strain, Ligamentous Injury, or Osteoarthritis Flare",
+            "General Medicine": "Viral Prodrome, Acute Infection, or Systemic Inflammatory Response"
+        };
+
+        let diagnosisReport = `<div style="background: #1e293b; padding: 12px; border-radius: 8px; border-left: 4px solid #3b82f6;">`;
+        diagnosisReport += `<b>📝 Clinical Impression Summary</b><br><hr style="border-color:#334155; margin:8px 0;">`;
+        diagnosisReport += `• <b>Focus Area:</b> ${session.data.dept}<br>`;
+        diagnosisReport += `• <b>Symptom Character:</b> ${getSnippet(session.data.impact)}<br>`;
+        diagnosisReport += `• <b>Modifiers:</b> ${getSnippet(session.data.triggers)}<br>`;
+        diagnosisReport += `<hr style="border-color:#334155; margin:8px 0;">`;
+
+        if (hasCriticalFlags || (session.data.dept === 'Cardiology' && impactsDailyLife)) {
+            diagnosisReport += `<span style="color:#ef4444; font-weight:900; font-size:13px;">🚨 TRIAGE: EMERGENCY EVALUATION REQUIRED</span><br><span style="font-size:12px; color:#cbd5e1;">The presence of critical signs (e.g., breathlessness, severe daily impact) requires immediate clinical intervention. Please proceed to an ER.</span>`;
+        } else if (impactsDailyLife) {
+            diagnosisReport += `<span style="color:#f59e0b; font-weight:900; font-size:13px;">⚠️ TRIAGE: URGENT CARE</span><br><span style="font-size:12px; color:#cbd5e1;">Your daily activities are being affected. Prompt physical examination is advised to prevent deterioration.</span>`;
         } else {
-            replyText += `💡 <b>Assessment:</b> This appears to be an acute (recent) issue. Take proper rest, stay hydrated, and monitor your symptoms closely. If they worsen, consult a specialist.`;
+            diagnosisReport += `<span style="color:#10b981; font-weight:900; font-size:13px;">ℹ️ TRIAGE: ROUTINE CARE</span><br><span style="font-size:12px; color:#cbd5e1;">Symptoms appear stable. Monitor closely and consult a specialist for a definitive treatment plan.</span>`;
         }
         
-        replyText += `<br><br><i>Would you like to connect with one of our top specialists now?</i>`;
+        diagnosisReport += `<br><br><span style="color:#94a3b8; font-size:11px;"><b>AI DIFFERENTIAL:</b> Presentation aligns with potential <i>${differentials[session.data.dept]}</i>. A physical examination is required to rule out other pathology.</span>`;
+        diagnosisReport += `</div>`;
+        
+        diagnosisReport += `<br><i>Would you like to book a consultation with our specialist to review this assessment?</i>`;
         
         delete activeChats[userId];
         
-        return { reply: replyText, dept: session.collectedDept, options: ["📅 Book Appointment", "🔄 Start Over"] };
+        return { reply: diagnosisReport, dept: session.data.dept, options: ["📅 Book Appointment", "🔄 Start Over"] };
     }
 }
 
@@ -163,7 +195,7 @@ async function aiTriageEngine(symptoms) {
     return "General Medicine";
 }
 
-// ==========================================
+// =======================================================
 
 app.post('/api/upload-pdf', authenticate, upload.single('reportPdf'), (req, res) => {
     res.json({ score: 100, biomarkers: [{name: "Offline Check", val: "N/A", status: "Manual System Active", color: "blue"}], insights: ["Automated PDF scanning disabled."], diet: [] });
