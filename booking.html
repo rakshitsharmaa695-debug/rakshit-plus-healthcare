@@ -11,6 +11,7 @@
 </head>
 <body class="text-slate-800 antialiased">
 
+    <!-- 🌟 NAVBAR -->
     <nav class="fixed w-full top-0 z-50 glass-nav border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 md:py-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center gap-2 group z-50">
@@ -24,10 +25,11 @@
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-10 flex flex-col lg:flex-row gap-6 lg:gap-12">
+    <!-- 🌟 MOBILE OVERLAP FIX: Added pt-28 -->
+    <div class="max-w-7xl mx-auto px-4 md:px-8 pt-28 md:pt-32 pb-10 flex flex-col lg:flex-row gap-6 lg:gap-12">
         <div class="lg:w-2/3 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden flex flex-col h-[450px] md:h-[650px]">
             <div class="bg-slate-50 border-b border-slate-200 p-3 md:p-5 flex items-center justify-between z-10 shadow-sm shrink-0">
-                <div class="flex items-center gap-3 md:gap-4"><div class="w-10 h-10 md:w-12 md:h-12 bg-white text-blue-600 rounded-full flex items-center justify-center text-2xl shadow-md border border-slate-100 shrink-0 p-1">🤖</div><div class="flex flex-col"><h2 class="font-black text-slate-900 text-sm md:text-lg leading-tight">Virtual Booking Assistant</h2><span class="text-[10px] md:text-[11px] text-blue-500 font-bold mb-0.5 tracking-wide">Powered By SmartCare AI</span><p class="text-[10px] md:text-xs font-bold text-green-500 flex items-center gap-1 mt-0.5"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse"></span> Online</p></div></div>
+                <div class="flex items-center gap-3 md:gap-4"><div class="w-10 h-10 md:w-12 md:h-12 bg-white text-blue-600 rounded-full flex items-center justify-center text-2xl shadow-md border border-slate-100 shrink-0 p-1">🤖</div><div class="flex flex-col"><h2 class="font-black text-slate-900 text-sm md:text-lg leading-tight">Virtual Booking Assistant</h2><span class="text-[10px] md:text-[11px] text-blue-500 font-bold mb-0.5 tracking-wide">Powered By SmartCare</span><p class="text-[10px] md:text-xs font-bold text-green-500 flex items-center gap-1 mt-0.5"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse"></span> Online</p></div></div>
                 <div id="doctorBadge" class="hidden bg-purple-50 text-purple-700 px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-bold border border-purple-200 shrink-0 text-center uppercase tracking-wide">Direct<br class="md:hidden"> Booking</div>
             </div>
             <div id="chatBox" class="flex-1 p-4 md:p-6 overflow-y-auto chat-scroll bg-slate-50 space-y-4 md:space-y-5"></div>
@@ -42,8 +44,21 @@
     </div>
 
     <script>
-        const token = localStorage.getItem('smartcare_jwt'); if (!token) { alert("Please login."); window.location.href = 'index.html'; }
+        // 🌟 SAAS AUTO-REDIRECT LOGIC ADDED HERE
+        const token = localStorage.getItem('smartcare_jwt'); 
+        const role = localStorage.getItem('smartcare_role');
+        
+        if (!token) { 
+            alert("Please login to book an appointment."); 
+            window.location.href = 'index.html'; 
+        }
+        
+        // If Doctor or Admin tries to book an appointment, kick them to their dashboard!
+        if (role === 'admin') { window.location.href = 'admin.html'; }
+        if (role === 'doctor') { window.location.href = 'doctor-dashboard.html'; }
+
         function logout() { localStorage.clear(); window.location.href="index.html"; }
+        
         const urlParams = new URLSearchParams(window.location.search); const preSelectedDocId = urlParams.get('docId');
         const chatBox = document.getElementById('chatBox'); const inputBox = document.getElementById('inputBox');
         let currentStep = 0; const bookingData = { doctor_id: preSelectedDocId || null };
@@ -62,21 +77,13 @@
         function submitAnswer(predefinedValue = null) { 
             let value = predefinedValue || document.getElementById('chat-input')?.value.trim(); 
             if (!value) return; 
-
-            // 🛡️ STRICT VALIDATION SHIELD
             const step = questions[currentStep];
             if (step.key === 'patient_name' && value.length < 3) return alert("⚠️ Please enter a valid name (at least 3 characters).");
             if (step.key === 'contact' && !/^[0-9]{10}$/.test(value)) return alert("⚠️ Please enter a valid 10-digit mobile number.");
             if (step.key === 'age' && (isNaN(value) || value <= 0 || value > 120)) return alert("⚠️ Please enter a valid age (1-120).");
             if (step.key === 'symptoms' && value.length < 4) return alert("⚠️ Please describe symptoms in a bit more detail.");
-            if (step.key === 'date') {
-                const selected = new Date(value); const today = new Date(); today.setHours(0,0,0,0);
-                if(selected < today) return alert("⚠️ Please select today or a future date.");
-            }
-
-            bookingData[step.key] = value; 
-            appendUserMessage(value); 
-            currentStep++; 
+            if (step.key === 'date') { const selected = new Date(value); const today = new Date(); today.setHours(0,0,0,0); if(selected < today) return alert("⚠️ Please select today or a future date."); }
+            bookingData[step.key] = value; appendUserMessage(value); currentStep++; 
             setTimeout(() => { if(currentStep < questions.length) { appendBotMessage(questions[currentStep].q); renderInput(); } else { renderInput(); } }, 400); 
         }
 
