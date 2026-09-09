@@ -29,7 +29,6 @@
         
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
             <div>
-                <!-- 🌟 DYNAMIC GREETING ADDED HERE -->
                 <h1 class="text-2xl md:text-4xl font-black text-slate-900 mb-1"><span id="timeGreeting">Hello</span>, <span id="patientName" class="text-blue-600">Loading...</span></h1>
                 <p class="text-sm md:text-base text-slate-500 font-medium" id="currentDate">Here is your clinical summary.</p>
             </div>
@@ -130,25 +129,47 @@
         </div>
     </div>
 
+    <!-- 🌟 NEW: LIVE QUEUE MODAL (Replacing Alert) -->
+    <div id="queueModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 transition-opacity p-4">
+        <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl transform scale-95 relative transition-transform text-center">
+            <button onclick="closeQueueModal()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold focus:outline-none">✖</button>
+            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 shadow-inner">📍</div>
+            <h2 class="text-2xl font-black text-slate-900 mb-1">Live Queue Sync</h2>
+            <p class="text-sm text-slate-500 font-bold mb-6 border-b border-slate-100 pb-4">Real-time clinical wait estimation</p>
+            
+            <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-4 shadow-sm">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Patients Ahead</p>
+                <p class="text-4xl font-black text-slate-800" id="queuePatients">--</p>
+            </div>
+            
+            <div class="bg-blue-600 rounded-2xl p-5 text-white shadow-lg">
+                <p class="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-1">Estimated Wait</p>
+                <p class="text-3xl font-black"><span id="queueTime">--</span> <span class="text-sm font-bold">Mins</span></p>
+            </div>
+        </div>
+    </div>
+
     <script>
         const token = localStorage.getItem('smartcare_jwt'); const role = localStorage.getItem('smartcare_role');
         if (!token || role !== 'patient') { window.location.href = 'index.html'; }
         function logout() { localStorage.removeItem('smartcare_jwt'); localStorage.removeItem('smartcare_role'); window.location.href = 'index.html'; }
 
-        // 🌟 DYNAMIC TIME ENGINE LOGIC ADDED HERE
         function updateGreeting() {
             const hour = new Date().getHours();
             let greeting = "Good Evening";
             if (hour < 12) greeting = "Good Morning";
             else if (hour < 18) greeting = "Good Afternoon";
             document.getElementById('timeGreeting').innerText = greeting;
-            
             document.getElementById('currentDate').innerText = "Today is " + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
         updateGreeting();
 
         function openVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
         function closeVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
+
+        // 🌟 NEW: QUEUE MODAL CONTROLLERS
+        function openQueueModal() { const m = document.getElementById('queueModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
+        function closeQueueModal() { const m = document.getElementById('queueModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
 
         async function loadMyDashboard() {
             try {
@@ -183,7 +204,7 @@
 
                 if (pending.length > 0) {
                     const next = pending[0];
-                    nextApptBox.innerHTML = `<div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6"><div><span class="bg-blue-600/30 text-blue-300 border border-blue-500/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 inline-block">Upcoming Visit</span><h4 class="text-2xl md:text-3xl font-black text-white mb-1">Dr. ${next.doctor_name || 'Assigned Specialist'}</h4><p class="text-slate-300 font-bold mb-4">${next.department}</p><div class="flex items-center gap-4 text-sm font-bold text-slate-400 bg-slate-800/50 inline-flex px-4 py-2 rounded-xl border border-slate-700"><span class="flex items-center gap-2">📅 ${next.appointment_date.split('|')[0]}</span><span class="flex items-center gap-2">⏰ ${next.appointment_date.split('|')[1] || 'TBD'}</span></div></div><button onclick="checkQueue(${next.id})" class="w-full md:w-auto bg-blue-600 text-white px-8 py-4 rounded-xl font-black shadow-lg hover:bg-white hover:text-slate-900 transition tracking-wide text-sm flex items-center justify-center gap-2 group"><span class="group-hover:animate-bounce">📍</span> Track Live Queue</button></div>`;
+                    nextApptBox.innerHTML = `<div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6"><div><span class="bg-blue-600/30 text-blue-300 border border-blue-500/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 inline-block">Upcoming Visit</span><h4 class="text-2xl md:text-3xl font-black text-white mb-1">Dr. ${next.doctor_name || 'Assigned Specialist'}</h4><p class="text-slate-300 font-bold mb-4">${next.department}</p><div class="flex items-center gap-4 text-sm font-bold text-slate-400 bg-slate-800/50 inline-flex px-4 py-2 rounded-xl border border-slate-700"><span class="flex items-center gap-2">📅 ${next.appointment_date.split('|')[0]}</span><span class="flex items-center gap-2">⏰ ${next.appointment_date.split('|')[1] || 'TBD'}</span></div></div><button id="trackBtnMain" onclick="checkQueue(${next.id}, 'trackBtnMain')" class="w-full md:w-auto bg-blue-600 text-white px-8 py-4 rounded-xl font-black shadow-lg hover:bg-white hover:text-slate-900 transition tracking-wide text-sm flex items-center justify-center gap-2 group"><span class="group-hover:animate-bounce">📍</span> Track Live Queue</button></div>`;
                 } else {
                     nextApptBox.innerHTML = `<div class="relative z-10 text-center py-6"><div class="text-4xl mb-3 opacity-50">✨</div><h4 class="text-xl font-bold text-white mb-2">You're all caught up!</h4><p class="text-slate-400 text-sm">No pending appointments. Stay healthy!</p></div>`;
                 }
@@ -192,8 +213,8 @@
                 
                 data.forEach(appt => {
                     let stColor = appt.status === 'Completed' ? 'text-green-600 bg-green-100 border-green-200' : 'text-amber-600 bg-amber-100 border-amber-200 animate-pulse';
-                    let queueBtn = appt.status === 'Pending' ? `<button onclick="checkQueue(${appt.id})" class="text-[10px] md:text-xs font-black uppercase tracking-widest bg-slate-900 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition whitespace-nowrap">Track</button>` : `<span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Closed</span>`;
-                    list.innerHTML += `<tr class="hover:bg-slate-50 transition-colors"><td class="px-6 py-5 font-black text-slate-900">#${appt.id}</td><td class="px-6 py-5 whitespace-nowrap"><p class="font-black text-slate-800">Dr. ${appt.doctor_name || 'Specialist'}</p><p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">${appt.department}</p></td><td class="px-6 py-5 font-bold text-slate-600 whitespace-nowrap">${appt.appointment_date}</td><td class="px-6 py-5"><span class="px-3 py-1.5 rounded-md border text-[10px] md:text-xs font-black uppercase tracking-widest ${stColor}">${appt.status}</span></td><td class="px-6 py-5 text-center">${queueBtn}</td></tr>`;
+                    let queueBtn = appt.status === 'Pending' ? `<button id="trackRow${appt.id}" onclick="checkQueue(${appt.id}, 'trackRow${appt.id}')" class="text-[10px] md:text-xs font-black uppercase tracking-widest bg-slate-900 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition whitespace-nowrap w-24">Track</button>` : `<span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Closed</span>`;
+                    list.innerHTML += `<tr class="hover:bg-slate-50 transition-colors"><td class="px-6 py-5 font-black text-slate-900">#${appt.id}</td><td class="px-6 py-5 whitespace-nowrap"><p class="font-black text-slate-800">Dr. ${appt.doctor_name || 'Specialist'}</p><p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">${appt.department}</p></td><td class="px-6 py-5 font-bold text-slate-600 whitespace-nowrap">${appt.appointment_date}</td><td class="px-6 py-5"><span class="px-3 py-1.5 rounded-md border text-[10px] md:text-xs font-black uppercase tracking-widest ${stColor}">${appt.status}</span></td><td class="px-6 py-5 text-center flex justify-center">${queueBtn}</td></tr>`;
                 });
             } catch(e) {}
         }
@@ -210,7 +231,27 @@
             btn.innerText = "Save Vitals"; btn.disabled = false;
         });
 
-        async function checkQueue(id) { try { const res = await fetch(`/api/queue/${id}`); const data = await res.json(); alert(`🏥 LIVE QUEUE STATUS:\n\nThere are ${data.patientsAhead} patient(s) ahead of you.\nEstimated wait time: ${data.estimatedWaitTime} mins.`); } catch(e) { alert("Failed to fetch queue status."); } }
+        // 🌟 REPLACED ALERT WITH CUSTOM UI MODAL
+        async function checkQueue(id, btnId) { 
+            const btn = document.getElementById(btnId);
+            const originalText = btn ? btn.innerHTML : "Track";
+            if(btn) { btn.innerHTML = `<span class="animate-pulse">Syncing...</span>`; btn.disabled = true; }
+            
+            try { 
+                const res = await fetch(`/api/queue/${id}`); 
+                const data = await res.json(); 
+                
+                document.getElementById('queuePatients').innerText = data.patientsAhead;
+                document.getElementById('queueTime').innerText = data.estimatedWaitTime;
+                
+                if(btn) { btn.innerHTML = originalText; btn.disabled = false; }
+                openQueueModal();
+                
+            } catch(e) { 
+                if(btn) { btn.innerHTML = originalText; btn.disabled = false; }
+                alert("Failed to sync with live queue. Check your connection."); 
+            } 
+        }
         
         document.addEventListener('DOMContentLoaded', loadMyDashboard);
     </script>
