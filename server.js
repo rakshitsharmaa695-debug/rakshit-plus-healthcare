@@ -57,7 +57,6 @@ function isGibberish(text) {
     return false;
 }
 
-// Function to extract a small meaningful snippet for the final report
 function getSnippet(text) {
     let words = text.split(' ');
     return words.length > 6 ? words.slice(0, 6).join(' ') + "..." : text;
@@ -86,7 +85,7 @@ async function getDeepAIResponse(userMessage, userId) {
         return { reply: "I couldn't process that. Please use clear, descriptive words so I can accurately assess your health condition." };
     }
 
-    // STEP 1: PRIMARY SYMPTOM -> Ask for Character/Impact (No 1-10 Scale)
+    // STEP 1: PRIMARY SYMPTOM -> Ask for Character/Impact (Apostrophes removed to prevent UI click break)
     if (session.step === 'ASK_PRIMARY') {
         const depts = {
             "Cardiology": ['chest', 'heart', 'palpitation', 'breath', 'jaw', 'arm', 'sweating', 'seene', 'dil', 'bp', 'pain', 'heavy', 'tight'],
@@ -113,8 +112,8 @@ async function getDeepAIResponse(userMessage, userId) {
         session.step = 'ASK_IMPACT';
         
         return { 
-            reply: `I see. This points to <b>${matchedDept}</b> concerns.<br><br>Let's dive deeper. Instead of giving me a number, <b>tell me about the nature of this discomfort.</b> Is it sharp, dull, throbbing, or burning? And is it stopping you from doing your normal daily tasks?`,
-            options: ["It's sharp and limits my movement", "It's a dull, continuous ache", "It's throbbing but manageable"]
+            reply: `I see. This points to <b>${matchedDept}</b> concerns.<br><br>Let's dive deeper. Tell me about the nature of this discomfort. Is it sharp, dull, throbbing, or burning? And is it stopping you from doing your normal daily tasks?`,
+            options: ["Sharp and limits movement", "A dull continuous ache", "Throbbing but manageable"]
         };
     }
     
@@ -124,7 +123,7 @@ async function getDeepAIResponse(userMessage, userId) {
         session.step = 'ASK_TRIGGERS';
         return { 
             reply: `Understood.<br><br><b>Does anything make it feel better or worse?</b><br>(For example: Does it increase when you eat, lie down, walk, or take a deep breath?)`,
-            options: ["It gets worse when I move", "Lying down helps", "Eating makes it worse", "Nothing changes it"]
+            options: ["Worse when I move", "Lying down helps", "Eating makes it worse", "Nothing changes it"]
         };
     }
 
@@ -134,7 +133,7 @@ async function getDeepAIResponse(userMessage, userId) {
         session.step = 'ASK_ASSOCIATED';
         return { 
             reply: `Noted. This helps narrow down the possibilities.<br><br><b>Finally, are you experiencing any other unusual signs?</b><br>(Like sudden sweating, dizziness, blurred vision, or breathing difficulty? If none, just type 'No').`,
-            options: ["No other symptoms", "Yes, feeling dizzy", "Yes, feeling breathless"]
+            options: ["No other symptoms", "Yes feeling dizzy", "Yes feeling breathless"]
         };
     }
 
@@ -142,12 +141,10 @@ async function getDeepAIResponse(userMessage, userId) {
     if (session.step === 'ASK_ASSOCIATED') {
         session.data.associated = msg;
         
-        // Advanced Semantic Flagging
         const fullContext = `${session.data.primary} ${session.data.impact} ${session.data.triggers} ${session.data.associated}`;
         const hasCriticalFlags = ['breath', 'faint', 'blood', 'sweat', 'vision', 'numb', 'unbearable', 'can\'t walk', 'paralyze', 'crushing'].some(w => fullContext.includes(w));
         const impactsDailyLife = ['stop', 'limit', 'can\'t', 'bed', 'sleep', 'wake', 'ruk'].some(w => session.data.impact.includes(w));
         
-        // Generating Smart Differentials based on Dept
         const differentials = {
             "Cardiology": "Angina Pectoris, Costochondritis, or Arrhythmia",
             "Neurology": "Migraine, Tension Cephalgia, or Vestibular Disturbance",
