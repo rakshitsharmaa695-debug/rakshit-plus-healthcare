@@ -9,9 +9,9 @@ const app = express();
 app.use(express.static(__dirname));
 app.use(express.json({ limit: '15mb' })); 
 
-const JWT_SECRET = process.env.JWT_SECRET || "RakshitPlus_Enterprise_Secret";
+const JWT_SECRET = process.env.JWT_SECRET || "SmartCare_Enterprise_Secret";
 
-// 🚀 DATABASE CONNECTION
+// 🚀 DATABASE CONNECTION (Kept exactly same so old data doesn't wipe)
 const pool = new Pool({
     connectionString: "postgresql://rakshitplus_db_user:NNn5OEOt6EGL57R3LlFXIYXTV1mxT0hu@dpg-dae3etf40ujc73dlb71g-a.ohio-postgres.render.com/rakshitplus_db",
     ssl: { rejectUnauthorized: false } 
@@ -21,7 +21,7 @@ const initDB = async () => {
     try {
         await pool.query(`CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'patient', specialization TEXT, image_url TEXT, experience TEXT, qualification TEXT, about TEXT, fees INTEGER, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
         await pool.query(`CREATE TABLE IF NOT EXISTS appointments (id SERIAL PRIMARY KEY, patient_id INTEGER, doctor_id INTEGER, patient_name TEXT, age INTEGER, gender TEXT, contact TEXT, symptoms TEXT, department TEXT, appointment_date TEXT, status TEXT DEFAULT 'Pending')`);
-        console.log("☁️ Cloud PostgreSQL Connected!");
+        console.log("☁️ SmartCare Cloud DB Connected!");
     } catch (err) { console.error("DB Connection Error:", err); }
 };
 initDB();
@@ -30,22 +30,24 @@ const authenticate = (req, res, next) => {
     const token = req.header('Authorization');
     if (!token) return res.status(401).json({ error: "Access Denied. Please Login." });
     try { req.user = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET); next(); } 
-    catch (err) { return res.status(401).json({ error: "Session expired." }); }
+    catch (err) { return res.status(401).json({ error: "Session expired. Please Login again." }); }
 };
 
 const upload = multer({ storage: multer.memoryStorage() }); 
 
 app.get('/api/user/profile', authenticate, async (req, res) => {
     try {
-        const result = await pool.query(`SELECT id, name, email, role, specialization, image_url, experience, qualification, about, fees, created_at FROM users WHERE id = $1`, [req.user.id]);
+        const result = await pool.query(
+            `SELECT id, name, email, role, specialization, image_url, experience, qualification, about, fees, created_at FROM users WHERE id = $1`, [req.user.id]
+        );
         if (result.rows.length === 0) return res.status(404).json({ error: "User not found" });
         res.json(result.rows[0]);
     } catch (e) { res.status(500).json({ error: "Server Error" }); }
 });
 
-// 🧠 ULTIMATE DEEP DIAGNOSIS TREE (With Conversational Booking)
+// 🧠 ULTIMATE DEEP DIAGNOSIS TREE
 const symptomTree = {
-    "start": { msg: "Welcome to RakshitPlus AI. I am your virtual doctor. 👨‍⚕️<br><br>Please choose your language / Apni bhasha chunein:", options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"] },
+    "start": { msg: "Welcome to SmartCare AI. I am your virtual doctor. 👨‍⚕️<br><br>Please choose your language / Apni bhasha chunein:", options: ["🇬🇧 English", "🇮🇳 Hindi / Hinglish"] },
     
     "🇬🇧 English": { msg: "Where are you experiencing discomfort?", options: ["🤕 Head", "🫀 Chest", "🍕 Stomach", "🤒 Fever"] },
     "🤕 Head": { msg: "Can you describe the headache?", options: ["Throbbing (Like a heartbeat)", "Sharp pain / Tight band"] },
@@ -207,4 +209,4 @@ app.delete('/api/admin/doctor/:id', authenticate, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`RakshitPlus Backend Live on Port ${PORT}!`));
+app.listen(PORT, () => console.log(`SmartCare Backend Live on Port ${PORT}!`));

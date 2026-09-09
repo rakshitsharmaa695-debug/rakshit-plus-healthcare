@@ -3,25 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal - RakshitPlus</title>
+    <title>Admin Portal - SmartCare</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    <style>body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } .hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }</style>
 </head>
 <body class="flex flex-col md:flex-row h-screen overflow-hidden text-slate-800">
 
-    <!-- Mobile Header & Nav -->
     <div class="md:hidden flex flex-col w-full z-50 shadow-sm">
         <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center">
-            <!-- 🌟 FIX: Name changed to Admin Panel -->
-            <h1 class="font-black text-xl text-white">Admin Panel</h1>
+            <h1 class="font-black text-xl text-white">Smart<span class="text-slate-400">Care</span> Admin</h1>
             <button onclick="logout()" class="text-xs bg-rose-500 text-white px-3 py-1.5 rounded-lg font-bold">Exit</button>
         </header>
-        <!-- Horizontal Scrollable Menu For Mobile -->
         <nav class="flex overflow-x-auto gap-2 p-3 bg-white border-b border-slate-200 whitespace-nowrap hide-scrollbar shadow-sm">
             <button onclick="showSection('overview')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold shrink-0 shadow-md">📊 Overview</button>
             <button onclick="showSection('addDoctor')" class="bg-slate-100 border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold shrink-0">➕ Add Doctor</button>
@@ -29,258 +22,98 @@
         </nav>
     </div>
 
-    <!-- Desktop Sidebar -->
     <aside class="w-64 bg-slate-900 text-white flex flex-col hidden md:flex shrink-0">
         <div class="p-6 border-b border-slate-800">
-            <!-- 🌟 FIX: Name changed to Admin Panel -->
             <h1 class="text-2xl font-black">Admin Panel</h1>
-            <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-bold">Root Access</p>
+            <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-bold">SmartCare Network</p>
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <a href="#" onclick="showSection('overview')" class="flex items-center gap-3 px-4 py-3 bg-blue-600 rounded-xl font-bold transition"><span>📊</span> Dashboard Overview</a>
-            <a href="#" onclick="showSection('addDoctor')" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl font-bold transition"><span>➕</span> Add New Doctor</a>
+            <a href="#" onclick="showSection('overview')" class="flex items-center gap-3 px-4 py-3 bg-blue-600 rounded-xl font-bold transition"><span>📊</span> Dashboard</a>
+            <a href="#" onclick="showSection('addDoctor')" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl font-bold transition"><span>➕</span> Add Doctor</a>
             <a href="#" onclick="showSection('manageStaff')" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl font-bold transition"><span>🩺</span> Manage Staff</a>
         </nav>
         <div class="p-4 border-t border-slate-800">
-            <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white rounded-xl font-bold transition">
-                Exit System
-            </button>
+            <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white rounded-xl font-bold transition">Exit System</button>
         </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="flex-1 flex flex-col h-full overflow-y-auto">
         <div class="p-4 md:p-10 w-full max-w-7xl mx-auto">
             
-            <!-- OVERVIEW SECTION -->
             <div id="sec-overview" class="block">
-                <div class="mb-6 md:mb-8 text-center sm:text-left">
-                    <h2 class="text-2xl md:text-3xl font-black text-slate-900">Dashboard Overview</h2>
-                    <p class="text-sm md:text-base text-slate-500 font-medium">Manage hospital operations.</p>
-                </div>
-                
+                <div class="mb-6 md:mb-8 text-center sm:text-left"><h2 class="text-2xl md:text-3xl font-black text-slate-900">Dashboard Overview</h2><p class="text-sm md:text-base text-slate-500 font-medium">Manage SmartCare operations.</p></div>
                 <div class="grid grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-                    <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3 md:gap-4">
-                        <div class="w-12 h-12 md:w-14 md:h-14 bg-purple-100 rounded-full flex items-center justify-center text-xl md:text-2xl shrink-0">👨‍⚕️</div>
-                        <div>
-                            <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide">Doctors</p>
-                            <h3 id="stat-doctors" class="text-2xl md:text-3xl font-black text-slate-800">0</h3>
-                        </div>
-                    </div>
-                    <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3 md:gap-4">
-                        <div class="w-12 h-12 md:w-14 md:h-14 bg-blue-100 rounded-full flex items-center justify-center text-xl md:text-2xl shrink-0">👥</div>
-                        <div>
-                            <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide">Bookings</p>
-                            <h3 id="stat-patients" class="text-2xl md:text-3xl font-black text-slate-800">0</h3>
-                        </div>
-                    </div>
+                    <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3 md:gap-4"><div class="w-12 h-12 md:w-14 md:h-14 bg-purple-100 rounded-full flex items-center justify-center text-xl md:text-2xl shrink-0">👨‍⚕️</div><div><p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide">Doctors</p><h3 id="stat-doctors" class="text-2xl md:text-3xl font-black text-slate-800">0</h3></div></div>
+                    <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3 md:gap-4"><div class="w-12 h-12 md:w-14 md:h-14 bg-blue-100 rounded-full flex items-center justify-center text-xl md:text-2xl shrink-0">👥</div><div><p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wide">Bookings</p><h3 id="stat-patients" class="text-2xl md:text-3xl font-black text-slate-800">0</h3></div></div>
                 </div>
-
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-4 md:p-5 border-b border-slate-100 bg-slate-50">
-                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Recent Appointments</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="text-[10px] md:text-xs text-slate-400 uppercase bg-white border-b border-slate-100 font-bold whitespace-nowrap">
-                                <tr>
-                                    <th class="px-4 md:px-6 py-4">ID</th>
-                                    <th class="px-4 md:px-6 py-4">Patient</th>
-                                    <th class="px-4 md:px-6 py-4">Department</th>
-                                    <th class="px-4 md:px-6 py-4">Date</th>
-                                    <th class="px-4 md:px-6 py-4">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="allAppointmentsList" class="divide-y divide-slate-50">
-                                <tr><td colspan="5" class="p-8 text-center text-slate-400">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="p-4 md:p-5 border-b border-slate-100 bg-slate-50"><h3 class="font-bold text-slate-800 text-sm md:text-base">Recent Appointments</h3></div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm text-slate-600"><thead class="text-[10px] md:text-xs text-slate-400 uppercase bg-white border-b border-slate-100 font-bold whitespace-nowrap"><tr><th class="px-4 md:px-6 py-4">ID</th><th class="px-4 md:px-6 py-4">Patient</th><th class="px-4 md:px-6 py-4">Department</th><th class="px-4 md:px-6 py-4">Date</th><th class="px-4 md:px-6 py-4">Status</th></tr></thead><tbody id="allAppointmentsList" class="divide-y divide-slate-50"><tr><td colspan="5" class="p-8 text-center text-slate-400">Loading...</td></tr></tbody></table></div>
                 </div>
             </div>
 
-            <!-- ADD DOCTOR SECTION -->
             <div id="sec-addDoctor" class="hidden">
-                <div class="mb-6 md:mb-8 text-center sm:text-left">
-                    <h2 class="text-2xl md:text-3xl font-black text-slate-900">Register Doctor</h2>
-                </div>
-
+                <div class="mb-6 md:mb-8 text-center sm:text-left"><h2 class="text-2xl md:text-3xl font-black text-slate-900">Register Doctor</h2></div>
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 md:p-8">
                     <form id="addDoctorForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6" enctype="multipart/form-data">
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Full Name</label>
-                            <input type="text" id="doc-name" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Email (Login ID)</label>
-                            <input type="email" id="doc-email" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Temporary Password</label>
-                            <input type="password" id="doc-password" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Profile Photo</label>
-                            <input type="file" id="doc-image" accept="image/*" class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Department</label>
-                            <select id="doc-spec" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-bold text-sm text-slate-700">
-                                <option value="Cardiology">Cardiology</option>
-                                <option value="Neurology">Neurology</option>
-                                <option value="Orthopedics">Orthopedics</option>
-                                <option value="Gastroenterology">Gastroenterology</option>
-                                <option value="General Medicine">General Medicine</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Qualifications</label>
-                            <input type="text" id="doc-qual" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Experience</label>
-                            <input type="text" id="doc-exp" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Fee (₹)</label>
-                            <input type="number" id="doc-fee" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">About Bio</label>
-                            <textarea id="doc-about" rows="3" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"></textarea>
-                        </div>
-                        <div class="md:col-span-2 mt-2">
-                            <button type="submit" class="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-xl font-black shadow-lg hover:bg-blue-600 transition">Save Doctor Profile</button>
-                            <p id="doc-status" class="font-bold text-sm text-center mt-3 hidden"></p>
-                        </div>
+                        <div class="md:col-span-2"><label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Full Name</label><input type="text" id="doc-name" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"></div>
+                        <div><label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Email (Login ID)</label><input type="email" id="doc-email" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"></div>
+                        <div><label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Temporary Password</label><input type="password" id="doc-password" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"></div>
+                        <div class="md:col-span-2"><label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Profile Photo</label><input type="file" id="doc-image" accept="image/*" class="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700"></div>
+                        <div><label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Department</label><select id="doc-spec" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-bold text-sm text-slate-700"><option value="Cardiology">Cardiology</option><option value="Neurology">Neurology</option><option value="Orthopedics">Orthopedics</option><option value="Gastroenterology">Gastroenterology</option><option value="General Medicine">General Medicine</option></select></div>
+                        <div><label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Qualifications</label><input type="text" id="doc-qual" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"></div>
+                        <div><label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Experience</label><input type="text" id="doc-exp" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"></div>
+                        <div><label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Fee (₹)</label><input type="number" id="doc-fee" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"></div>
+                        <div class="md:col-span-2"><label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">About Bio</label><textarea id="doc-about" rows="3" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"></textarea></div>
+                        <div class="md:col-span-2 mt-2"><button type="submit" class="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-xl font-black shadow-lg hover:bg-blue-600 transition">Save Doctor Profile</button><p id="doc-status" class="font-bold text-sm text-center mt-3 hidden"></p></div>
                     </form>
                 </div>
             </div>
 
-            <!-- MANAGE STAFF SECTION -->
             <div id="sec-manageStaff" class="hidden">
-                <div class="mb-6 md:mb-8 text-center sm:text-left">
-                    <h2 class="text-2xl md:text-3xl font-black text-slate-900">Manage Staff</h2>
-                </div>
-                
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="text-[10px] md:text-xs text-slate-400 uppercase bg-slate-50 border-b border-slate-100 font-bold whitespace-nowrap">
-                                <tr>
-                                    <th class="px-4 md:px-6 py-4">Name</th>
-                                    <th class="px-4 md:px-6 py-4">Specialization</th>
-                                    <th class="px-4 md:px-6 py-4">Fee</th>
-                                    <th class="px-4 md:px-6 py-4 text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="doctorsList" class="divide-y divide-slate-50">
-                                <!-- Dynamic Data -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="mb-6 md:mb-8 text-center sm:text-left"><h2 class="text-2xl md:text-3xl font-black text-slate-900">Manage Staff</h2></div>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-left text-sm text-slate-600"><thead class="text-[10px] md:text-xs text-slate-400 uppercase bg-slate-50 border-b border-slate-100 font-bold whitespace-nowrap"><tr><th class="px-4 md:px-6 py-4">Name</th><th class="px-4 md:px-6 py-4">Specialization</th><th class="px-4 md:px-6 py-4">Fee</th><th class="px-4 md:px-6 py-4 text-center">Action</th></tr></thead><tbody id="doctorsList" class="divide-y divide-slate-50"></tbody></table></div></div>
             </div>
             
         </div>
     </main>
 
     <script>
-        const token = localStorage.getItem('rakshitplus_jwt');
-        const role = localStorage.getItem('rakshitplus_role');
-
+        const token = localStorage.getItem('smartcare_jwt'); const role = localStorage.getItem('smartcare_role');
         if (!token || role !== 'admin') { window.location.href = 'index.html'; }
-
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
 
         function showSection(id) {
-            ['sec-overview', 'sec-addDoctor', 'sec-manageStaff'].forEach(sec => document.getElementById(sec).classList.add('hidden'));
-            document.getElementById(`sec-${id}`).classList.remove('hidden');
-            
-            // Adjust mobile nav button colors
-            if(window.innerWidth < 768) {
-                const navBtns = document.querySelectorAll('nav button');
-                navBtns.forEach(btn => {
-                    btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-                    btn.classList.add('bg-slate-100', 'text-slate-700');
-                });
-                event.target.classList.remove('bg-slate-100', 'text-slate-700');
-                event.target.classList.add('bg-blue-600', 'text-white', 'shadow-md');
-            }
-
-            if(id === 'overview') loadOverview();
-            if(id === 'manageStaff') loadDoctors();
+            ['sec-overview', 'sec-addDoctor', 'sec-manageStaff'].forEach(sec => document.getElementById(sec).classList.add('hidden')); document.getElementById(`sec-${id}`).classList.remove('hidden');
+            if(window.innerWidth < 768) { document.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md'); btn.classList.add('bg-slate-100', 'text-slate-700'); }); event.target.classList.remove('bg-slate-100', 'text-slate-700'); event.target.classList.add('bg-blue-600', 'text-white', 'shadow-md'); }
+            if(id === 'overview') loadOverview(); if(id === 'manageStaff') loadDoctors();
         }
 
         async function loadOverview() {
             try {
-                const res = await fetch('/api/admin/appointments', { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                document.getElementById('stat-patients').innerText = data.length || 0;
-                const tbody = document.getElementById('allAppointmentsList');
-                tbody.innerHTML = '';
-                
-                data.slice(0, 10).forEach(appt => {
-                    let st = appt.status === 'Completed' ? 'text-green-600 bg-green-100' : 'text-amber-600 bg-amber-100';
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 md:px-6 py-4 font-black text-slate-900">#${appt.id}</td>
-                            <td class="px-4 md:px-6 py-4 font-bold text-slate-700 whitespace-nowrap">${appt.patient_name}</td>
-                            <td class="px-4 md:px-6 py-4 font-medium text-blue-600 whitespace-nowrap">${appt.department}</td>
-                            <td class="px-4 md:px-6 py-4 font-medium whitespace-nowrap">${appt.appointment_date}</td>
-                            <td class="px-4 md:px-6 py-4"><span class="px-3 py-1 rounded-full text-[10px] font-black tracking-wide ${st}">${appt.status}</span></td>
-                        </tr>
-                    `;
-                });
+                const res = await fetch('/api/admin/appointments', { headers: { 'Authorization': `Bearer ${token}` } }); const data = await res.json();
+                document.getElementById('stat-patients').innerText = data.length || 0; const tbody = document.getElementById('allAppointmentsList'); tbody.innerHTML = '';
+                data.slice(0, 10).forEach(appt => { let st = appt.status === 'Completed' ? 'text-green-600 bg-green-100' : 'text-amber-600 bg-amber-100'; tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-black text-slate-900">#${appt.id}</td><td class="px-4 md:px-6 py-4 font-bold text-slate-700 whitespace-nowrap">${appt.patient_name}</td><td class="px-4 md:px-6 py-4 font-medium text-blue-600 whitespace-nowrap">${appt.department}</td><td class="px-4 md:px-6 py-4 font-medium whitespace-nowrap">${appt.appointment_date}</td><td class="px-4 md:px-6 py-4"><span class="px-3 py-1 rounded-full text-[10px] font-black tracking-wide ${st}">${appt.status}</span></td></tr>`; });
             } catch (e) {}
         }
 
         async function loadDoctors() {
             try {
-                const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const docs = data.filter(u => u.role === 'doctor');
-                document.getElementById('stat-doctors').innerText = docs.length;
-                const tbody = document.getElementById('doctorsList');
-                tbody.innerHTML = '';
-                
-                docs.forEach(doc => {
-                    let imgTag = doc.image_url ? `<img src="${doc.image_url}" class="w-8 h-8 rounded-full shrink-0 object-cover border border-slate-200">` : ``;
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 md:px-6 py-4 font-bold text-slate-900 flex items-center gap-3 whitespace-nowrap">${imgTag} <div class="flex flex-col"><span class="text-sm">${doc.name}</span><span class="text-[10px] text-slate-400 font-medium">${doc.email}</span></div></td>
-                            <td class="px-4 md:px-6 py-4 font-bold text-purple-600 whitespace-nowrap">${doc.specialization}</td>
-                            <td class="px-4 md:px-6 py-4 font-black text-green-600">₹${doc.fees}</td>
-                            <td class="px-4 md:px-6 py-4 text-center">
-                                <button onclick="deleteDoctor(${doc.id})" class="bg-rose-100 text-rose-600 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wide hover:bg-rose-500 hover:text-white transition uppercase">Remove</button>
-                            </td>
-                        </tr>
-                    `;
-                });
+                const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } }); const data = await res.json();
+                const docs = data.filter(u => u.role === 'doctor'); document.getElementById('stat-doctors').innerText = docs.length; const tbody = document.getElementById('doctorsList'); tbody.innerHTML = '';
+                docs.forEach(doc => { let imgTag = doc.image_url ? `<img src="${doc.image_url}" class="w-8 h-8 rounded-full shrink-0 object-cover border border-slate-200">` : ``; tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-900 flex items-center gap-3 whitespace-nowrap">${imgTag} <div class="flex flex-col"><span class="text-sm">${doc.name}</span><span class="text-[10px] text-slate-400 font-medium">${doc.email}</span></div></td><td class="px-4 md:px-6 py-4 font-bold text-purple-600 whitespace-nowrap">${doc.specialization}</td><td class="px-4 md:px-6 py-4 font-black text-green-600">₹${doc.fees}</td><td class="px-4 md:px-6 py-4 text-center"><button onclick="deleteDoctor(${doc.id})" class="bg-rose-100 text-rose-600 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wide hover:bg-rose-500 hover:text-white transition uppercase">Remove</button></td></tr>`; });
             } catch (e) {}
         }
 
-        async function deleteDoctor(id) {
-            if (!confirm("Remove this doctor permanently?")) return;
-            try {
-                await fetch(`/api/admin/doctor/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
-                loadDoctors(); loadOverview(); 
-            } catch (e) {}
-        }
+        async function deleteDoctor(id) { if (!confirm("Remove this doctor permanently?")) return; try { await fetch(`/api/admin/doctor/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }}); loadDoctors(); loadOverview(); } catch (e) {} }
 
         document.getElementById('addDoctorForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); const btn = e.target.querySelector('button'); const status = document.getElementById('doc-status');
-            btn.innerText = "Saving..."; btn.disabled = true; status.classList.remove('hidden');
+            e.preventDefault(); const btn = e.target.querySelector('button'); const status = document.getElementById('doc-status'); btn.innerText = "Saving..."; btn.disabled = true; status.classList.remove('hidden');
             try {
-                const formData = new FormData();
-                ['name', 'email', 'password', 'spec', 'qual', 'exp', 'fee', 'about'].forEach(f => {
-                    formData.append(f === 'spec' ? 'specialization' : f === 'qual' ? 'qualification' : f === 'exp' ? 'experience' : f === 'fee' ? 'fees' : f, document.getElementById(`doc-${f}`).value);
-                });
+                const formData = new FormData(); ['name', 'email', 'password', 'spec', 'qual', 'exp', 'fee', 'about'].forEach(f => { formData.append(f === 'spec' ? 'specialization' : f === 'qual' ? 'qualification' : f === 'exp' ? 'experience' : f === 'fee' ? 'fees' : f, document.getElementById(`doc-${f}`).value); });
                 if (document.getElementById('doc-image').files.length > 0) formData.append('doctorPhoto', document.getElementById('doc-image').files[0]);
-
                 const res = await fetch('/api/admin/add-doctor', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
-                if (res.ok) { status.className = "text-green-600 mt-3 font-bold text-sm block text-center"; status.innerText = "Doctor registered successfully!"; e.target.reset(); loadDoctors(); } 
-                else { status.className = "text-rose-500 mt-3 font-bold text-sm block text-center"; status.innerText = "Error saving profile."; }
+                if (res.ok) { status.className = "text-green-600 mt-3 font-bold text-sm block text-center"; status.innerText = "Doctor registered successfully!"; e.target.reset(); loadDoctors(); } else { status.className = "text-rose-500 mt-3 font-bold text-sm block text-center"; status.innerText = "Error saving profile."; }
             } catch (error) {} finally { btn.innerText = "Save Doctor Profile"; btn.disabled = false; }
         });
 

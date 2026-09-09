@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RakshitPlus - AI Healthcare Ecosystem</title>
+    <title>SmartCare - AI Healthcare Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -20,28 +20,18 @@
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-
         .options-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .chat-option-btn { 
-            background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; 
-            border-radius: 20px; padding: 8px 16px; cursor: pointer; 
-            font-size: 13px; font-weight: 500; transition: all 0.2s ease; 
-        }
+        .chat-option-btn { background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 20px; padding: 8px 16px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s ease; }
         .chat-option-btn:hover { background-color: #2563eb; color: white; border-color: #2563eb; transform: translateY(-1px); }
-        .dept-highlight { 
-            display: inline-block; margin-top: 12px; padding: 6px 12px; 
-            background-color: #064e3b; color: #34d399; border-radius: 6px; 
-            font-weight: 600; font-size: 13px; border: 1px solid #059669; 
-        }
+        .dept-highlight { display: inline-block; margin-top: 12px; padding: 6px 12px; background-color: #064e3b; color: #34d399; border-radius: 6px; font-weight: 600; font-size: 13px; border: 1px solid #059669; }
     </style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden">
 
-    <!-- 🌟 NAVBAR -->
     <nav class="fixed w-full top-0 z-50 glass-nav border-b border-slate-100/50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 md:py-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center z-50 group">
-                <img src="1000022082.png" alt="RakshitPlus Logo" class="h-10 md:h-14 object-contain group-hover:scale-105 transition-transform duration-300">
+                <img src="1000022082.png" alt="SmartCare Logo" class="h-10 md:h-14 object-contain group-hover:scale-105 transition-transform duration-300">
             </a>
             <button id="mobileMenuBtn" class="md:hidden p-2 text-slate-600 focus:outline-none">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -52,7 +42,6 @@
                 <a href="contact.html" class="hover:text-blue-600 transition-colors">Contact Us</a>
             </div>
             
-            <!-- Desktop Auth -->
             <div class="hidden md:flex items-center space-x-4">
                 <div id="authButtons" class="flex gap-3 items-center">
                     <button onclick="openModal('loginModal')" class="font-bold text-slate-600 hover:text-blue-600 px-4 py-2 transition">Login</button>
@@ -67,7 +56,6 @@
             </div>
         </div>
 
-        <!-- 📱 Mobile Menu -->
         <div id="mobileMenu" class="md:hidden max-h-0 opacity-0 overflow-hidden flex flex-col items-center py-0 bg-white/95 rounded-2xl shadow-xl mt-2 w-full text-center border-t border-slate-100 transition-all duration-300">
             <a href="index.html" class="text-blue-600 font-bold w-full py-3 mt-2 border-b border-slate-100">Home</a>
             <a href="doctors.html" class="font-bold text-slate-600 w-full py-3 border-b border-slate-100">Find Doctors</a>
@@ -87,7 +75,6 @@
         </div>
     </nav>
 
-    <!-- 🌟 CLEAN HERO SECTION -->
     <main class="hero-gradient min-h-screen flex items-center relative pt-24 md:pt-20 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 md:px-8 grid lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full relative z-10">
             <div class="space-y-6 text-center lg:text-left pt-10 lg:pt-0">
@@ -99,7 +86,7 @@
                     Smart care, <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-400">zero waiting.</span>
                 </h1>
                 <p class="text-base md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed md:pr-8">
-                    Connect with top specialists instantly and chat with RakshitPlus AI for a real-time health assessment.
+                    Connect with top specialists instantly and chat with SmartCare AI for a real-time health assessment.
                 </p>
                 <div class="pt-4 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
                     <a href="booking.html" class="inline-flex justify-center items-center bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold shadow-xl gap-3 text-lg hover:bg-blue-600 transition-all w-full sm:w-auto">Book Consultation</a>
@@ -113,22 +100,19 @@
         </div>
     </main>
 
-    <!-- 🌟 CHAT WINDOW -->
     <div id="ai-chat-window" class="hidden fixed bottom-[110px] right-4 md:right-8 z-50 w-[92vw] sm:w-[400px] bg-[#0f172a] border border-slate-700 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex-col h-[65vh] sm:h-[550px] transform transition-all">
         <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 border-b border-blue-500/30 flex justify-between items-center shadow-md z-10">
             <div class="flex items-center gap-3">
-                <img src="1000022082.png" alt="RakshitPlus AI" class="w-11 h-11 object-contain bg-white rounded-full p-1 shadow-lg flex-shrink-0">
+                <img src="1000022082.png" alt="SmartCare AI" class="w-11 h-11 object-contain bg-white rounded-full p-1 shadow-lg flex-shrink-0">
                 <div class="text-left flex flex-col">
                     <h3 class="text-white font-black text-lg leading-tight tracking-wide">Virtual Doctor</h3>
-                    <span class="text-[11px] text-blue-300 font-semibold mt-0.5">Powered By RakshitPlus AI</span>
+                    <span class="text-[11px] text-blue-300 font-semibold mt-0.5">Powered By SmartCare AI</span>
                 </div>
             </div>
             <button id="close-ai-chat" class="text-slate-400 hover:text-white transition bg-white/10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">✖</button>
         </div>
         
-        <div id="chat-messages" class="relative flex-1 p-4 chat-scroll overflow-y-auto bg-[#0f172a] flex flex-col gap-4">
-            <!-- Messages dynamically injected -->
-        </div>
+        <div id="chat-messages" class="relative flex-1 p-4 chat-scroll overflow-y-auto bg-[#0f172a] flex flex-col gap-4"></div>
 
         <div id="typing-indicator" class="hidden p-4 bg-[#0f172a]">
             <div class="flex gap-2 w-full">
@@ -142,32 +126,22 @@
         </div>
 
         <div class="p-3 bg-slate-900 border-t border-slate-700 flex flex-col gap-2">
-            <div id="chat-input-container" class="hidden">
-                <input type="text" id="chat-input">
-                <button id="chat-send-btn">Send</button>
-            </div>
+            <div id="chat-input-container" class="hidden"><input type="text" id="chat-input"><button id="chat-send-btn">Send</button></div>
             <p class="text-center text-[10px] text-slate-400 font-medium tracking-wide">Select an option above to diagnose symptoms.</p>
         </div>
     </div>
 
-    <!-- 🌟 FLOATING ACTION WIDGET -->
     <div class="fixed bottom-6 right-4 md:right-8 z-40 flex flex-col items-center gap-2">
         <button id="ai-widget-toggle" class="relative group focus:outline-none flex flex-col items-center">
             <div class="absolute inset-0 bg-blue-500 rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
             <div class="relative w-14 h-14 md:w-16 md:h-16 bg-white rounded-full shadow-[0_8px_30px_rgba(37,99,235,0.4)] flex items-center justify-center border-[1.5px] border-blue-400/60 transform group-hover:scale-105 transition-all duration-300 z-10 p-1">
-                <img src="1000022082.png" alt="RakshitPlus AI" class="w-full h-full object-contain rounded-full">
-                <span class="absolute top-0 right-0 flex h-4 w-4">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border border-white"></span>
-                </span>
+                <img src="1000022082.png" alt="SmartCare AI" class="w-full h-full object-contain rounded-full">
+                <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border border-white"></span></span>
             </div>
         </button>
-        <span class="text-[11px] md:text-xs font-black text-slate-800 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-slate-200 uppercase tracking-wide">
-            AI Health Checkup
-        </span>
+        <span class="text-[11px] md:text-xs font-black text-slate-800 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-slate-200 uppercase tracking-wide">AI Health Checkup</span>
     </div>
 
-    <!-- 🌟 AUTHENTICATION MODALS -->
     <div id="loginModal" class="fixed inset-0 modal-bg z-[100] hidden flex items-center justify-center opacity-0 transition-opacity p-4">
         <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform">
             <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
@@ -178,7 +152,7 @@
                 <button type="submit" class="w-full bg-blue-600 text-white p-3 md:p-4 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition mt-2">Login Securely</button>
             </form>
             <p id="logMsg" class="mt-4 text-center text-sm font-bold hidden"></p>
-            <p class="text-center text-xs md:text-sm text-slate-500 font-medium mt-6 md:mt-8">New to RakshitPlus? <button onclick="switchModal('loginModal', 'registerModal')" class="text-blue-600 font-bold hover:underline">Create an account</button></p>
+            <p class="text-center text-xs md:text-sm text-slate-500 font-medium mt-6 md:mt-8">New to SmartCare? <button onclick="switchModal('loginModal', 'registerModal')" class="text-blue-600 font-bold hover:underline">Create an account</button></p>
         </div>
     </div>
 
@@ -198,287 +172,111 @@
     </div>
 
     <script>
-        // --- Core UI & Logic ---
         document.getElementById('mobileMenuBtn').addEventListener('click', function() {
             const menu = document.getElementById('mobileMenu');
-            if (menu.classList.contains('max-h-0')) {
-                menu.classList.remove('max-h-0', 'opacity-0', 'py-0');
-                menu.classList.add('max-h-[500px]', 'opacity-100', 'py-4');
-            } else {
-                menu.classList.add('max-h-0', 'opacity-0', 'py-0');
-                menu.classList.remove('max-h-[500px]', 'opacity-100', 'py-4');
-            }
+            if (menu.classList.contains('max-h-0')) { menu.classList.remove('max-h-0', 'opacity-0', 'py-0'); menu.classList.add('max-h-[500px]', 'opacity-100', 'py-4'); } 
+            else { menu.classList.add('max-h-0', 'opacity-0', 'py-0'); menu.classList.remove('max-h-[500px]', 'opacity-100', 'py-4'); }
         });
         function openModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.remove('hidden'); setTimeout(()=>{m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95');},10); }
         function closeModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(()=>{m.classList.add('hidden');},300); }
         function switchModal(c, o) { closeModal(c); setTimeout(()=>openModal(o), 300); }
-
         const toggleUI = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
 
         function checkAuth() {
             try {
-                const token = localStorage.getItem('rakshitplus_jwt');
-                const role = localStorage.getItem('rakshitplus_role');
-                
-                // Reset all first
+                const token = localStorage.getItem('smartcare_jwt');
+                const role = localStorage.getItem('smartcare_role');
                 toggleUI('adminPortalBtn', false); toggleUI('doctorDashboardBtn', false); toggleUI('patientDashboardBtn', false);
                 toggleUI('adminPortalBtnMobile', false); toggleUI('doctorDashboardBtnMobile', false); toggleUI('patientDashboardBtnMobile', false);
                 
                 if (token) {
-                    toggleUI('authButtons', false); toggleUI('userProfileBtn', true); 
-                    toggleUI('mobileAuthButtons', false); toggleUI('mobileUserProfileBtn', true);
-                    
-                    if(role === 'admin') { 
-                        toggleUI('adminPortalBtn', true); toggleUI('adminPortalBtnMobile', true); 
-                    } else if (role === 'doctor') {
-                        toggleUI('doctorDashboardBtn', true); toggleUI('doctorDashboardBtnMobile', true);
-                    } else { 
-                        toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true); 
-                    }
+                    toggleUI('authButtons', false); toggleUI('userProfileBtn', true); toggleUI('mobileAuthButtons', false); toggleUI('mobileUserProfileBtn', true);
+                    if(role === 'admin') { toggleUI('adminPortalBtn', true); toggleUI('adminPortalBtnMobile', true); } 
+                    else if (role === 'doctor') { toggleUI('doctorDashboardBtn', true); toggleUI('doctorDashboardBtnMobile', true); } 
+                    else { toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true); }
                 } else {
-                    toggleUI('authButtons', true); toggleUI('userProfileBtn', false); 
-                    toggleUI('mobileAuthButtons', true); toggleUI('mobileUserProfileBtn', false);
+                    toggleUI('authButtons', true); toggleUI('userProfileBtn', false); toggleUI('mobileAuthButtons', true); toggleUI('mobileUserProfileBtn', false);
                 }
             } catch(e) {}
         }
-        function logout() { localStorage.removeItem('rakshitplus_jwt'); localStorage.removeItem('rakshitplus_role'); window.location.reload(); }
+        function logout() { localStorage.removeItem('smartcare_jwt'); localStorage.removeItem('smartcare_role'); window.location.reload(); }
         document.addEventListener('DOMContentLoaded', checkAuth);
 
-        // 🌟 LOGIN LOGIC
         document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
             e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Verifying..."; btn.disabled = true; 
             try {
                 const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('log-email').value, password: document.getElementById('log-password').value }) });
                 const msg = document.getElementById('logMsg'); msg.classList.remove('hidden'); const data = await res.json();
-                if(res.ok) { localStorage.setItem('rakshitplus_jwt', data.token); localStorage.setItem('rakshitplus_role', data.role); window.location.reload(); } 
+                if(res.ok) { localStorage.setItem('smartcare_jwt', data.token); localStorage.setItem('smartcare_role', data.role); window.location.reload(); } 
                 else { msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; }
             } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; }
         });
 
-        // 🌟 REGISTER LOGIC (Fixed)
         document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-            const btn = e.target.querySelector('button'); 
-            btn.innerText = "Creating Account..."; btn.disabled = true;
+            e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Creating Account..."; btn.disabled = true;
             try {
-                const res = await fetch('/api/auth/register', { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ 
-                        name: document.getElementById('reg-name').value, 
-                        email: document.getElementById('reg-email').value, 
-                        password: document.getElementById('reg-password').value 
-                    }) 
-                });
-                
-                const msg = document.getElementById('regMsg'); 
-                msg.classList.remove('hidden');
-                
-                if(res.ok) { 
-                    msg.className = "mt-4 text-green-600 text-center text-sm font-bold"; 
-                    msg.innerText = "Account Created! Redirecting to login...";
-                    setTimeout(() => switchModal('registerModal', 'loginModal'), 1500);
-                } else { 
-                    const data = await res.json();
-                    msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; 
-                    msg.innerText = data.error || "Failed to register."; 
-                }
-            } catch (error) { 
-                console.error(error); 
-            } finally { 
-                btn.innerText = "Sign Up Now"; btn.disabled = false; 
-            }
+                const res = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value }) });
+                const msg = document.getElementById('regMsg'); msg.classList.remove('hidden');
+                if(res.ok) { msg.className = "mt-4 text-green-600 text-center text-sm font-bold"; msg.innerText = "Account Created! Redirecting to login..."; setTimeout(() => switchModal('registerModal', 'loginModal'), 1500); } 
+                else { const data = await res.json(); msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error || "Failed to register."; }
+            } catch (error) { console.error(error); } finally { btn.innerText = "Sign Up Now"; btn.disabled = false; }
         });
 
-        // --- 🌟 ADVANCED CONVERSATIONAL BOOKING LOGIC ---
         const aiToggleBtn = document.getElementById('ai-widget-toggle');
         const aiChatWindow = document.getElementById('ai-chat-window');
         const closeAiChatBtn = document.getElementById('close-ai-chat');
         const chatMessages = document.getElementById('chat-messages');
         const typingIndicator = document.getElementById('typing-indicator');
-
-        const botPopSound = new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg');
-        botPopSound.volume = 0.6;
-
+        const botPopSound = new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg'); botPopSound.volume = 0.6;
         let isChatInitialized = false;
 
         aiToggleBtn.addEventListener('click', () => {
-            const token = localStorage.getItem('rakshitplus_jwt');
-            if (!token) {
-                document.getElementById('loginTitle').innerText = "Login Required";
-                const logMsg = document.getElementById('logMsg');
-                logMsg.innerText = "Please login to access the Virtual Doctor.";
-                logMsg.className = "mt-4 text-center text-sm font-bold text-rose-500";
-                logMsg.classList.remove('hidden');
-                openModal('loginModal');
-                return;
-            }
-
-            if(aiChatWindow.classList.contains('hidden')) {
-                aiChatWindow.classList.remove('hidden');
-                aiChatWindow.classList.add('flex');
-                const badge = aiToggleBtn.querySelector('.animate-ping');
-                if(badge) badge.parentElement.remove(); 
-                
-                if(!isChatInitialized) {
-                    chatMessages.innerHTML = '';
-                    fetchAIResponse("start");
-                    isChatInitialized = true;
-                }
-            } else {
-                aiChatWindow.classList.add('hidden');
-                aiChatWindow.classList.remove('flex');
-            }
+            if (!localStorage.getItem('smartcare_jwt')) { document.getElementById('loginTitle').innerText = "Login Required"; const logMsg = document.getElementById('logMsg'); logMsg.innerText = "Please login to access the Virtual Doctor."; logMsg.className = "mt-4 text-center text-sm font-bold text-rose-500"; logMsg.classList.remove('hidden'); openModal('loginModal'); return; }
+            if(aiChatWindow.classList.contains('hidden')) { aiChatWindow.classList.remove('hidden'); aiChatWindow.classList.add('flex'); const badge = aiToggleBtn.querySelector('.animate-ping'); if(badge) badge.parentElement.remove(); if(!isChatInitialized) { chatMessages.innerHTML = ''; fetchAIResponse("start"); isChatInitialized = true; } } 
+            else { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); }
         });
 
-        closeAiChatBtn.addEventListener('click', () => {
-            aiChatWindow.classList.add('hidden');
-            aiChatWindow.classList.remove('flex');
-        });
+        closeAiChatBtn.addEventListener('click', () => { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); });
 
         function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
 
         function appendMessageHTML(htmlContent, isUser = false) {
-            chatMessages.innerHTML += `
-                <div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} bubble-enter relative z-10">
-                    ${!isUser ? '<img src="1000022082.png" alt="AI" class="w-8 h-8 rounded-full object-contain bg-white p-0.5 border border-blue-400/30 flex-shrink-0 shadow">' : ''}
-                    <div class="${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] text-sm shadow-md leading-relaxed">
-                        ${htmlContent}
-                    </div>
-                </div>`;
-            scrollToBottom();
-            if (!isUser) botPopSound.play().catch(e => console.log("Audio autoplay blocked"));
+            chatMessages.innerHTML += `<div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} bubble-enter relative z-10">${!isUser ? '<img src="1000022082.png" alt="AI" class="w-8 h-8 rounded-full object-contain bg-white p-0.5 border border-blue-400/30 flex-shrink-0 shadow">' : ''}<div class="${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] text-sm shadow-md leading-relaxed">${htmlContent}</div></div>`;
+            scrollToBottom(); if (!isUser) botPopSound.play().catch(e => console.log("Audio autoplay blocked"));
         }
 
-        // 🌟 INJECT IN-CHAT BOOKING FORM
         function showInChatBookingForm() {
             const today = new Date().toISOString().split('T')[0];
-            const formHtml = `
-                <div class="bg-slate-700 border border-slate-600 p-4 rounded-xl mt-2 w-full shadow-lg" id="chatBookingFormBox">
-                    <p class="font-black text-white mb-3 text-center border-b border-slate-600 pb-2">🏥 Quick Appointment</p>
-                    <input type="text" id="chat-book-name" placeholder="Patient Name" class="w-full mb-3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
-                    <input type="tel" id="chat-book-phone" placeholder="Contact Number" class="w-full mb-3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
-                    <div class="flex gap-2 mb-3">
-                        <input type="number" id="chat-book-age" placeholder="Age" class="w-1/3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
-                        <select id="chat-book-gender" class="w-2/3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
-                            <option value="" disabled selected>Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                        </select>
-                    </div>
-                    <div class="flex gap-2 mb-3">
-                        <input type="date" id="chat-book-date" min="${today}" class="w-1/2 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
-                        <select id="chat-book-time" class="w-1/2 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium">
-                            <option value="" disabled selected>Time</option>
-                            <option value="10:00 AM">10:00 AM</option>
-                            <option value="01:00 PM">01:00 PM</option>
-                            <option value="04:00 PM">04:00 PM</option>
-                        </select>
-                    </div>
-                    <button onclick="submitChatBooking()" id="chatBookBtn" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold shadow-md hover:bg-blue-500 transition">Confirm Booking 🚀</button>
-                </div>
-            `;
+            const formHtml = `<div class="bg-slate-700 border border-slate-600 p-4 rounded-xl mt-2 w-full shadow-lg" id="chatBookingFormBox"><p class="font-black text-white mb-3 text-center border-b border-slate-600 pb-2">🏥 Quick Appointment</p><input type="text" id="chat-book-name" placeholder="Patient Name" class="w-full mb-3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><input type="tel" id="chat-book-phone" placeholder="Contact Number" class="w-full mb-3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><div class="flex gap-2 mb-3"><input type="number" id="chat-book-age" placeholder="Age" class="w-1/3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><select id="chat-book-gender" class="w-2/3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><option value="" disabled selected>Gender</option><option value="Male">Male</option><option value="Female">Female</option></select></div><div class="flex gap-2 mb-3"><input type="date" id="chat-book-date" min="${today}" class="w-1/2 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><select id="chat-book-time" class="w-1/2 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><option value="" disabled selected>Time</option><option value="10:00 AM">10:00 AM</option><option value="01:00 PM">01:00 PM</option><option value="04:00 PM">04:00 PM</option></select></div><button onclick="submitChatBooking()" id="chatBookBtn" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold shadow-md hover:bg-blue-500 transition">Confirm Booking 🚀</button></div>`;
             appendMessageHTML(formHtml, false);
         }
 
-        // 🌟 SUBMIT IN-CHAT BOOKING
         async function submitChatBooking() {
-            const btn = document.getElementById('chatBookBtn');
-            const token = localStorage.getItem('rakshitplus_jwt');
-            
-            const payload = {
-                patient_name: document.getElementById('chat-book-name').value,
-                contact: document.getElementById('chat-book-phone').value,
-                age: document.getElementById('chat-book-age').value,
-                gender: document.getElementById('chat-book-gender').value,
-                symptoms: "Assessed via AI Chatbot", 
-                date: `${document.getElementById('chat-book-date').value} | ${document.getElementById('chat-book-time').value}`,
-                doctor_id: null // Let backend assign based on symptoms
-            };
-
-            if(!payload.patient_name || !payload.contact || !document.getElementById('chat-book-date').value || !document.getElementById('chat-book-time').value || !payload.age || !payload.gender) {
-                alert("Please fill all details correctly.");
-                return;
-            }
-
+            const btn = document.getElementById('chatBookBtn'); const token = localStorage.getItem('smartcare_jwt');
+            const payload = { patient_name: document.getElementById('chat-book-name').value, contact: document.getElementById('chat-book-phone').value, age: document.getElementById('chat-book-age').value, gender: document.getElementById('chat-book-gender').value, symptoms: "Assessed via AI Chatbot", date: `${document.getElementById('chat-book-date').value} | ${document.getElementById('chat-book-time').value}`, doctor_id: null };
+            if(!payload.patient_name || !payload.contact || !document.getElementById('chat-book-date').value || !document.getElementById('chat-book-time').value || !payload.age || !payload.gender) { alert("Please fill all details correctly."); return; }
             btn.innerText = "Processing..."; btn.disabled = true;
-
             try {
-                const res = await fetch('/api/appointments', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(payload)
-                });
-                
-                if(res.ok) {
-                    const data = await res.json();
-                    document.getElementById('chatBookingFormBox').innerHTML = `
-                        <div class="text-center py-4">
-                            <span class="text-4xl">✅</span>
-                            <p class="font-black text-green-400 mt-2 text-lg">Booking Confirmed!</p>
-                            <p class="text-slate-300 text-sm mt-1">Appt ID: #${data.id}</p>
-                            <a href="dashboard.html" class="block mt-4 bg-slate-900 text-white px-4 py-2 rounded font-bold border border-slate-600 hover:bg-blue-600 transition">Go to Dashboard</a>
-                        </div>
-                    `;
-                    scrollToBottom();
-                } else {
-                    alert("Failed to book.");
-                    btn.innerText = "Confirm Booking 🚀"; btn.disabled = false;
-                }
-            } catch(e) {
-                alert("Error booking appointment.");
-                btn.innerText = "Confirm Booking 🚀"; btn.disabled = false;
-            }
+                const res = await fetch('/api/appointments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
+                if(res.ok) { const data = await res.json(); document.getElementById('chatBookingFormBox').innerHTML = `<div class="text-center py-4"><span class="text-4xl">✅</span><p class="font-black text-green-400 mt-2 text-lg">Booking Confirmed!</p><p class="text-slate-300 text-sm mt-1">Appt ID: #${data.id}</p><a href="dashboard.html" class="block mt-4 bg-slate-900 text-white px-4 py-2 rounded font-bold border border-slate-600 hover:bg-blue-600 transition">Go to Dashboard</a></div>`; scrollToBottom(); } 
+                else { alert("Failed to book."); btn.innerText = "Confirm Booking 🚀"; btn.disabled = false; }
+            } catch(e) { alert("Error booking appointment."); btn.innerText = "Confirm Booking 🚀"; btn.disabled = false; }
         }
 
-        function handleOptionClick(selectedOption) {
-            appendMessageHTML(selectedOption, true);
-            
-            // 🌟 INTERCEPT "BOOK APPOINTMENT" CLICK
-            if (selectedOption === '📅 Book Appointment' || selectedOption === '📅 Doctor Book Karein') {
-                showInChatBookingForm();
-                return;
-            }
-
-            fetchAIResponse(selectedOption);
-        }
+        function handleOptionClick(selectedOption) { appendMessageHTML(selectedOption, true); if (selectedOption === '📅 Book Appointment' || selectedOption === '📅 Doctor Book Karein') { showInChatBookingForm(); return; } fetchAIResponse(selectedOption); }
 
         async function fetchAIResponse(userMessage) {
-            typingIndicator.classList.remove('hidden');
-            scrollToBottom();
-            const token = localStorage.getItem('rakshitplus_jwt');
-
+            typingIndicator.classList.remove('hidden'); scrollToBottom(); const token = localStorage.getItem('smartcare_jwt');
             try {
-                const res = await fetch('/api/ai-chat', {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ message: userMessage })
-                });
-                
-                let data = await res.json();
-                typingIndicator.classList.add('hidden');
-
+                const res = await fetch('/api/ai-chat', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ message: userMessage }) });
+                let data = await res.json(); typingIndicator.classList.add('hidden');
                 if (res.ok) {
                     let botResponseHTML = `<span>${data.reply}</span>`;
-                    
-                    if (data.department) {
-                        botResponseHTML += `<br><span class="dept-highlight">✅ Recommended: ${data.department}</span>`;
-                    }
-
-                    if (data.options && data.options.length > 0) {
-                        botResponseHTML += `<div class="options-container">`;
-                        data.options.forEach(opt => {
-                            botResponseHTML += `<button class="chat-option-btn" onclick="handleOptionClick('${opt}')">${opt}</button>`;
-                        });
-                        botResponseHTML += `</div>`;
-                    }
-
+                    if (data.department) botResponseHTML += `<br><span class="dept-highlight">✅ Recommended: ${data.department}</span>`;
+                    if (data.options && data.options.length > 0) { botResponseHTML += `<div class="options-container">`; data.options.forEach(opt => { botResponseHTML += `<button class="chat-option-btn" onclick="handleOptionClick('${opt}')">${opt}</button>`; }); botResponseHTML += `</div>`; }
                     appendMessageHTML(botResponseHTML, false);
                 } else { throw new Error(data.error || "Server Error"); }
-            } catch(e) {
-                typingIndicator.classList.add('hidden');
-                appendMessageHTML(`<span class="text-rose-400 font-bold">⚠️ ${e.message}</span>`, false);
-            }
+            } catch(e) { typingIndicator.classList.add('hidden'); appendMessageHTML(`<span class="text-rose-400 font-bold">⚠️ ${e.message}</span>`, false); }
         }
     </script>
 </body>
