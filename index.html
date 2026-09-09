@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartCare - AI Healthcare Ecosystem</title>
+    <title>SmartCare - Smart Healthcare Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -33,7 +33,7 @@
             
             <button id="mobileMenuBtn" class="md:hidden p-2 text-slate-600 focus:outline-none"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
             <div class="hidden md:flex space-x-8 font-bold text-slate-500 items-center">
-                <a href="index.html" class="text-blue-600">Home</a><a href="doctors.html" class="hover:text-blue-600 transition-colors">Find Doctors</a><a href="contact.html" class="hover:text-blue-600 transition-colors">Contact Us</a>
+                <a href="index.html" class="text-blue-600">Home</a><a href="doctors.html" class="hover:text-blue-600 transition-colors">Find Doctors</a><a href="about.html" class="hover:text-blue-600 transition-colors">About Us</a><a href="contact.html" class="hover:text-blue-600 transition-colors">Contact Us</a>
             </div>
             <div class="hidden md:flex items-center space-x-4">
                 <div id="authButtons" class="flex gap-3 items-center"><button onclick="openModal('loginModal')" class="font-bold text-slate-600 hover:text-blue-600 px-4 py-2 transition">Login</button><a href="booking.html" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition-all">Book Consult</a></div>
@@ -42,7 +42,7 @@
         </div>
 
         <div id="mobileMenu" class="md:hidden max-h-0 opacity-0 overflow-hidden flex flex-col items-center py-0 bg-white/95 rounded-2xl shadow-xl mt-2 w-full text-center border-t border-slate-100 transition-all duration-300">
-            <a href="index.html" class="text-blue-600 font-bold w-full py-3 mt-2 border-b border-slate-100">Home</a><a href="doctors.html" class="font-bold text-slate-600 w-full py-3 border-b border-slate-100">Find Doctors</a><a href="contact.html" class="font-bold text-slate-600 w-full py-3 mb-2">Contact Us</a>
+            <a href="index.html" class="text-blue-600 font-bold w-full py-3 mt-2 border-b border-slate-100">Home</a><a href="doctors.html" class="font-bold text-slate-600 w-full py-3 border-b border-slate-100">Find Doctors</a><a href="about.html" class="font-bold text-slate-600 w-full py-3 border-b border-slate-100">About Us</a><a href="contact.html" class="font-bold text-slate-600 w-full py-3 mb-2">Contact Us</a>
             <div id="mobileAuthButtons" class="w-full px-6 pb-6 space-y-3"><button onclick="openModal('loginModal'); document.getElementById('mobileMenuBtn').click();" class="block font-bold text-slate-600 border border-slate-200 py-3 rounded-xl w-full">Login</button><a href="booking.html" class="block bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg w-full">Book Consult</a></div>
             <div id="mobileUserProfileBtn" class="hidden w-full px-6 pb-6 space-y-3"><a href="admin.html" id="adminPortalBtnMobile" class="hidden block bg-red-600 text-white py-3 rounded-xl text-sm font-bold shadow-md w-full">🛡️ Admin Panel</a><a href="doctor-dashboard.html" id="doctorDashboardBtnMobile" class="hidden block bg-purple-600 text-white py-3 rounded-xl text-sm font-bold shadow-md w-full">👨‍⚕️ Doctor Portal</a><a href="dashboard.html" id="patientDashboardBtnMobile" class="hidden block bg-slate-900 text-white py-3 rounded-xl text-sm font-bold shadow-md w-full">🏥 My Dashboard</a><button onclick="logout()" class="block w-full text-sm font-bold text-slate-500 border border-slate-200 py-3 rounded-xl">Logout Securely</button></div>
         </div>
@@ -56,7 +56,7 @@
                     <span class="text-xs md:text-sm font-bold text-slate-700 tracking-wide">Next-Gen Healthcare Portal</span>
                 </div>
                 <h1 class="text-4xl md:text-6xl lg:text-[76px] font-black leading-[1.05] text-slate-900 tracking-tight">Welcome to <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-400">SmartCare.</span></h1>
-                <p class="text-base md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed md:pr-8">Connect with top specialists instantly and chat with our virtual doctor for a real-time health assessment.</p>
+                <p class="text-base md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed md:pr-8">Connect with top specialists instantly and consult our virtual doctor for a real-time clinical assessment.</p>
                 <div class="pt-4 flex flex-col sm:flex-row justify-center lg:justify-start gap-4"><a href="booking.html" class="inline-flex justify-center items-center bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold shadow-xl gap-3 text-lg hover:bg-blue-600 transition-all w-full sm:w-auto">Book Consultation</a></div>
             </div>
             <div class="relative w-full h-[300px] md:h-[550px] lg:h-[650px] flex justify-center items-center mt-4 lg:mt-0">
@@ -95,6 +95,7 @@
         </div>
     </div>
 
+    <!-- 🌟 UPDATED FLOATING VIRTUAL DOCTOR WIDGET -->
     <div class="fixed bottom-6 right-4 md:right-8 z-40 flex flex-col items-center gap-2">
         <button id="ai-widget-toggle" class="relative group focus:outline-none flex flex-col items-center">
             <div class="absolute inset-0 bg-blue-500 rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
@@ -103,7 +104,7 @@
                 <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border border-white"></span></span>
             </div>
         </button>
-        <span class="text-[11px] md:text-xs font-black text-slate-800 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-slate-200 uppercase tracking-wide">AI Health Checkup</span>
+        <span class="text-[11px] md:text-xs font-black text-slate-800 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-slate-200 uppercase tracking-wide">Ask Virtual Doctor</span>
     </div>
 
     <div id="loginModal" class="fixed inset-0 modal-bg z-[100] hidden flex items-center justify-center opacity-0 transition-opacity p-4">
@@ -134,7 +135,8 @@
         function checkAuth() {
             try {
                 const token = localStorage.getItem('smartcare_jwt'); const role = localStorage.getItem('smartcare_role');
-                toggleUI('adminPortalBtn', false); toggleUI('doctorDashboardBtn', false); toggleUI('patientDashboardBtn', false); toggleUI('adminPortalBtnMobile', false); toggleUI('doctorDashboardBtnMobile', false); toggleUI('patientDashboardBtnMobile', false);
+                toggleUI('adminPortalBtn', false); toggleUI('doctorDashboardBtn', false); toggleUI('patientDashboardBtn', false);
+                toggleUI('adminPortalBtnMobile', false); toggleUI('doctorDashboardBtnMobile', false); toggleUI('patientDashboardBtnMobile', false);
                 if (token) { toggleUI('authButtons', false); toggleUI('userProfileBtn', true); toggleUI('mobileAuthButtons', false); toggleUI('mobileUserProfileBtn', true); if(role === 'admin') { toggleUI('adminPortalBtn', true); toggleUI('adminPortalBtnMobile', true); } else if (role === 'doctor') { toggleUI('doctorDashboardBtn', true); toggleUI('doctorDashboardBtnMobile', true); } else { toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true); } } else { toggleUI('authButtons', true); toggleUI('userProfileBtn', false); toggleUI('mobileAuthButtons', true); toggleUI('mobileUserProfileBtn', false); }
             } catch(e) {}
         }
@@ -156,7 +158,6 @@
             scrollToBottom(); if (!isUser) botPopSound.play().catch(e => console.log("Audio blocked"));
         }
 
-        // 🌟 NEW: SEND BUTTON LOGIC
         document.getElementById('chat-send-btn')?.addEventListener('click', () => {
             const input = document.getElementById('chat-input');
             const msg = input.value.trim();
@@ -170,7 +171,12 @@
         
         async function submitChatBooking() { const btn = document.getElementById('chatBookBtn'); const token = localStorage.getItem('smartcare_jwt'); const payload = { patient_name: document.getElementById('chat-book-name').value, contact: document.getElementById('chat-book-phone').value, age: document.getElementById('chat-book-age').value, gender: document.getElementById('chat-book-gender').value, symptoms: "Assessed via AI Chatbot", date: `${document.getElementById('chat-book-date').value} | ${document.getElementById('chat-book-time').value}`, doctor_id: null }; if(payload.patient_name.length < 3) return alert("⚠️ Please enter a valid full name."); if(!/^[0-9]{10}$/.test(payload.contact)) return alert("⚠️ Please enter a valid 10-digit mobile number."); if(payload.age <= 0 || payload.age > 120) return alert("⚠️ Please enter a valid age."); if(!payload.gender || !document.getElementById('chat-book-date').value || !document.getElementById('chat-book-time').value) return alert("⚠️ Please fill all fields."); btn.innerText = "Processing..."; btn.disabled = true; try { const res = await fetch('/api/appointments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) }); if(res.ok) { const data = await res.json(); document.getElementById('chatBookingFormBox').innerHTML = `<div class="text-center py-4"><span class="text-4xl">✅</span><p class="font-black text-green-400 mt-2 text-lg">Booking Confirmed!</p><p class="text-slate-300 text-sm mt-1">Appt ID: #${data.id}</p><a href="dashboard.html" class="block mt-4 bg-slate-900 text-white px-4 py-2 rounded font-bold border border-slate-600 hover:bg-blue-600 transition">Go to Dashboard</a></div>`; scrollToBottom(); } else { alert("Failed to book."); btn.innerText = "Confirm Booking 🚀"; btn.disabled = false; } } catch(e) { alert("Error."); btn.innerText = "Confirm Booking 🚀"; btn.disabled = false; } }
 
-        function handleOptionClick(selectedOption) { appendMessageHTML(selectedOption, true); if (selectedOption === '📅 Book Appointment' || selectedOption === '📅 Doctor Book Karein') { showInChatBookingForm(); return; } fetchAIResponse(selectedOption); }
+        function handleOptionClick(selectedOption) {
+            const safeOpt = selectedOption.replace(/\\'/g, "'"); 
+            appendMessageHTML(safeOpt, true); 
+            if (safeOpt === '📅 Book Appointment' || safeOpt === '📅 Doctor Book Karein') { showInChatBookingForm(); return; } 
+            fetchAIResponse(safeOpt); 
+        }
         
         async function fetchAIResponse(userMessage) { 
             typingIndicator.classList.remove('hidden'); scrollToBottom(); const token = localStorage.getItem('smartcare_jwt'); 
@@ -182,7 +188,10 @@
                     if (data.department) botResponseHTML += `<br><span class="dept-highlight">✅ Recommended: ${data.department}</span>`; 
                     if (data.options && data.options.length > 0) { 
                         botResponseHTML += `<div class="options-container">`; 
-                        data.options.forEach(opt => { botResponseHTML += `<button class="chat-option-btn" onclick="handleOptionClick('${opt}')">${opt}</button>`; }); 
+                        data.options.forEach(opt => { 
+                            const escapedOpt = opt.replace(/'/g, "\\'");
+                            botResponseHTML += `<button class="chat-option-btn" onclick="handleOptionClick('${escapedOpt}')">${opt}</button>`; 
+                        }); 
                         botResponseHTML += `</div>`; 
                     } 
                     appendMessageHTML(botResponseHTML, false); 
