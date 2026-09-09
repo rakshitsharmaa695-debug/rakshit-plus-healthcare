@@ -11,6 +11,7 @@
 </head>
 <body class="text-slate-800 antialiased">
 
+    <!-- 🌟 NAVBAR -->
     <nav class="fixed w-full top-0 z-50 glass-nav border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 md:py-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center gap-2 group z-50">
@@ -25,6 +26,8 @@
     </nav>
 
     <div class="max-w-7xl mx-auto px-4 md:px-8 pt-28 md:pt-32 pb-10 flex flex-col lg:flex-row gap-6 lg:gap-12">
+        
+        <!-- Chat Interface -->
         <div class="lg:w-2/3 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden flex flex-col h-[450px] md:h-[650px]">
             <div class="bg-slate-50 border-b border-slate-200 p-3 md:p-5 flex items-center justify-between z-10 shadow-sm shrink-0">
                 <div class="flex items-center gap-3 md:gap-4"><div class="w-10 h-10 md:w-12 md:h-12 bg-white text-blue-600 rounded-full flex items-center justify-center text-2xl shadow-md border border-slate-100 shrink-0 p-1">🩺</div><div class="flex flex-col"><h2 class="font-black text-slate-900 text-sm md:text-lg leading-tight">Virtual Booking Assistant</h2><span class="text-[10px] md:text-[11px] text-blue-500 font-bold mb-0.5 tracking-wide">Powered By SmartCare</span><p class="text-[10px] md:text-xs font-bold text-green-500 flex items-center gap-1 mt-0.5"><span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse"></span> Online</p></div></div>
@@ -34,6 +37,7 @@
             <div id="inputBox" class="bg-white border-t border-slate-200 p-3 md:p-5 shrink-0"></div>
         </div>
         
+        <!-- Ticket / QR Interface -->
         <div class="lg:w-1/3 bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 text-center shadow-2xl relative overflow-hidden flex flex-col justify-center min-h-[350px] md:min-h-[400px]">
             <div class="absolute inset-0 bg-blue-500 opacity-20 blur-3xl rounded-full"></div>
             <div id="qrPlaceholder" class="relative z-10 w-full py-6 md:py-10"><div class="w-16 h-16 md:w-20 md:h-20 bg-slate-800 text-slate-400 border border-slate-700 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl md:text-4xl shadow-inner">🎫</div><h3 class="font-black text-white text-lg md:text-2xl mb-2">Digital Ticket</h3><p class="text-slate-400 text-xs md:text-sm font-medium">Answer questions to generate pass.</p></div>
@@ -45,7 +49,8 @@
         const token = localStorage.getItem('smartcare_jwt'); 
         const role = localStorage.getItem('smartcare_role');
         
-        if (!token) { alert("Please login to book an appointment."); window.location.href = 'index.html'; }
+        // Removed ugly alerts, silently redirecting
+        if (!token) { window.location.href = 'index.html'; }
         if (role === 'admin') { window.location.href = 'admin.html'; }
         if (role === 'doctor') { window.location.href = 'doctor-dashboard.html'; }
 
@@ -54,37 +59,116 @@
         const urlParams = new URLSearchParams(window.location.search); const preSelectedDocId = urlParams.get('docId');
         const chatBox = document.getElementById('chatBox'); const inputBox = document.getElementById('inputBox');
         let currentStep = 0; const bookingData = { doctor_id: preSelectedDocId || null };
-        const questions = [{ key: 'patient_name', type: 'text', q: "What is the patient's full name?", placeholder: "Rahul Sharma" }, { key: 'contact', type: 'tel', q: "Please provide a valid contact number.", placeholder: "9876543210" }, { key: 'age', type: 'number', q: "How old is the patient?", placeholder: "Age" }, { key: 'gender', type: 'options', q: "What is the patient's gender?", opts: ['Male', 'Female', 'Other'] }, { key: 'symptoms', type: 'text', q: "Briefly describe the symptoms.", placeholder: "Severe headache..." }, { key: 'date', type: 'date', q: "When would you like to visit?" }, { key: 'time', type: 'options', q: "Select a preferred time slot.", opts: ['10:00 AM', '11:30 AM', '01:00 PM', '02:30 PM'] }];
+        const questions = [{ key: 'patient_name', type: 'text', q: "What is the patient's full name?", placeholder: "e.g. Rahul Sharma" }, { key: 'contact', type: 'tel', q: "Please provide a valid contact number.", placeholder: "e.g. 9876543210" }, { key: 'age', type: 'number', q: "How old is the patient?", placeholder: "e.g. 25" }, { key: 'gender', type: 'options', q: "What is the patient's gender?", opts: ['Male', 'Female', 'Other'] }, { key: 'symptoms', type: 'text', q: "Briefly describe the symptoms in words.", placeholder: "e.g. Severe headache and fever" }, { key: 'date', type: 'date', q: "When would you like to visit?" }, { key: 'time', type: 'options', q: "Select a preferred time slot.", opts: ['10:00 AM', '11:30 AM', '01:00 PM', '02:30 PM'] }];
 
         function scrollToBottom() { setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100); }
-        function appendBotMessage(text) { chatBox.insertAdjacentHTML('beforeend', `<div class="flex gap-2.5 w-full chat-bubble"><div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white text-blue-600 flex items-center justify-center text-xl shadow-md shrink-0 border border-slate-200">🩺</div><div class="bg-white border border-slate-200 text-slate-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-xs md:text-sm font-medium shadow-sm leading-relaxed">${text}</div></div>`); scrollToBottom(); }
-        function appendUserMessage(text) { chatBox.insertAdjacentHTML('beforeend', `<div class="flex w-full justify-end chat-bubble"><div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] text-xs md:text-sm font-bold shadow-md">${text}</div></div>`); scrollToBottom(); }
-
-        function renderInput() {
-            if (currentStep >= questions.length) { inputBox.innerHTML = ''; processBooking(); return; } const step = questions[currentStep]; inputBox.innerHTML = '';
-            if (['text', 'tel', 'number', 'date'].includes(step.type)) { let minAttr = step.type === 'date' ? `min="${new Date().toISOString().split('T')[0]}"` : ''; inputBox.innerHTML = `<div class="flex gap-2"><input type="${step.type}" id="chat-input" placeholder="${step.placeholder || ''}" ${minAttr} class="flex-1 bg-slate-50 border border-slate-300 p-3 md:p-3.5 rounded-xl outline-none focus:border-blue-600 font-bold text-sm shadow-inner"><button onclick="submitAnswer()" class="bg-blue-600 text-white px-5 rounded-xl font-black shadow-lg hover:bg-slate-900 transition">➤</button></div>`; const inputEl = document.getElementById('chat-input'); inputEl.focus(); inputEl.addEventListener('keypress', (e) => { if(e.key === 'Enter') submitAnswer(); }); } 
-            else if (step.type === 'options') { let btns = step.opts.map(opt => `<button onclick="submitAnswer('${opt}')" class="bg-white border-2 border-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold hover:border-blue-600 hover:text-blue-600 transition shadow-sm">${opt}</button>`).join(''); inputBox.innerHTML = `<div class="flex flex-wrap gap-2 w-full justify-center md:justify-start">${btns}</div>`; }
+        
+        function appendBotMessage(text) { 
+            chatBox.insertAdjacentHTML('beforeend', `<div class="flex gap-2.5 w-full chat-bubble"><div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white text-blue-600 flex items-center justify-center text-xl shadow-md shrink-0 border border-slate-200">🩺</div><div class="bg-white border border-slate-200 text-slate-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-xs md:text-sm font-medium shadow-sm leading-relaxed">${text}</div></div>`); 
+            scrollToBottom(); 
+        }
+        
+        function appendUserMessage(text) { 
+            chatBox.insertAdjacentHTML('beforeend', `<div class="flex w-full justify-end chat-bubble"><div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] text-xs md:text-sm font-bold shadow-md">${text}</div></div>`); 
+            scrollToBottom(); 
         }
 
+        function renderInput() {
+            if (currentStep >= questions.length) { inputBox.innerHTML = ''; processBooking(); return; } 
+            const step = questions[currentStep]; inputBox.innerHTML = '';
+            
+            if (['text', 'tel', 'number', 'date'].includes(step.type)) { 
+                let minAttr = step.type === 'date' ? `min="${new Date().toISOString().split('T')[0]}"` : ''; 
+                inputBox.innerHTML = `<div class="flex gap-2"><input type="${step.type}" id="chat-input" placeholder="${step.placeholder || ''}" ${minAttr} class="flex-1 bg-slate-50 border border-slate-300 p-3 md:p-3.5 rounded-xl outline-none focus:border-blue-600 font-bold text-sm shadow-inner"><button onclick="submitAnswer()" class="bg-blue-600 text-white px-5 rounded-xl font-black shadow-lg hover:bg-slate-900 transition">➤</button></div>`; 
+                const inputEl = document.getElementById('chat-input'); inputEl.focus(); 
+                inputEl.addEventListener('keypress', (e) => { if(e.key === 'Enter') submitAnswer(); }); 
+            } 
+            else if (step.type === 'options') { 
+                let btns = step.opts.map(opt => `<button onclick="submitAnswer('${opt}')" class="bg-white border-2 border-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold hover:border-blue-600 hover:text-blue-600 transition shadow-sm">${opt}</button>`).join(''); 
+                inputBox.innerHTML = `<div class="flex flex-wrap gap-2 w-full justify-center md:justify-start">${btns}</div>`; 
+            }
+        }
+
+        // 🌟 ULTRA STRICT VALIDATION (NO BROWSER ALERTS)
         function submitAnswer(predefinedValue = null) { 
             let value = predefinedValue || document.getElementById('chat-input')?.value.trim(); 
             if (!value) return; 
+            
             const step = questions[currentStep];
-            if (step.key === 'patient_name' && value.length < 3) return alert("⚠️ Please enter a valid name (at least 3 characters).");
-            if (step.key === 'contact' && !/^[0-9]{10}$/.test(value)) return alert("⚠️ Please enter a valid 10-digit mobile number.");
-            if (step.key === 'age' && (isNaN(value) || value <= 0 || value > 120)) return alert("⚠️ Please enter a valid age (1-120).");
-            if (step.key === 'symptoms' && value.length < 4) return alert("⚠️ Please describe symptoms in a bit more detail.");
-            if (step.key === 'date') { const selected = new Date(value); const today = new Date(); today.setHours(0,0,0,0); if(selected < today) return alert("⚠️ Please select today or a future date."); }
-            bookingData[step.key] = value; appendUserMessage(value); currentStep++; 
-            setTimeout(() => { if(currentStep < questions.length) { appendBotMessage(questions[currentStep].q); renderInput(); } else { renderInput(); } }, 400); 
+            let errorMsg = null;
+
+            if (step.key === 'patient_name') {
+                if (value.length < 3 || !/^[a-zA-Z\s]+$/.test(value)) errorMsg = "Please enter a valid full name using alphabets only.";
+            } else if (step.key === 'contact') {
+                if (!/^[6-9]\d{9}$/.test(value)) errorMsg = "Please enter a valid 10-digit Indian mobile number.";
+            } else if (step.key === 'age') {
+                if (isNaN(value) || value <= 0 || value > 120) errorMsg = "Please enter a valid age between 1 and 120.";
+            } else if (step.key === 'symptoms') {
+                if (value.length < 4 || /^\d+$/.test(value)) errorMsg = "Please describe the symptoms properly in words.";
+            } else if (step.key === 'date') {
+                const selected = new Date(value); const today = new Date(); today.setHours(0,0,0,0); 
+                if(selected < today) errorMsg = "Please select today or a future date."; 
+            }
+
+            // If error found, show it inside the chat!
+            if (errorMsg) {
+                appendUserMessage(value);
+                appendBotMessage(`<span class="text-rose-500 font-bold">⚠️ ${errorMsg}</span>`);
+                setTimeout(() => { renderInput(); }, 300); // Re-render input
+                return;
+            }
+
+            // If no error, proceed normally
+            bookingData[step.key] = value; 
+            appendUserMessage(value); 
+            currentStep++; 
+            
+            setTimeout(() => { 
+                if(currentStep < questions.length) { 
+                    appendBotMessage(questions[currentStep].q); 
+                    renderInput(); 
+                } else { 
+                    renderInput(); 
+                } 
+            }, 400); 
         }
 
-        async function startChat() { if(preSelectedDocId) { document.getElementById('doctorBadge').classList.remove('hidden'); try { const doc = await (await fetch(`/api/doctors/${preSelectedDocId}`)).json(); appendBotMessage(`Hello! I see you want to book an appointment with <b>${doc.name}</b>. Let's get the patient's details.`); } catch(e) { appendBotMessage(`Hello! Let's get your appointment booked.`); } } else { appendBotMessage(`Hello! Let's get your appointment booked. SmartCare AI will assign the best specialist.`); } setTimeout(() => { appendBotMessage(questions[0].q); renderInput(); }, 600); }
+        async function startChat() { 
+            if(preSelectedDocId) { 
+                document.getElementById('doctorBadge').classList.remove('hidden'); 
+                try { 
+                    const doc = await (await fetch(`/api/doctors/${preSelectedDocId}`)).json(); 
+                    appendBotMessage(`Hello! I see you want to book an appointment with <b>${doc.name}</b>. Let's get the patient's details.`); 
+                } catch(e) { 
+                    appendBotMessage(`Hello! Let's get your appointment booked.`); 
+                } 
+            } else { 
+                appendBotMessage(`Hello! Let's get your appointment booked. SmartCare AI will assign the best specialist.`); 
+            } 
+            setTimeout(() => { appendBotMessage(questions[0].q); renderInput(); }, 600); 
+        }
 
         async function processBooking() {
             appendBotMessage("<span class='animate-pulse text-blue-600 font-bold'>Processing and generating Pass... ⏳</span>");
             const payload = { ...bookingData, date: `${bookingData.date} | ${bookingData.time}` }; delete payload.time;
-            try { const res = await fetch('/api/appointments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) }); const data = await res.json(); if (res.status === 201) { appendBotMessage(`🎉 <b>Booking Complete!</b><br>Check the <b>Digital Ticket</b> generated below/aside.`); document.getElementById('qrPlaceholder').classList.add('hidden'); document.getElementById('successResult').classList.remove('hidden'); const trackingUrl = `${window.location.origin}/tracking.html?id=${data.id}`; document.getElementById('qrcode').innerHTML = ""; new QRCode(document.getElementById("qrcode"), { text: trackingUrl, width: window.innerWidth < 768 ? 120 : 150, height: window.innerWidth < 768 ? 120 : 150, colorDark : "#0f172a", colorLight : "#ffffff" }); document.getElementById('res-dept').innerText = data.dept; document.getElementById('res-id').innerHTML = `<a href="${trackingUrl}" target="_blank" class="mt-4 block w-full bg-white text-slate-900 py-3 rounded-xl text-xs md:text-sm font-black hover:bg-blue-50 transition shadow-lg">Open Live Tracker ➤</a>`; } else { appendBotMessage(`⚠️ Error: ${data.error}`); } } catch(err) { appendBotMessage(`⚠️ Network error.`); }
+            try { 
+                const res = await fetch('/api/appointments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) }); 
+                const data = await res.json(); 
+                if (res.status === 201) { 
+                    appendBotMessage(`🎉 <b>Booking Complete!</b><br>Check the <b>Digital Ticket</b> generated below/aside.`); 
+                    document.getElementById('qrPlaceholder').classList.add('hidden'); 
+                    document.getElementById('successResult').classList.remove('hidden'); 
+                    const trackingUrl = `${window.location.origin}/tracking.html?id=${data.id}`; 
+                    document.getElementById('qrcode').innerHTML = ""; 
+                    new QRCode(document.getElementById("qrcode"), { text: trackingUrl, width: window.innerWidth < 768 ? 120 : 150, height: window.innerWidth < 768 ? 120 : 150, colorDark : "#0f172a", colorLight : "#ffffff" }); 
+                    document.getElementById('res-dept').innerText = data.dept; 
+                    document.getElementById('res-id').innerHTML = `<a href="${trackingUrl}" target="_blank" class="mt-4 block w-full bg-white text-slate-900 py-3 rounded-xl text-xs md:text-sm font-black hover:bg-blue-50 transition shadow-lg">Open Live Tracker ➤</a>`; 
+                } else { 
+                    appendBotMessage(`<span class="text-rose-500 font-bold">⚠️ Error: ${data.error}</span>`); 
+                } 
+            } catch(err) { 
+                appendBotMessage(`<span class="text-rose-500 font-bold">⚠️ Network error. Could not book.</span>`); 
+            }
         }
         document.addEventListener('DOMContentLoaded', startChat);
     </script>
