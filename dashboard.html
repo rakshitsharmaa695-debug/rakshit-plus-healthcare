@@ -29,13 +29,13 @@
         
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
             <div>
-                <h1 class="text-2xl md:text-4xl font-black text-slate-900 mb-1">Good Morning, <span id="patientName" class="text-blue-600">Loading...</span></h1>
+                <!-- 🌟 DYNAMIC GREETING ADDED HERE -->
+                <h1 class="text-2xl md:text-4xl font-black text-slate-900 mb-1"><span id="timeGreeting">Hello</span>, <span id="patientName" class="text-blue-600">Loading...</span></h1>
                 <p class="text-sm md:text-base text-slate-500 font-medium" id="currentDate">Here is your clinical summary.</p>
             </div>
             <a href="booking.html" class="md:hidden w-full text-center bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-900 transition">➕ Book New Consultation</a>
         </div>
 
-        <!-- 🌟 ACCURATE VITALS SECTION -->
         <div class="mb-4 flex justify-between items-center">
             <h3 class="font-black text-lg text-slate-800">My Health Vitals</h3>
             <button onclick="openVitalsModal()" class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg shadow-sm hover:bg-blue-600 hover:text-white transition">✏️ Edit Vitals</button>
@@ -135,18 +135,20 @@
         if (!token || role !== 'patient') { window.location.href = 'index.html'; }
         function logout() { localStorage.removeItem('smartcare_jwt'); localStorage.removeItem('smartcare_role'); window.location.href = 'index.html'; }
 
-        document.getElementById('currentDate').innerText = "Today is " + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        // 🌟 DYNAMIC TIME ENGINE LOGIC ADDED HERE
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = "Good Evening";
+            if (hour < 12) greeting = "Good Morning";
+            else if (hour < 18) greeting = "Good Afternoon";
+            document.getElementById('timeGreeting').innerText = greeting;
+            
+            document.getElementById('currentDate').innerText = "Today is " + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+        updateGreeting();
 
-        function openVitalsModal() { 
-            const m = document.getElementById('vitalsModal'); 
-            m.classList.remove('hidden'); 
-            setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); 
-        }
-        function closeVitalsModal() { 
-            const m = document.getElementById('vitalsModal'); 
-            m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); 
-            setTimeout(() => { m.classList.add('hidden'); }, 300); 
-        }
+        function openVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
+        function closeVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
 
         async function loadMyDashboard() {
             try {
@@ -160,13 +162,11 @@
                     document.getElementById('patientInitials').innerText = profile.name.substring(0, 2).toUpperCase();
                     document.getElementById('profileCardDate').innerText = new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                     
-                    // 🌟 ACCURATE VITALS POPULATION
                     document.getElementById('ui-bg').innerText = profile.blood_group || 'N/A';
                     document.getElementById('ui-hr').innerText = profile.heart_rate || '--';
                     document.getElementById('ui-bp').innerText = profile.blood_pressure || '--/--';
                     document.getElementById('ui-wt').innerText = profile.weight || '--';
                     
-                    // Pre-fill form
                     document.getElementById('form-bg').value = profile.blood_group || 'Unknown';
                     document.getElementById('form-hr').value = profile.heart_rate || '';
                     document.getElementById('form-bp').value = profile.blood_pressure || '';
@@ -198,27 +198,14 @@
             } catch(e) {}
         }
 
-        // 🌟 SUBMIT NEW VITALS
         document.getElementById('vitalsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('vitalSubmitBtn');
             btn.innerText = "Saving..."; btn.disabled = true;
             try {
-                const payload = {
-                    blood_group: document.getElementById('form-bg').value,
-                    heart_rate: document.getElementById('form-hr').value,
-                    blood_pressure: document.getElementById('form-bp').value,
-                    weight: document.getElementById('form-wt').value
-                };
-                const res = await fetch('/api/user/vitals', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(payload)
-                });
-                if(res.ok) {
-                    closeVitalsModal();
-                    loadMyDashboard(); // Refresh UI instantly
-                } else { alert("Failed to save."); }
+                const payload = { blood_group: document.getElementById('form-bg').value, heart_rate: document.getElementById('form-hr').value, blood_pressure: document.getElementById('form-bp').value, weight: document.getElementById('form-wt').value };
+                const res = await fetch('/api/user/vitals', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
+                if(res.ok) { closeVitalsModal(); loadMyDashboard(); } else { alert("Failed to save."); }
             } catch(error) { alert("Network Error"); }
             btn.innerText = "Save Vitals"; btn.disabled = false;
         });
