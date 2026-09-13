@@ -20,6 +20,8 @@
         .chat-option-btn { background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 20px; padding: 8px 16px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s ease; }
         .chat-option-btn:hover { background-color: #2563eb; color: white; border-color: #2563eb; transform: translateY(-1px); }
         .dept-highlight { display: inline-block; margin-top: 12px; padding: 6px 12px; background-color: #064e3b; color: #34d399; border-radius: 6px; font-weight: 600; font-size: 13px; border: 1px solid #059669; }
+        .remedy-highlight { display: inline-block; margin-top: 12px; padding: 12px 16px; background-color: #fef3c7; color: #92400e; border-radius: 12px; font-weight: 600; font-size: 13px; border: 1px solid #fde68a; width: 100%; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .report-card { background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
     </style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden">
@@ -27,8 +29,8 @@
     <nav class="fixed w-full top-0 z-50 glass-nav border-b border-slate-100/50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 md:py-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center gap-2 group z-50">
-                <div class="bg-blue-600 text-white w-9 h-9 md:w-11 md:h-11 flex items-center justify-center rounded-xl font-black text-lg md:text-xl shadow-lg group-hover:bg-slate-900 transition">SC</div>
-                <span class="font-black text-xl md:text-2xl tracking-tight text-slate-900 group-hover:text-blue-600 transition">Smart<span class="text-blue-600 group-hover:text-slate-900">Care</span></span>
+                <div class="bg-blue-600 text-white w-9 h-9 md:w-11 md:h-11 flex items-center justify-center rounded-xl font-black text-lg md:text-xl shadow-lg">SC</div>
+                <span class="font-black text-xl md:text-2xl tracking-tight text-slate-900 group-hover:text-blue-600 transition">Smart<span class="text-blue-600">Care</span></span>
             </a>
             
             <button id="mobileMenuBtn" class="md:hidden p-2 text-slate-600 focus:outline-none"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
@@ -56,7 +58,7 @@
                     <span class="text-xs md:text-sm font-bold text-slate-700 tracking-wide">Next-Gen Healthcare Portal</span>
                 </div>
                 <h1 class="text-4xl md:text-6xl lg:text-[76px] font-black leading-[1.05] text-slate-900 tracking-tight">Welcome to <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-400">SmartCare.</span></h1>
-                <p class="text-base md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed md:pr-8">Connect with top specialists instantly and consult our virtual doctor for a real-time clinical assessment.</p>
+                <p class="text-base md:text-xl text-slate-500 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed md:pr-8">Connect with top specialists instantly and consult our virtual doctor for a deep clinical assessment.</p>
                 <div class="pt-4 flex flex-col sm:flex-row justify-center lg:justify-start gap-4"><a href="booking.html" class="inline-flex justify-center items-center bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold shadow-xl gap-3 text-lg hover:bg-blue-600 transition-all w-full sm:w-auto">Book Consultation</a></div>
             </div>
             <div class="relative w-full h-[300px] md:h-[550px] lg:h-[650px] flex justify-center items-center mt-4 lg:mt-0">
@@ -67,62 +69,31 @@
         </div>
     </main>
 
-    <div id="ai-chat-window" class="hidden fixed bottom-[110px] right-4 md:right-8 z-50 w-[92vw] sm:w-[400px] bg-[#0f172a] border border-slate-700 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex-col h-[65vh] sm:h-[550px] transform transition-all">
-        <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 border-b border-blue-500/30 flex justify-between items-center shadow-md z-10">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center text-xl shadow-lg flex-shrink-0">🩺</div>
-                <div class="text-left flex flex-col"><h3 class="text-white font-black text-lg leading-tight tracking-wide">Virtual Doctor</h3><span class="text-[11px] text-blue-300 font-semibold mt-0.5">Powered By SmartCare</span></div>
-            </div>
-            <button id="close-ai-chat" class="text-slate-400 hover:text-white transition bg-white/10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">✖</button>
-        </div>
-        
+    <!-- 🌟 IN-DASHBOARD AI CHAT WIDGET -->
+    <div id="ai-chat-window" class="hidden fixed bottom-[110px] right-4 md:right-8 z-[400] w-[92vw] sm:w-[400px] bg-[#0f172a] border border-slate-700 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex-col h-[65vh] sm:h-[550px] transform transition-all">
+        <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 border-b border-blue-500/30 flex justify-between items-center shadow-md z-10"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center text-xl shadow-lg flex-shrink-0">🩺</div><div class="text-left flex flex-col"><h3 class="text-white font-black text-lg leading-tight tracking-wide">Virtual Doctor</h3><span class="text-[11px] text-blue-300 font-semibold mt-0.5">Clinical Protocol Active</span></div></div><button id="close-ai-chat" class="text-slate-400 hover:text-white transition bg-white/10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">✖</button></div>
         <div id="chat-messages" class="relative flex-1 p-4 chat-scroll overflow-y-auto bg-[#0f172a] flex flex-col gap-4"></div>
-
-        <div id="typing-indicator" class="hidden p-4 bg-[#0f172a]">
-            <div class="flex gap-2 w-full">
-                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div>
-                <div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex items-center gap-1 shadow-md">
-                    <div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="p-3 bg-slate-900 border-t border-slate-700 flex flex-col gap-2">
-            <div id="chat-input-container" class="flex gap-2 w-full">
-                <input type="text" id="chat-input" placeholder="Type your symptoms here..." class="flex-1 bg-slate-800 text-white border border-slate-600 p-2.5 rounded-xl outline-none focus:border-blue-500 text-sm font-medium">
-                <button id="chat-send-btn" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-blue-500 transition">Send</button>
-            </div>
-        </div>
+        <div id="typing-indicator" class="hidden p-4 bg-[#0f172a]"><div class="flex gap-2 w-full"><div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div><div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex items-center gap-1 shadow-md"><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div></div></div></div>
+        <div class="p-3 bg-slate-900 border-t border-slate-700 flex flex-col gap-2"><div id="chat-input-container" class="flex gap-2 w-full"><input type="text" id="chat-input" placeholder="Describe symptoms deeply..." class="flex-1 bg-slate-800 text-white border border-slate-600 p-2.5 rounded-xl outline-none focus:border-blue-500 text-sm font-medium"><button id="chat-send-btn" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-blue-500 transition">Send</button></div></div>
     </div>
 
-    <div class="fixed bottom-6 right-4 md:right-8 z-40 flex flex-col items-center gap-2">
-        <button id="ai-widget-toggle" class="relative group focus:outline-none flex flex-col items-center">
-            <div class="absolute inset-0 bg-blue-500 rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
-            <div class="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-full shadow-[0_8px_30px_rgba(37,99,235,0.4)] flex items-center justify-center text-3xl text-white transform group-hover:scale-105 transition-all duration-300 z-10 border-2 border-white">
-                🩺
-                <span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border border-white"></span></span>
-            </div>
-        </button>
-        <span class="text-[11px] md:text-xs font-black text-slate-800 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-slate-200 uppercase tracking-wide">Ask Virtual Doctor</span>
+    <!-- Floating Trigger -->
+    <div class="fixed bottom-6 right-4 md:right-8 z-[350] flex flex-col items-center gap-2">
+        <button id="ai-widget-toggle" class="relative group focus:outline-none flex flex-col items-center"><div class="absolute inset-0 bg-blue-500 rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div><div class="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-full shadow-[0_8px_30px_rgba(37,99,235,0.4)] flex items-center justify-center text-3xl text-white transform group-hover:scale-105 transition-all duration-300 z-10 border-2 border-white">🩺<span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border border-white"></span></span></div></button>
+        <span class="text-[11px] md:text-xs font-black text-slate-800 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-slate-200 uppercase tracking-wide">Virtual Doctor</span>
     </div>
 
-    <div id="loginModal" class="fixed inset-0 modal-bg z-[100] hidden flex items-center justify-center opacity-0 transition-opacity p-4">
-        <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform">
-            <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
-            <h2 id="loginTitle" class="text-2xl md:text-3xl font-black text-slate-900 mb-2">Welcome Back</h2>
-            <form id="loginForm" class="space-y-4 md:space-y-5 mt-6"><input type="email" id="log-email" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="hello@example.com"><input type="password" id="log-password" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="••••••••"><button type="submit" class="w-full bg-blue-600 text-white p-3 md:p-4 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition mt-2">Login Securely</button></form>
-            <p id="logMsg" class="mt-4 text-center text-sm font-bold hidden"></p><p class="text-center text-xs md:text-sm text-slate-500 font-medium mt-6 md:mt-8">New to SmartCare? <button onclick="switchModal('loginModal', 'registerModal')" class="text-blue-600 font-bold hover:underline">Create an account</button></p>
+    <!-- 🌟 DEEP CLINICAL GUIDE MODAL (VISUAL IMAGES) -->
+    <div id="guideModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[600] flex items-center justify-center opacity-0 transition-opacity p-4">
+        <div class="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl transform scale-95 relative transition-transform overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50"><div><h2 class="text-xl font-black text-slate-900" id="guideTitle">Visual Assessment Guide</h2><p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Clinical Protocol</p></div><button onclick="closeGuide()" class="text-slate-400 hover:text-rose-500 transition text-2xl font-bold">✖</button></div>
+            <div class="p-6 overflow-y-auto" id="guideContent"></div>
+            <div class="p-5 border-t border-slate-100 bg-slate-50 text-center"><button onclick="completeGuide()" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-blue-600 transition">I have completed the check</button></div>
         </div>
     </div>
 
-    <div id="registerModal" class="fixed inset-0 modal-bg z-[100] hidden flex items-center justify-center opacity-0 transition-opacity p-4">
-        <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform">
-            <button onclick="closeModal('registerModal')" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
-            <h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">Create Account</h2>
-            <form id="registerForm" class="space-y-4 md:space-y-5 mt-6"><input type="text" id="reg-name" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="John Doe"><input type="email" id="reg-email" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="john@example.com"><input type="password" id="reg-password" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="••••••••"><button type="submit" class="w-full bg-slate-900 text-white p-3 md:p-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition mt-2">Sign Up Now</button></form>
-            <p id="regMsg" class="mt-4 text-center text-sm font-bold hidden"></p><p class="text-center text-xs md:text-sm text-slate-500 font-medium mt-6 md:mt-8">Already registered? <button onclick="switchModal('registerModal', 'loginModal')" class="text-blue-600 font-bold hover:underline">Login here</button></p>
-        </div>
-    </div>
+    <div id="loginModal" class="fixed inset-0 modal-bg z-[100] hidden flex items-center justify-center opacity-0 transition-opacity p-4"><div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform"><button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button><h2 id="loginTitle" class="text-2xl md:text-3xl font-black text-slate-900 mb-2">Welcome Back</h2><form id="loginForm" class="space-y-4 md:space-y-5 mt-6"><input type="email" id="log-email" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="hello@example.com"><input type="password" id="log-password" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="••••••••"><button type="submit" class="w-full bg-blue-600 text-white p-3 md:p-4 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition mt-2">Login Securely</button></form><p id="logMsg" class="mt-4 text-center text-sm font-bold hidden"></p><p class="text-center text-xs md:text-sm text-slate-500 font-medium mt-6 md:mt-8">New to SmartCare? <button onclick="switchModal('loginModal', 'registerModal')" class="text-blue-600 font-bold hover:underline">Create an account</button></p></div></div>
+    <div id="registerModal" class="fixed inset-0 modal-bg z-[100] hidden flex items-center justify-center opacity-0 transition-opacity p-4"><div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-10 w-full max-w-md shadow-2xl transform scale-95 relative transition-transform"><button onclick="closeModal('registerModal')" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button><h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">Create Account</h2><form id="registerForm" class="space-y-4 md:space-y-5 mt-6"><input type="text" id="reg-name" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="John Doe"><input type="email" id="reg-email" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="john@example.com"><input type="password" id="reg-password" required class="w-full bg-slate-50 border border-slate-200 p-3 md:p-4 rounded-xl outline-none focus:border-blue-500 font-medium text-sm md:text-base" placeholder="••••••••"><button type="submit" class="w-full bg-slate-900 text-white p-3 md:p-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition mt-2">Sign Up Now</button></form><p id="regMsg" class="mt-4 text-center text-sm font-bold hidden"></p><p class="text-center text-xs md:text-sm text-slate-500 font-medium mt-6 md:mt-8">Already registered? <button onclick="switchModal('registerModal', 'loginModal')" class="text-blue-600 font-bold hover:underline">Login here</button></p></div></div>
 
     <script>
         document.getElementById('mobileMenuBtn').addEventListener('click', function() { const menu = document.getElementById('mobileMenu'); if (menu.classList.contains('max-h-0')) { menu.classList.remove('max-h-0', 'opacity-0', 'py-0'); menu.classList.add('max-h-[500px]', 'opacity-100', 'py-4'); } else { menu.classList.add('max-h-0', 'opacity-0', 'py-0'); menu.classList.remove('max-h-[500px]', 'opacity-100', 'py-4'); } });
@@ -133,102 +104,223 @@
 
         function checkAuth() {
             try {
-                const token = localStorage.getItem('smartcare_jwt'); 
-                const role = localStorage.getItem('smartcare_role');
-                
-                const path = window.location.pathname;
-                const isHomepage = path.endsWith('index.html') || path === '/';
-                if (token && isHomepage) {
-                    if (role === 'admin') { window.location.href = 'admin.html'; return; }
-                    if (role === 'doctor') { window.location.href = 'doctor-dashboard.html'; return; }
-                }
-
+                const token = localStorage.getItem('smartcare_jwt'); const role = localStorage.getItem('smartcare_role');
+                const path = window.location.pathname; const isHomepage = path.endsWith('index.html') || path === '/';
+                if (token && isHomepage) { if (role === 'admin') { window.location.href = 'admin.html'; return; } if (role === 'doctor') { window.location.href = 'doctor-dashboard.html'; return; } }
                 toggleUI('patientDashboardBtn', false); toggleUI('patientDashboardBtnMobile', false);
-                if (token) { 
-                    toggleUI('authButtons', false); toggleUI('userProfileBtn', true); toggleUI('mobileAuthButtons', false); toggleUI('mobileUserProfileBtn', true); 
-                    if(role === 'patient') { toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true); }
-                } else { 
-                    toggleUI('authButtons', true); toggleUI('userProfileBtn', false); toggleUI('mobileAuthButtons', true); toggleUI('mobileUserProfileBtn', false); 
-                }
+                if (token) { toggleUI('authButtons', false); toggleUI('userProfileBtn', true); toggleUI('mobileAuthButtons', false); toggleUI('mobileUserProfileBtn', true); if(role === 'patient') { toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true); } } else { toggleUI('authButtons', true); toggleUI('userProfileBtn', false); toggleUI('mobileAuthButtons', true); toggleUI('mobileUserProfileBtn', false); }
             } catch(e) {}
         }
-
         function logout() { localStorage.removeItem('smartcare_jwt'); localStorage.removeItem('smartcare_role'); window.location.reload(); }
         document.addEventListener('DOMContentLoaded', checkAuth);
 
-        document.getElementById('loginForm')?.addEventListener('submit', async (e) => { 
-            e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Verifying..."; btn.disabled = true; 
-            try { 
-                const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('log-email').value, password: document.getElementById('log-password').value }) }); 
-                const msg = document.getElementById('logMsg'); msg.classList.remove('hidden'); 
-                const data = await res.json(); 
-                if(res.ok) { 
-                    localStorage.setItem('smartcare_jwt', data.token); 
-                    localStorage.setItem('smartcare_role', data.role); 
-                    
-                    if(data.role === 'admin') window.location.href = 'admin.html';
-                    else if(data.role === 'doctor') window.location.href = 'doctor-dashboard.html';
-                    else window.location.reload(); 
+        document.getElementById('loginForm')?.addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Verifying..."; btn.disabled = true; try { const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('log-email').value, password: document.getElementById('log-password').value }) }); const msg = document.getElementById('logMsg'); msg.classList.remove('hidden'); const data = await res.json(); if(res.ok) { localStorage.setItem('smartcare_jwt', data.token); localStorage.setItem('smartcare_role', data.role); if(data.role === 'admin') window.location.href = 'admin.html'; else if(data.role === 'doctor') window.location.href = 'doctor-dashboard.html'; else window.location.reload(); } else { msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; } } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; } });
+        document.getElementById('registerForm')?.addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Creating Account..."; btn.disabled = true; try { const res = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value }) }); const msg = document.getElementById('regMsg'); msg.classList.remove('hidden'); if(res.ok) { msg.className = "mt-4 text-green-600 text-center text-sm font-bold"; msg.innerText = "Account Created! Redirecting to login..."; setTimeout(() => switchModal('registerModal', 'loginModal'), 1500); } else { const data = await res.json(); msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error || "Failed to register."; } } catch (error) { } finally { btn.innerText = "Sign Up Now"; btn.disabled = false; } });
 
-                } else { 
-                    msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; 
-                } 
-            } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; } 
-        });
+        // 🌟 ADVANCED VISUAL CLINICAL GUIDES WITH MEDICAL IMAGES
+        const guideData = {
+            'eye': { 
+                title: "Comprehensive Vision & Eye Exam", 
+                html: `<div class="space-y-6">
+                        <div><h4 class="font-black text-slate-800 flex items-center gap-2"><span>1️⃣</span> Distance Acuity (Snellen Test)</h4><p class="text-sm text-slate-600 mt-1 mb-3">Place your device 10 feet away. Cover one eye and try reading the lowest possible line. Repeat with the other eye.</p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Snellen_chart.svg/400px-Snellen_chart.svg.png" class="mx-auto h-48 object-contain bg-white p-2 rounded-xl border border-slate-200 shadow-sm"></div>
+                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>2️⃣</span> Macular Degeneration (Amsler Grid)</h4><p class="text-sm text-slate-600 mt-1 mb-3">Stare at the center dot from 14 inches away. Do any lines appear wavy, blurred, or missing?</p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Amslergrid.svg/400px-Amslergrid.svg.png" class="mx-auto h-48 w-48 object-cover rounded-xl border border-slate-200 shadow-sm"></div>
+                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>3️⃣</span> Color Vision (Ishihara Plate)</h4><p class="text-sm text-slate-600 mt-1 mb-3">What number do you see in the circle below? (Normally, it should clearly be 74).</p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Ishihara_9.svg/400px-Ishihara_9.svg.png" class="mx-auto h-40 w-40 object-cover rounded-full shadow-sm"></div>
+                       </div>` 
+            },
+            'skin': { 
+                title: "Advanced Skin Health Self-Exam", 
+                html: `<div class="space-y-6">
+                        <div><h4 class="font-black text-slate-800 flex items-center gap-2"><span>1️⃣</span> Tissue Paper Test (Oily/Dry Check)</h4><p class="text-sm text-slate-600 mt-1 mb-3">Wash your face, wait 1 hour. Press a dry tissue on your T-Zone and cheeks. If tissue shows oil spots from both, you have <b>Oily</b> skin. If only T-zone, it's <b>Combination</b>.</p><div class="w-full bg-slate-100 p-4 rounded-xl text-center text-3xl">🧻 💧</div></div>
+                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>2️⃣</span> The Pinch Test (Hydration Level)</h4><p class="text-sm text-slate-600 mt-1">Gently pinch the skin on the back of your hand for 3 seconds. If it snaps back instantly, your skin is well hydrated. If it takes a few seconds, you are dehydrated.</p></div>
+                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>3️⃣</span> The ABCDE Rule for Moles</h4><p class="text-sm text-slate-600 mt-1">Check body spots for <b>A</b>symmetry, irregular <b>B</b>orders, uneven <b>C</b>olor, large <b>D</b>iameter (>6mm), and <b>E</b>volution (growing/changing).</p></div>
+                       </div>` 
+            },
+            'hair': { 
+                title: "Scalp & Root Diagnostic", 
+                html: `<div class="space-y-6">
+                        <div><h4 class="font-black text-slate-800 flex items-center gap-2"><span>1️⃣</span> The Pull Test (Hairfall Severity)</h4><p class="text-sm text-slate-600 mt-1 mb-3">Grasp a section of about 50 strands near the root and pull gently upward. Losing more than 6 strands indicates active, abnormal shedding.</p><div class="w-full bg-slate-100 p-4 rounded-xl text-center text-3xl">🤏</div></div>
+                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>2️⃣</span> Root Bulb Check</h4><p class="text-sm text-slate-600 mt-1">Look at the end of a fallen hair. If it has a tiny white bulb, it fell naturally from the root (Telogen). If there is no bulb and it's tapered, the hair is breaking due to weakness.</p></div>
+                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>3️⃣</span> Water Float Test (Porosity)</h4><p class="text-sm text-slate-600 mt-1">Drop a clean strand of hair in a glass of water. If it floats, it's healthy (Low Porosity). If it sinks rapidly, it absorbs water too fast indicating severe damage/dryness.</p></div>
+                       </div>` 
+            }
+        };
 
-        document.getElementById('registerForm')?.addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Creating Account..."; btn.disabled = true; try { const res = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value }) }); const msg = document.getElementById('regMsg'); msg.classList.remove('hidden'); if(res.ok) { msg.className = "mt-4 text-green-600 text-center text-sm font-bold"; msg.innerText = "Account Created! Redirecting to login..."; setTimeout(() => switchModal('registerModal', 'loginModal'), 1500); } else { const data = await res.json(); msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error || "Failed to register."; } } catch (error) { console.error(error); } finally { btn.innerText = "Sign Up Now"; btn.disabled = false; } });
+        function openGuide(type) { document.getElementById('guideTitle').innerText = guideData[type].title; document.getElementById('guideContent').innerHTML = guideData[type].html; const m = document.getElementById('guideModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
+        function closeGuide() { const m = document.getElementById('guideModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
+        function completeGuide() { closeGuide(); processLocalAI("I have completed the visual tests. Please give me my final report."); } 
 
-        const aiToggleBtn = document.getElementById('ai-widget-toggle'); const aiChatWindow = document.getElementById('ai-chat-window'); const closeAiChatBtn = document.getElementById('close-ai-chat'); const chatMessages = document.getElementById('chat-messages'); const typingIndicator = document.getElementById('typing-indicator'); const botPopSound = new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg'); botPopSound.volume = 0.6; let isChatInitialized = false;
+        // 🌟 DEEP CLINICAL INTERROGATION ENGINE
+        let localChatState = { step: 'INIT', data: {} };
+        const aiToggleBtn = document.getElementById('ai-widget-toggle'); const aiChatWindow = document.getElementById('ai-chat-window'); const closeAiChatBtn = document.getElementById('close-ai-chat'); const chatMessages = document.getElementById('chat-messages'); const typingIndicator = document.getElementById('typing-indicator'); let isChatInitialized = false;
         
-        aiToggleBtn.addEventListener('click', () => { if (!localStorage.getItem('smartcare_jwt')) { document.getElementById('loginTitle').innerText = "Login Required"; const logMsg = document.getElementById('logMsg'); logMsg.innerText = "Please login to consult the Virtual Doctor."; logMsg.className = "mt-4 text-center text-sm font-bold text-rose-500"; logMsg.classList.remove('hidden'); openModal('loginModal'); return; } if(aiChatWindow.classList.contains('hidden')) { aiChatWindow.classList.remove('hidden'); aiChatWindow.classList.add('flex'); const badge = aiToggleBtn.querySelector('.animate-ping'); if(badge) badge.parentElement.remove(); if(!isChatInitialized) { chatMessages.innerHTML = ''; fetchAIResponse("start"); isChatInitialized = true; } } else { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); } });
+        aiToggleBtn.addEventListener('click', () => { if(aiChatWindow.classList.contains('hidden')) { aiChatWindow.classList.remove('hidden'); aiChatWindow.classList.add('flex'); const badge = aiToggleBtn.querySelector('.animate-ping'); if(badge) badge.parentElement.remove(); if(!isChatInitialized) { chatMessages.innerHTML = ''; processLocalAI("start"); isChatInitialized = true; } } else { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); } });
         closeAiChatBtn.addEventListener('click', () => { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); });
-        
         function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
 
-        function appendMessageHTML(htmlContent, isUser = false) {
-            chatMessages.innerHTML += `<div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} bubble-enter relative z-10">${!isUser ? '<div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div>' : ''}<div class="${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] text-sm shadow-md leading-relaxed">${htmlContent}</div></div>`;
-            scrollToBottom(); if (!isUser) botPopSound.play().catch(e => console.log("Audio blocked"));
-        }
-
-        document.getElementById('chat-send-btn')?.addEventListener('click', () => {
-            const input = document.getElementById('chat-input');
-            const msg = input.value.trim();
-            if(msg) { appendMessageHTML(msg, true); fetchAIResponse(msg); input.value = ''; }
-        });
-        document.getElementById('chat-input')?.addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') document.getElementById('chat-send-btn').click();
-        });
-
-        function showInChatBookingForm() { const today = new Date().toISOString().split('T')[0]; const formHtml = `<div class="bg-slate-700 border border-slate-600 p-4 rounded-xl mt-2 w-full shadow-lg" id="chatBookingFormBox"><p class="font-black text-white mb-3 text-center border-b border-slate-600 pb-2">🏥 Quick Appointment</p><input type="text" id="chat-book-name" placeholder="Patient Name" class="w-full mb-3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><input type="tel" id="chat-book-phone" placeholder="Contact Number" class="w-full mb-3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><div class="flex gap-2 mb-3"><input type="number" id="chat-book-age" placeholder="Age" class="w-1/3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><select id="chat-book-gender" class="w-2/3 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><option value="" disabled selected>Gender</option><option value="Male">Male</option><option value="Female">Female</option></select></div><div class="flex gap-2 mb-3"><input type="date" id="chat-book-date" min="${today}" class="w-1/2 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><select id="chat-book-time" class="w-1/2 p-2.5 bg-slate-800 border border-slate-600 text-white rounded-lg outline-none focus:border-blue-400 font-medium"><option value="" disabled selected>Time</option><option value="10:00 AM">10:00 AM</option><option value="01:00 PM">01:00 PM</option><option value="04:00 PM">04:00 PM</option></select></div><button onclick="submitChatBooking()" id="chatBookBtn" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold shadow-md hover:bg-blue-500 transition">Confirm Booking 🚀</button></div>`; appendMessageHTML(formHtml, false); }
-        
-        async function submitChatBooking() { const btn = document.getElementById('chatBookBtn'); const token = localStorage.getItem('smartcare_jwt'); const payload = { patient_name: document.getElementById('chat-book-name').value, contact: document.getElementById('chat-book-phone').value, age: document.getElementById('chat-book-age').value, gender: document.getElementById('chat-book-gender').value, symptoms: "Assessed via AI Chatbot", date: `${document.getElementById('chat-book-date').value} | ${document.getElementById('chat-book-time').value}`, doctor_id: null }; if(payload.patient_name.length < 3) return alert("⚠️ Please enter a valid full name."); if(!/^[0-9]{10}$/.test(payload.contact)) return alert("⚠️ Please enter a valid 10-digit mobile number."); if(payload.age <= 0 || payload.age > 120) return alert("⚠️ Please enter a valid age."); if(!payload.gender || !document.getElementById('chat-book-date').value || !document.getElementById('chat-book-time').value) return alert("⚠️ Please fill all fields."); btn.innerText = "Processing..."; btn.disabled = true; try { const res = await fetch('/api/appointments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) }); if(res.ok) { const data = await res.json(); document.getElementById('chatBookingFormBox').innerHTML = `<div class="text-center py-4"><span class="text-4xl">✅</span><p class="font-black text-green-400 mt-2 text-lg">Booking Confirmed!</p><p class="text-slate-300 text-sm mt-1">Appt ID: #${data.id}</p><a href="dashboard.html" class="block mt-4 bg-slate-900 text-white px-4 py-2 rounded font-bold border border-slate-600 hover:bg-blue-600 transition">Go to Dashboard</a></div>`; scrollToBottom(); } else { alert("Failed to book."); btn.innerText = "Confirm Booking 🚀"; btn.disabled = false; } } catch(e) { alert("Error."); btn.innerText = "Confirm Booking 🚀"; btn.disabled = false; } }
+        function appendMessageHTML(htmlContent, isUser = false) { chatMessages.innerHTML += `<div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} bubble-enter relative z-10">${!isUser ? '<div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div>' : ''}<div class="${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] text-sm shadow-md leading-relaxed">${htmlContent}</div></div>`; scrollToBottom(); }
+        document.getElementById('chat-send-btn')?.addEventListener('click', () => { const input = document.getElementById('chat-input'); const msg = input.value.trim(); if(msg) { appendMessageHTML(msg, true); processLocalAI(msg); input.value = ''; } });
+        document.getElementById('chat-input')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') document.getElementById('chat-send-btn').click(); });
 
         function handleOptionClick(selectedOption) {
             const safeOpt = selectedOption.replace(/\\'/g, "'"); 
+            if (safeOpt === '📄 Download Diagnostic Report') { generatePDFReport(); return; }
             appendMessageHTML(safeOpt, true); 
-            if (safeOpt === '📅 Book Appointment' || safeOpt === '📅 Doctor Book Karein') { showInChatBookingForm(); return; } 
-            fetchAIResponse(safeOpt); 
+            if (safeOpt.includes('Book Appointment')) { window.location.href='booking.html'; return; } 
+            if (safeOpt.includes('Open Skin')) { openGuide('skin'); return; }
+            if (safeOpt.includes('Open Eye')) { openGuide('eye'); return; }
+            if (safeOpt.includes('Open Hair')) { openGuide('hair'); return; }
+            processLocalAI(safeOpt); 
         }
-        
-        async function fetchAIResponse(userMessage) { 
-            typingIndicator.classList.remove('hidden'); scrollToBottom(); const token = localStorage.getItem('smartcare_jwt'); 
-            try { 
-                const res = await fetch('/api/ai-chat', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ message: userMessage }) }); 
-                let data = await res.json(); typingIndicator.classList.add('hidden'); 
-                if (res.ok) { 
-                    let botResponseHTML = `<span>${data.reply}</span>`; 
-                    if (data.department) botResponseHTML += `<br><span class="dept-highlight">✅ Recommended: ${data.department}</span>`; 
-                    if (data.options && data.options.length > 0) { 
-                        botResponseHTML += `<div class="options-container">`; 
-                        data.options.forEach(opt => { 
-                            const escapedOpt = opt.replace(/'/g, "\\'");
-                            botResponseHTML += `<button class="chat-option-btn" onclick="handleOptionClick('${escapedOpt}')">${opt}</button>`; 
-                        }); 
-                        botResponseHTML += `</div>`; 
-                    } 
-                    appendMessageHTML(botResponseHTML, false); 
-                } else { throw new Error(data.error || "Server Error"); } 
-            } catch(e) { typingIndicator.classList.add('hidden'); appendMessageHTML(`<span class="text-rose-400 font-bold">⚠️ ${e.message}</span>`, false); } 
+
+        function processLocalAI(msg) {
+            typingIndicator.classList.remove('hidden'); scrollToBottom(); msg = msg.toLowerCase();
+            setTimeout(() => {
+                typingIndicator.classList.add('hidden'); let response = {};
+
+                if (msg.includes('start') || msg.includes('hi') || msg.includes('🔄')) {
+                    localChatState = { step: 'ASK_PRIMARY', data: {} };
+                    response = { reply: "Namaste! 🙏 I am the SmartCare Clinical Assistant.<br><br>Before we generate a diagnosis, I need to ask you a few deep questions to understand your condition perfectly.<br><br><b>What is the primary symptom you are experiencing today?</b>", options: ["Skin issues / Acne", "Hair fall / Weak roots", "Eye strain / Redness", "Stomach Ache / Acidity", "Fever / Cold"] };
+                } 
+                else if (localChatState.step === 'ASK_PRIMARY') {
+                    localChatState.data.primary = msg;
+                    if(msg.includes('skin')||msg.includes('acne')) localChatState.data.cat = 'Dermatology';
+                    else if(msg.includes('hair')||msg.includes('root')) localChatState.data.cat = 'Trichology';
+                    else if(msg.includes('eye')||msg.includes('strain')) localChatState.data.cat = 'Ophthalmology';
+                    else if(msg.includes('stomach')||msg.includes('acid')) localChatState.data.cat = 'Gastroenterology';
+                    else localChatState.data.cat = 'General Medicine';
+                    localChatState.step = 'ASK_DURATION';
+                    response = { reply: `I understand. You are experiencing issues related to <b>${localChatState.data.cat}</b>.<br><br>To get to the root of this, <b>exactly how long have you been experiencing these symptoms?</b> Did they appear suddenly or gradually?`, options: ["Started suddenly today", "Gradually over a few days", "It's been weeks/months"] };
+                }
+                else if (localChatState.step === 'ASK_DURATION') {
+                    localChatState.data.duration = msg;
+                    localChatState.step = 'ASK_SEVERITY';
+                    response = { reply: `Noted. It's important to gauge the intensity.<br><br>On a scale of 1 to 10 (where 10 is unbearable), <b>how severe is the discomfort right now?</b>`, options: ["Mild annoyance (1-3)", "Moderate impact (4-7)", "Severe, completely stopping work (8-10)"] };
+                }
+                else if (localChatState.step === 'ASK_SEVERITY') {
+                    localChatState.data.severity = msg;
+                    localChatState.step = 'ASK_DETAILS';
+                    response = { reply: `Thank you. Sometimes conditions are linked to other body systems.<br><br><b>Are there any other accompanying symptoms?</b> (For example: fever, nausea, radiating pain, fatigue, or changes in sleep patterns?)`, options: ["No other symptoms", "Yes, slight fever/fatigue", "Feeling dizzy/nauseous"] };
+                }
+                else if (localChatState.step === 'ASK_DETAILS') {
+                    localChatState.data.details = msg;
+                    localChatState.step = 'ASK_LIFESTYLE';
+                    response = { reply: `One final question before I compile your assessment:<br><br><b>Have there been any recent drastic changes in your diet, stress levels, or daily routine?</b>`, options: ["No changes", "High stress recently", "Poor diet / Junk food"] };
+                }
+                else if (localChatState.step === 'ASK_LIFESTYLE') {
+                    localChatState.data.lifestyle = msg;
+                    localChatState.step = 'FINAL_TRIAGE';
+                    
+                    if (localChatState.data.cat === 'Dermatology') {
+                        response = { reply: `I have compiled your data. For a complete dermatological assessment, a visual self-check is required.<br><br>Please use our Advanced Skin Evaluation to check for hydration and oil levels. Click below to open the guide.`, options: ["🧴 Open Skin Assessment Guide", "Skip to Report"], triggerGuide: 'skin' };
+                    } else if (localChatState.data.cat === 'Ophthalmology') {
+                        response = { reply: `Your symptom history suggests optical strain or macular issues. 👁️<br><br>Please follow our interactive Eye Guide to perform the Snellen and Amsler tests.`, options: ["👁️ Open Eye Assessment Guide", "Skip to Report"], triggerGuide: 'eye' };
+                    } else if (localChatState.data.cat === 'Trichology') {
+                        response = { reply: `We need to verify your follicular strength and hair porosity based on your stress/diet inputs. 💇‍♂️<br><br>Please run the Scalp Assessment Guide.`, options: ["💇‍♂️ Open Hair Assessment Guide", "Skip to Report"], triggerGuide: 'hair' };
+                    } else {
+                        response = { reply: `Processing your comprehensive medical profile... Please wait.`, options: ["Show Final Report"] };
+                    }
+                }
+                else if (localChatState.step === 'FINAL_TRIAGE') {
+                    let remedies = "";
+                    if(localChatState.data.cat === 'Dermatology') remedies = "<b>Home Remedy:</b> Apply a paste of Neem and Multani Mitti with Rose water to soothe inflammation. Hydrate well if skin feels dry post-pinch test.";
+                    else if(localChatState.data.cat === 'Trichology') remedies = "<b>Home Remedy:</b> Massage scalp with warm Bhringraj or Amla oil. If hair sinks in water (high porosity), use protein-rich aloe vera masks.";
+                    else if(localChatState.data.cat === 'Ophthalmology') remedies = "<b>Home Remedy:</b> Place cool cucumber slices on closed eyelids. Wash eyes gently with filtered Triphala water to reduce digital strain.";
+                    else if(localChatState.data.cat === 'Gastroenterology') remedies = "<b>Home Remedy:</b> Boil Jeera (Cumin) and Saunf (Fennel) in water. Drink it lukewarm after meals to balance digestion.";
+                    else remedies = "<b>Home Remedy:</b> Drink hot Tulsi-Ginger Kadha. A warm glass of Haldi Doodh (Turmeric Milk) before bed aids systemic immunity.";
+
+                    let report = `<div class="report-card"><h4 style="color:#0f172a; font-weight:900; border-bottom:1px solid #e2e8f0; padding-bottom:8px; margin-bottom:8px;">📋 Clinical Assessment Summary</h4><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>Primary Issue:</b> ${localChatState.data.primary}</p><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>Duration:</b> ${localChatState.data.duration}</p><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>Severity:</b> ${localChatState.data.severity}</p><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>Other Symptoms:</b> ${localChatState.data.details}</p><p style="font-size:12px; color:#475569; margin-bottom:8px;"><b>Lifestyle Factors:</b> ${localChatState.data.lifestyle}</p>`;
+                    
+                    if (localChatState.data.severity.includes('severe') || localChatState.data.severity.includes('8') || localChatState.data.severity.includes('10')) {
+                        report += `<div style="background:#fef2f2; color:#b91c1c; padding:8px; border-radius:6px; font-size:11px; font-weight:bold; margin-bottom:8px;">🚨 CRITICAL: High Probability Match. Immediate physical evaluation recommended.</div>`;
+                    } else {
+                        report += `<div style="background:#ecfdf5; color:#047857; padding:8px; border-radius:6px; font-size:11px; font-weight:bold; margin-bottom:8px;">ℹ️ STABLE: Routine Match. Monitor for 48 hours.</div>`;
+                    }
+                    report += `<div class="remedy-highlight">🌿 ${remedies}</div></div>`;
+                    
+                    localChatState.step = 'INIT';
+                    response = { reply: report, dept: localChatState.data.cat, options: ["📄 Download Diagnostic Report", "📅 Book Appointment", "🔄 Start Over"] };
+                }
+
+                let botHTML = `<span>${response.reply}</span>`; 
+                if (response.dept) botHTML += `<br><span class="dept-highlight">✅ Recommended Department: ${response.dept}</span>`; 
+                if (response.options) { botHTML += `<div class="options-container">`; response.options.forEach(opt => { botHTML += `<button class="chat-option-btn" onclick="handleOptionClick('${opt.replace(/'/g, "\\'")}')">${opt}</button>`; }); botHTML += `</div>`; } 
+                appendMessageHTML(botHTML, false); 
+                if (response.triggerGuide) { setTimeout(() => { openGuide(response.triggerGuide); }, 2000); }
+
+            }, 1000);
+        }
+
+        // 🌟 ENTERPRISE PDF GENERATOR (NO AI MENTION, PREMIUM UI)
+        function generatePDFReport() {
+            const patientName = document.getElementById('profileCardName') ? document.getElementById('profileCardName').innerText : 'Guest Patient';
+            const patientId = document.getElementById('profileCardId') ? document.getElementById('profileCardId').innerText : 'SC-UNREGISTERED';
+            const date = new Date().toLocaleString();
+            
+            const chatBubbles = document.querySelectorAll('#chat-messages .report-card');
+            let rawHtml = "<p>No recent diagnosis data found.</p>";
+            if(chatBubbles.length > 0) {
+                rawHtml = chatBubbles[chatBubbles.length - 1].innerHTML;
+            }
+
+            const printWindow = window.open('', '_blank');
+            const template = `
+                <html>
+                <head>
+                    <title>SmartCare Diagnostic Report</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; padding: 50px; max-width: 850px; margin: 0 auto; background: #ffffff; }
+                        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; padding-bottom: 20px; margin-bottom: 40px; }
+                        .logo-area h1 { margin: 0; color: #2563eb; font-size: 32px; font-weight: 900; letter-spacing: -1px; }
+                        .logo-area p { margin: 4px 0 0 0; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+                        .doc-meta { text-align: right; font-size: 13px; color: #475569; }
+                        .doc-meta strong { color: #0f172a; }
+                        .patient-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+                        .p-row { font-size: 14px; }
+                        .p-row span:first-child { font-weight: bold; color: #64748b; display: inline-block; width: 130px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;}
+                        .p-row span:last-child { font-weight: 700; color: #0f172a; font-size: 15px; }
+                        .report-section { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+                        .report-section h4 { font-size: 20px; color: #0f172a; margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
+                        .report-section p { font-size: 15px; line-height: 1.8; color: #334155; margin-bottom: 12px; }
+                        .report-section b { color: #0f172a; }
+                        .remedy-highlight { margin-top: 25px; padding: 20px; background-color: #fef3c7; color: #92400e; border-left: 5px solid #f59e0b; border-radius: 4px 12px 12px 4px; font-weight: 600; font-size: 14px; }
+                        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 120px; font-weight: 900; color: rgba(37, 99, 235, 0.03); z-index: -1; pointer-events: none; white-space: nowrap; }
+                        .footer { margin-top: 60px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 30px; }
+                        .stamp { margin-top: 40px; display: inline-block; border: 3px dashed #2563eb; color: #2563eb; font-weight: 900; padding: 12px 25px; border-radius: 8px; text-transform: uppercase; transform: rotate(-3deg); letter-spacing: 2px; font-size: 14px; opacity: 0.8; }
+                    </style>
+                </head>
+                <body>
+                    <div class="watermark">SMARTCARE</div>
+                    <div class="header">
+                        <div class="logo-area">
+                            <h1>SC SmartCare</h1>
+                            <p>Automated Clinical Protocol</p>
+                        </div>
+                        <div class="doc-meta">
+                            <div>Date: <strong>${date}</strong></div>
+                            <div style="margin-top:5px;">Report ID: <strong>SC-REP-${Math.floor(Math.random()*90000) + 10000}</strong></div>
+                        </div>
+                    </div>
+                    <div class="patient-box">
+                        <div class="p-row"><span>Patient Name:</span> <span>${patientName}</span></div>
+                        <div class="p-row"><span>Patient ID:</span> <span>${patientId}</span></div>
+                        <div class="p-row"><span>Generated By:</span> <span>SmartCare Digital Protocol</span></div>
+                        <div class="p-row"><span>Status:</span> <span style="color:#2563eb;">Verified Assessment</span></div>
+                    </div>
+                    <div class="report-section">
+                        ${rawHtml}
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="stamp">VALIDATED VIA SMARTCARE</div>
+                    </div>
+                    <div class="footer">
+                        <p><b>Important Medical Disclaimer:</b> This document is generated through the SmartCare Automated Clinical Protocol based on self-reported patient symptoms and includes traditional wellness practices. It is for informational triage purposes and does NOT substitute professional medical diagnosis, prescription, or in-person treatment.</p>
+                        <p style="margin-top: 10px;">Powered By SmartCare Health Technologies © 2026. All rights reserved.</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            printWindow.document.write(template); printWindow.document.close(); printWindow.focus();
+            setTimeout(() => { printWindow.print(); printWindow.close(); }, 750);
         }
     </script>
 </body>
