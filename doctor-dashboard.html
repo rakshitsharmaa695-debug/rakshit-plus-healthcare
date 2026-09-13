@@ -127,7 +127,7 @@
                     let actionButton = isCompleted 
                         ? `<span class="inline-flex items-center gap-1.5 text-[10px] md:text-xs font-black text-slate-400 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 uppercase tracking-widest">✔️ Cleared</span>`
                         : `<div class="flex gap-2 justify-center">
-                                <button onclick="startVideoCall('${appt.patient_name}', ${appt.id})" class="${appt.status === 'Calling' ? 'bg-green-500' : 'bg-slate-800'} text-white px-3 py-2 rounded-lg text-lg hover:bg-green-500 transition shadow-md" title="Ring Patient & Join Call">📹</button>
+                                <button onclick="startVideoCall('${appt.patient_name}', ${appt.id})" class="${appt.status === 'Calling' ? 'bg-green-500 animate-pulse' : 'bg-slate-800 hover:bg-green-500'} text-white px-3 py-2 rounded-lg text-lg transition shadow-md" title="Ring Patient & Join Call">📹</button>
                                 <button onclick="updateStatus(${appt.id}, 'Completed')" class="bg-blue-600 text-white hover:bg-slate-900 px-4 py-2.5 rounded-xl text-xs font-black shadow-md transition uppercase tracking-wide">Complete</button>
                            </div>`;
 
@@ -142,34 +142,24 @@
             try {
                 await fetch(`/api/doctor/appointment/${appointmentId}/status`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ status: newStatus }) });
                 loadAppointments();
-            } catch(e) { console.log("Failed to update status"); }
+            } catch(e) {}
         }
 
-        // 🌟 NEW: INITIATES RINGING ON PATIENT DASHBOARD!
+        // 🌟 NEW: INITIATES RINGING ON PATIENT DASHBOARD
         async function startVideoCall(patientName, apptId) {
-            // Update Backend to 'Calling' to trigger Patient's interval popup
             activeCallApptId = apptId;
-            await updateStatus(apptId, 'Calling');
+            await updateStatus(apptId, 'Calling'); // This hits DB and triggers Patient's Polling Interval!
 
             document.getElementById('callPatName').innerText = `Consulting with ${patientName}`;
-            const m = document.getElementById('videoCallModal');
-            m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); }, 10);
-            
+            const m = document.getElementById('videoCallModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); }, 10);
             const roomName = `SmartCare_Secure_Consultation_Room_${apptId}_${new Date().toISOString().split('T')[0]}`;
             document.getElementById('jitsiContainer').innerHTML = `<iframe allow="camera; microphone; display-capture; autoplay; clipboard-write" src="https://meet.jit.si/${roomName}" style="height: 100%; width: 100%; border: 0px;"></iframe>`;
         }
 
         async function endVideoCall() {
             document.getElementById('jitsiContainer').innerHTML = ""; 
-            const m = document.getElementById('videoCallModal');
-            m.classList.add('opacity-0'); 
-            setTimeout(() => { m.classList.add('hidden'); }, 300);
-
-            // Change status back to Pending so it stops ringing for patient
-            if(activeCallApptId) {
-                await updateStatus(activeCallApptId, 'Pending');
-                activeCallApptId = null;
-            }
+            const m = document.getElementById('videoCallModal'); m.classList.add('opacity-0'); setTimeout(() => { m.classList.add('hidden'); }, 300);
+            if(activeCallApptId) { await updateStatus(activeCallApptId, 'Pending'); activeCallApptId = null; }
         }
 
         document.addEventListener('DOMContentLoaded', loadAppointments);

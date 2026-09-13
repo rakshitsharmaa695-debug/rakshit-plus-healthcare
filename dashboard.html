@@ -6,7 +6,19 @@
     <title>My Health Portal - SmartCare</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; } .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #e2e8f0; }</style>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; } 
+        .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #e2e8f0; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        .bubble-enter { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .chat-scroll::-webkit-scrollbar { width: 5px; } .chat-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        .typing-dot { animation: typingBounce 1.4s infinite ease-in-out both; } .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        .options-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .chat-option-btn { background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 20px; padding: 8px 16px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s ease; }
+        .chat-option-btn:hover { background-color: #2563eb; color: white; border-color: #2563eb; transform: translateY(-1px); }
+        .dept-highlight { display: inline-block; margin-top: 12px; padding: 6px 12px; background-color: #064e3b; color: #34d399; border-radius: 6px; font-weight: 600; font-size: 13px; border: 1px solid #059669; }
+    </style>
 </head>
 <body class="text-slate-800 antialiased">
 
@@ -26,40 +38,22 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 md:px-8 pt-28 md:pt-32 pb-20">
+        
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-            <div><h1 class="text-2xl md:text-4xl font-black text-slate-900 mb-1"><span id="timeGreeting">Hello</span>, <span id="patientName" class="text-blue-600">Loading...</span></h1><p class="text-sm md:text-base text-slate-500 font-medium" id="currentDate">Here is your clinical summary.</p></div>
+            <div>
+                <h1 class="text-2xl md:text-4xl font-black text-slate-900 mb-1"><span id="timeGreeting">Hello</span>, <span id="patientName" class="text-blue-600">Loading...</span></h1>
+                <p class="text-sm md:text-base text-slate-500 font-medium" id="currentDate">Here is your clinical summary.</p>
+            </div>
             <a href="booking.html" class="md:hidden w-full text-center bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-900 transition">➕ Book Consult</a>
         </div>
 
+        <!-- 🌟 VITALS SECTION -->
         <div class="mb-4 flex justify-between items-center"><h3 class="font-black text-lg text-slate-800">My Health Vitals</h3><button onclick="openVitalsModal()" class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg shadow-sm hover:bg-blue-600 hover:text-white transition">✏️ Edit Vitals</button></div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition"><div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-lg">🩸</span><span class="text-[10px] font-bold text-slate-400 uppercase">Blood Group</span></div><h3 class="text-2xl font-black text-slate-800" id="ui-bg">--</h3></div>
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition"><div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center text-lg">❤️</span><span class="text-[10px] font-bold text-slate-400 uppercase">Heart Rate</span></div><h3 class="text-2xl font-black text-slate-800"><span id="ui-hr">--</span> <span class="text-sm text-slate-400 font-bold">bpm</span></h3></div>
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition"><div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-lg">🩺</span><span class="text-[10px] font-bold text-slate-400 uppercase">Blood Pressure</span></div><h3 class="text-2xl font-black text-slate-800" id="ui-bp">--/--</h3></div>
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition"><div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-lg">⚖️</span><span class="text-[10px] font-bold text-slate-400 uppercase">Weight</span></div><h3 class="text-2xl font-black text-slate-800"><span id="ui-wt">--</span> <span class="text-sm text-slate-400 font-bold">kg</span></h3></div>
-        </div>
-
-        <!-- 🌟 REPLACED: CLINICAL SELF-ASSESSMENT GUIDES -->
-        <h3 class="font-black text-lg text-slate-800 mb-4 flex items-center gap-2"><span>🧬</span> Clinical Self-Assessment Guides <span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest border border-purple-200 ml-2">Beta</span></h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl shadow-lg border border-slate-700 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition" onclick="openGuide('skin')">
-                <div class="absolute right-[-20px] top-[-20px] opacity-10 text-8xl group-hover:scale-110 transition duration-500">🧴</div>
-                <h4 class="text-xl font-black mb-2">Skin Evaluation</h4>
-                <p class="text-xs text-slate-400 font-medium mb-5">Step-by-step guide to check moles, rashes, and hydration.</p>
-                <button class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold shadow-md">📖 Open Guide</button>
-            </div>
-            <div class="bg-gradient-to-br from-blue-900 to-indigo-900 p-6 rounded-2xl shadow-lg border border-indigo-700 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition" onclick="openGuide('eye')">
-                <div class="absolute right-[-20px] top-[-20px] opacity-10 text-8xl group-hover:scale-110 transition duration-500">👁️</div>
-                <h4 class="text-xl font-black mb-2">Eye & Vision Check</h4>
-                <p class="text-xs text-slate-300 font-medium mb-5">Sclera analysis and at-home visual acuity testing.</p>
-                <button class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold shadow-md">📖 Open Guide</button>
-            </div>
-            <div class="bg-gradient-to-br from-amber-900 to-orange-900 p-6 rounded-2xl shadow-lg border border-orange-700 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition" onclick="openGuide('hair')">
-                <div class="absolute right-[-20px] top-[-20px] opacity-10 text-8xl group-hover:scale-110 transition duration-500">💇‍♂️</div>
-                <h4 class="text-xl font-black mb-2">Scalp & Hair Health</h4>
-                <p class="text-xs text-slate-300 font-medium mb-5">Instructions for the pull-test and scalp condition review.</p>
-                <button class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold shadow-md">📖 Open Guide</button>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -73,15 +67,61 @@
                     <div class="bg-white rounded-[1.5rem] shadow-sm border border-slate-200 overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-left text-sm text-slate-600"><thead class="text-[10px] md:text-xs text-slate-400 uppercase bg-slate-50 border-b border-slate-100 font-bold whitespace-nowrap"><tr><th class="px-6 py-4">ID</th><th class="px-6 py-4">Specialist & Dept</th><th class="px-6 py-4">Date & Time</th><th class="px-6 py-4">Status</th><th class="px-6 py-4 text-center">Live Queue</th></tr></thead><tbody id="myApptList" class="divide-y divide-slate-50"><tr><td colspan="5" class="p-12 text-center text-slate-400 font-bold">Loading records...</td></tr></tbody></table></div></div>
                 </div>
             </div>
+            
             <div class="space-y-6">
+                <!-- Patient Profile Card -->
                 <div class="bg-white rounded-[2rem] p-8 border border-slate-200 shadow-sm text-center"><div id="patientInitials" class="w-24 h-24 bg-blue-100 text-blue-600 rounded-full mx-auto flex items-center justify-center text-3xl font-black mb-4 shadow-inner">--</div><h3 id="profileCardName" class="text-xl font-black text-slate-900">Loading...</h3><p id="profileCardEmail" class="text-sm font-bold text-slate-500 mb-6">...</p><div class="grid grid-cols-2 gap-4 text-left border-t border-slate-100 pt-6"><div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Patient ID</p><p id="profileCardId" class="font-black text-slate-800">SC-...</p></div><div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Member Since</p><p id="profileCardDate" class="font-black text-slate-800">...</p></div></div></div>
-                <div class="bg-white rounded-[2rem] p-6 border border-slate-200 shadow-sm"><h3 class="text-sm font-black text-slate-800 mb-4 uppercase tracking-widest">Quick Actions</h3><div class="space-y-3"><a href="index.html" class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition group"><div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-lg shadow-sm group-hover:text-blue-600">🩺</div><div><h4 class="font-bold text-slate-800 text-sm">Consult Virtual Doctor</h4><p class="text-[10px] text-slate-500 font-medium mt-0.5">Get instant AI triage</p></div></a><a href="booking.html" class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-green-300 hover:bg-green-50 transition group"><div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-lg shadow-sm group-hover:text-green-600">📅</div><div><h4 class="font-bold text-slate-800 text-sm">Book New Appointment</h4><p class="text-[10px] text-slate-500 font-medium mt-0.5">Schedule a clinical visit</p></div></a></div></div>
+                
+                <!-- 🌟 FIXED QUICK ACTIONS (Opens Chatbot directly on Dashboard) -->
+                <div class="bg-white rounded-[2rem] p-6 border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-black text-slate-800 mb-4 uppercase tracking-widest">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <button onclick="document.getElementById('ai-widget-toggle').click();" class="w-full flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition group text-left">
+                            <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-lg shadow-sm group-hover:text-blue-600">🤖</div>
+                            <div><h4 class="font-bold text-slate-800 text-sm">Consult Virtual Doctor</h4><p class="text-[10px] text-slate-500 font-medium mt-0.5">Start deep ML diagnostics</p></div>
+                        </button>
+                        <a href="booking.html" class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-green-300 hover:bg-green-50 transition group text-left">
+                            <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-lg shadow-sm group-hover:text-green-600">📅</div>
+                            <div><h4 class="font-bold text-slate-800 text-sm">Book New Appointment</h4><p class="text-[10px] text-slate-500 font-medium mt-0.5">Schedule a clinical visit</p></div>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- 🌟 CLINICAL GUIDE MODAL -->
-    <div id="guideModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] flex items-center justify-center opacity-0 transition-opacity p-4">
+    <!-- 🌟 NEW: IN-DASHBOARD AI CHAT WIDGET (Powered by ML Engine) -->
+    <div id="ai-chat-window" class="hidden fixed bottom-[110px] right-4 md:right-8 z-[400] w-[92vw] sm:w-[400px] bg-[#0f172a] border border-slate-700 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex-col h-[65vh] sm:h-[550px] transform transition-all">
+        <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 border-b border-blue-500/30 flex justify-between items-center shadow-md z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center text-xl shadow-lg flex-shrink-0">🩺</div>
+                <div class="text-left flex flex-col"><h3 class="text-white font-black text-lg leading-tight tracking-wide">Virtual Doctor</h3><span class="text-[11px] text-blue-300 font-semibold mt-0.5">ML Diagnosis Engine Active</span></div>
+            </div>
+            <button id="close-ai-chat" class="text-slate-400 hover:text-white transition bg-white/10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">✖</button>
+        </div>
+        <div id="chat-messages" class="relative flex-1 p-4 chat-scroll overflow-y-auto bg-[#0f172a] flex flex-col gap-4"></div>
+        <div id="typing-indicator" class="hidden p-4 bg-[#0f172a]">
+            <div class="flex gap-2 w-full"><div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div><div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex items-center gap-1 shadow-md"><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div></div></div>
+        </div>
+        <div class="p-3 bg-slate-900 border-t border-slate-700 flex flex-col gap-2">
+            <div id="chat-input-container" class="flex gap-2 w-full">
+                <input type="text" id="chat-input" placeholder="Describe symptoms deeply..." class="flex-1 bg-slate-800 text-white border border-slate-600 p-2.5 rounded-xl outline-none focus:border-blue-500 text-sm font-medium">
+                <button id="chat-send-btn" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-blue-500 transition">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Trigger -->
+    <div class="fixed bottom-6 right-4 md:right-8 z-[350] flex flex-col items-center gap-2">
+        <button id="ai-widget-toggle" class="relative group focus:outline-none flex flex-col items-center">
+            <div class="absolute inset-0 bg-blue-500 rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+            <div class="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-full shadow-[0_8px_30px_rgba(37,99,235,0.4)] flex items-center justify-center text-3xl text-white transform group-hover:scale-105 transition-all duration-300 z-10 border-2 border-white">🩺<span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border border-white"></span></span></div>
+        </button>
+        <span class="text-[11px] md:text-xs font-black text-slate-800 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-slate-200 uppercase tracking-wide">Ask Virtual Doctor</span>
+    </div>
+
+    <!-- 🌟 CLINICAL GUIDE MODAL (Auto-Triggered by ML Chatbot) -->
+    <div id="guideModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[600] flex items-center justify-center opacity-0 transition-opacity p-4">
         <div class="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl transform scale-95 relative transition-transform overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <div><h2 class="text-xl font-black text-slate-900" id="guideTitle">Assessment Guide</h2><p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Clinical Protocol</p></div>
@@ -89,12 +129,13 @@
             </div>
             <div class="p-6 overflow-y-auto" id="guideContent"></div>
             <div class="p-5 border-t border-slate-100 bg-slate-50 text-center">
-                <button onclick="closeGuide()" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-blue-600 transition">I have completed the check</button>
+                <!-- User clicks this to tell Bot they are done -->
+                <button onclick="completeGuide()" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-blue-600 transition">I have completed the check</button>
             </div>
         </div>
     </div>
 
-    <!-- 🌟 NEW: REAL-TIME INCOMING CALL POPUP -->
+    <!-- 🌟 INCOMING CALL POPUP (Polling Receiver) -->
     <div id="incomingCallModal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[500] flex items-center justify-center">
         <div class="bg-slate-800 p-8 rounded-[2rem] text-center shadow-2xl border border-slate-700 w-full max-w-sm relative overflow-hidden">
             <div class="absolute inset-0 bg-blue-500 opacity-20 animate-pulse blur-3xl"></div>
@@ -111,7 +152,7 @@
     </div>
 
     <!-- 🌟 JITSI VIDEO ROOM MODAL -->
-    <div id="videoCallModal" class="hidden fixed inset-0 bg-slate-900 z-[300] flex flex-col opacity-0 transition-opacity">
+    <div id="videoCallModal" class="hidden fixed inset-0 bg-slate-900 z-[700] flex flex-col opacity-0 transition-opacity">
         <div class="p-4 flex justify-between items-center bg-slate-800 absolute w-full top-0 z-50 shadow-md">
             <div class="flex items-center gap-3"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-white font-bold text-sm tracking-wide" id="callHeaderName">Live Consultation</span></div>
             <button onclick="endVideoCall()" class="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2 rounded-lg text-xs font-bold shadow-md transition">End Call 📞</button>
@@ -119,11 +160,11 @@
         <div id="jitsiContainer" class="flex-1 w-full h-full mt-[60px] bg-black"></div>
     </div>
 
-    <!-- Edit Vitals & Queue Modals (Kept Hidden Here for Brevity, but you should keep your existing ones) -->
+    <!-- Modals for Vitals and Queue -->
     <div id="vitalsModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 transition-opacity p-4"><div class="bg-white rounded-[2rem] p-6 md:p-8 w-full max-w-sm shadow-2xl transform scale-95 relative transition-transform"><button onclick="closeVitalsModal()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button><h2 class="text-2xl font-black text-slate-900 mb-1">Update Vitals</h2><form id="vitalsForm" class="space-y-4 mt-5"><div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Blood Group</label><select id="form-bg" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option><option>Unknown</option></select></div><div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Heart Rate (bpm)</label><input type="number" id="form-hr" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"></div><div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Blood Pressure</label><input type="text" id="form-bp" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"></div><div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Weight (kg)</label><input type="number" id="form-wt" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"></div><button type="submit" id="vitalSubmitBtn" class="w-full bg-blue-600 text-white p-3.5 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition mt-2">Save Vitals</button></form></div></div>
     <div id="queueModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 transition-opacity p-4"><div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl transform scale-95 relative transition-transform text-center"><button onclick="closeQueueModal()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button><div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 shadow-inner">📍</div><h2 class="text-2xl font-black text-slate-900 mb-1">Live Queue Sync</h2><div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-4 mt-6"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Patients Ahead</p><p class="text-4xl font-black text-slate-800" id="queuePatients">--</p></div><div class="bg-blue-600 rounded-2xl p-5 text-white shadow-lg"><p class="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-1">Estimated Wait</p><p class="text-3xl font-black"><span id="queueTime">--</span> <span class="text-sm font-bold">Mins</span></p></div></div></div>
 
-    <!-- Audio for Ringtone -->
+    <!-- Ringtone Audio -->
     <audio id="ringtone" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" loop></audio>
 
     <script>
@@ -133,7 +174,6 @@
 
         function updateGreeting() { const hour = new Date().getHours(); let greeting = "Good Evening"; if (hour < 12) greeting = "Good Morning"; else if (hour < 18) greeting = "Good Afternoon"; document.getElementById('timeGreeting').innerText = greeting; document.getElementById('currentDate').innerText = "Today is " + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); } updateGreeting();
 
-        // Standard Modals
         function openVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); } function closeVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
         function openQueueModal() { const m = document.getElementById('queueModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); } function closeQueueModal() { const m = document.getElementById('queueModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
 
@@ -165,57 +205,84 @@
             } catch(e) {}
         }
 
+        document.getElementById('vitalsForm').addEventListener('submit', async (e) => { e.preventDefault(); const btn = document.getElementById('vitalSubmitBtn'); btn.innerText = "Saving..."; btn.disabled = true; try { const payload = { blood_group: document.getElementById('form-bg').value, heart_rate: document.getElementById('form-hr').value, blood_pressure: document.getElementById('form-bp').value, weight: document.getElementById('form-wt').value }; await fetch('/api/user/vitals', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) }); closeVitalsModal(); loadMyDashboard(); } catch(error) {} btn.innerText = "Save Vitals"; btn.disabled = false; });
         async function checkQueue(id, btnElement) { const originalText = btnElement.innerHTML; btnElement.innerHTML = `<span class="animate-pulse">Syncing...</span>`; btnElement.disabled = true; try { const res = await fetch(`/api/queue/${id}`); const data = await res.json(); document.getElementById('queuePatients').innerText = data.patientsAhead; document.getElementById('queueTime').innerText = data.estimatedWaitTime; btnElement.innerHTML = originalText; btnElement.disabled = false; openQueueModal(); } catch(e) { btnElement.innerHTML = originalText; btnElement.disabled = false; alert("Network error."); } }
 
-        // 🌟 NEW: CLINICAL SELF-ASSESSMENT GUIDES
+        // 🌟 NEW: CLINICAL SELF-ASSESSMENT GUIDES (Images & Text)
         const guideData = {
-            'skin': { title: "Skin Health Self-Exam", html: `<div class="space-y-6"><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl shrink-0">🪞</div><div><h4 class="font-black text-slate-800">Step 1: Proper Lighting</h4><p class="text-sm text-slate-600 mt-1">Stand in front of a full-length mirror in a brightly lit room. Ensure there are no harsh shadows on your body.</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-2xl shrink-0">🔍</div><div><h4 class="font-black text-slate-800">Step 2: The ABCDE Rule for Moles</h4><p class="text-sm text-slate-600 mt-1">Check moles for <b>A</b>symmetry, irregular <b>B</b>orders, uneven <b>C</b>olor, large <b>D</b>iameter (>6mm), and <b>E</b>volution (changes over time).</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-2xl shrink-0">🖐️</div><div><h4 class="font-black text-slate-800">Step 3: Palpation</h4><p class="text-sm text-slate-600 mt-1">Gently run your fingers over your skin. Note any new bumps, rough patches, or areas that feel tender or scaly.</p></div></div></div>` },
-            'eye': { title: "Eye & Vision Self-Check", html: `<div class="space-y-6"><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl shrink-0">📏</div><div><h4 class="font-black text-slate-800">Step 1: Distance Acuity</h4><p class="text-sm text-slate-600 mt-1">Cover one eye and try to read a book title or calendar from 10 feet away. Repeat with the other eye.</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-2xl shrink-0">👁️</div><div><h4 class="font-black text-slate-800">Step 2: Sclera Inspection</h4><p class="text-sm text-slate-600 mt-1">Look in the mirror. The white part of your eye (Sclera) should be clear. Look for excessive redness, yellowing, or abnormal blood vessels.</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-2xl shrink-0">🦯</div><div><h4 class="font-black text-slate-800">Step 3: Peripheral Test</h4><p class="text-sm text-slate-600 mt-1">Look straight ahead. Hold your finger to the far side of your head and slowly bring it forward. You should notice movement early.</p></div></div></div>` },
-            'hair': { title: "Scalp & Follicle Assessment", html: `<div class="space-y-6"><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl shrink-0">🤏</div><div><h4 class="font-black text-slate-800">Step 1: The Pull Test</h4><p class="text-sm text-slate-600 mt-1">Grasp a small section of hair (about 50-60 strands) and pull gently upward. Losing more than 6 strands may indicate active shedding.</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-2xl shrink-0">🔎</div><div><h4 class="font-black text-slate-800">Step 2: Scalp Inspection</h4><p class="text-sm text-slate-600 mt-1">Part your hair in different places. Look for redness, thick dandruff flakes, inflammation, or circular bald patches.</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-2xl shrink-0">📏</div><div><h4 class="font-black text-slate-800">Step 3: Parting Width</h4><p class="text-sm text-slate-600 mt-1">Part your hair down the middle. If the visible scalp line looks wider than it used to, it could be a sign of early thinning.</p></div></div></div>` }
+            'skin': { title: "Skin Health Self-Exam", html: `<div class="space-y-6"><div class="flex gap-4 items-start"><img src="https://cdn-icons-png.flaticon.com/512/3233/3233483.png" class="w-12 h-12 object-contain shrink-0 opacity-80"><div><h4 class="font-black text-slate-800">Step 1: Proper Lighting</h4><p class="text-sm text-slate-600 mt-1">Stand in front of a full-length mirror in a brightly lit room. Ensure there are no harsh shadows on your body.</p></div></div><div class="flex gap-4 items-start"><img src="https://cdn-icons-png.flaticon.com/512/2814/2814288.png" class="w-12 h-12 object-contain shrink-0 opacity-80"><div><h4 class="font-black text-slate-800">Step 2: The ABCDE Rule</h4><p class="text-sm text-slate-600 mt-1">Check moles for <b>A</b>symmetry, irregular <b>B</b>orders, uneven <b>C</b>olor, large <b>D</b>iameter (>6mm), and <b>E</b>volution (changes).</p></div></div><div class="flex gap-4 items-start"><img src="https://cdn-icons-png.flaticon.com/512/2554/2554030.png" class="w-12 h-12 object-contain shrink-0 opacity-80"><div><h4 class="font-black text-slate-800">Step 3: Palpation</h4><p class="text-sm text-slate-600 mt-1">Gently run your fingers over your skin. Note any new bumps, rough patches, or areas that feel tender.</p></div></div></div>` },
+            'eye': { title: "Eye & Vision Self-Check", html: `<div class="space-y-6"><div class="flex gap-4 items-start"><img src="https://cdn-icons-png.flaticon.com/512/3004/3004393.png" class="w-12 h-12 object-contain shrink-0 opacity-80"><div><h4 class="font-black text-slate-800">Step 1: Distance Acuity</h4><p class="text-sm text-slate-600 mt-1">Cover one eye and try to read a book title or calendar from 10 feet away. Repeat with the other eye.</p></div></div><div class="flex gap-4 items-start"><img src="https://cdn-icons-png.flaticon.com/512/3209/3209935.png" class="w-12 h-12 object-contain shrink-0 opacity-80"><div><h4 class="font-black text-slate-800">Step 2: Sclera Inspection</h4><p class="text-sm text-slate-600 mt-1">Look in the mirror. The white part of your eye should be clear. Look for excessive redness or yellowing.</p></div></div><div class="flex gap-4 items-start"><img src="https://cdn-icons-png.flaticon.com/512/5828/5828116.png" class="w-12 h-12 object-contain shrink-0 opacity-80"><div><h4 class="font-black text-slate-800">Step 3: Peripheral Test</h4><p class="text-sm text-slate-600 mt-1">Look straight ahead. Hold your finger to the far side of your head and slowly bring it forward.</p></div></div></div>` },
+            'hair': { title: "Scalp & Follicle Assessment", html: `<div class="space-y-6"><div class="flex gap-4 items-start"><img src="https://cdn-icons-png.flaticon.com/512/1154/1154448.png" class="w-12 h-12 object-contain shrink-0 opacity-80"><div><h4 class="font-black text-slate-800">Step 1: The Pull Test</h4><p class="text-sm text-slate-600 mt-1">Grasp a small section of hair (about 50 strands) and pull gently upward. Losing more than 6 strands indicates shedding.</p></div></div><div class="flex gap-4 items-start"><img src="https://cdn-icons-png.flaticon.com/512/2854/2854300.png" class="w-12 h-12 object-contain shrink-0 opacity-80"><div><h4 class="font-black text-slate-800">Step 2: Scalp Inspection</h4><p class="text-sm text-slate-600 mt-1">Part your hair in different places. Look for redness, thick dandruff flakes, or circular bald patches.</p></div></div><div class="flex gap-4 items-start"><img src="https://cdn-icons-png.flaticon.com/512/3133/3133379.png" class="w-12 h-12 object-contain shrink-0 opacity-80"><div><h4 class="font-black text-slate-800">Step 3: Parting Width</h4><p class="text-sm text-slate-600 mt-1">Part your hair down the middle. If the visible scalp line looks wider, it could be a sign of early thinning.</p></div></div></div>` }
         };
 
         function openGuide(type) { document.getElementById('guideTitle').innerText = guideData[type].title; document.getElementById('guideContent').innerHTML = guideData[type].html; const m = document.getElementById('guideModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
         function closeGuide() { const m = document.getElementById('guideModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
+        function completeGuide() { closeGuide(); fetchAIResponse("I have completed the self assessment check. What next?"); } // Tells bot guide is done!
+
+        // 🌟 CHATBOT ML ENGINE WIRING
+        const aiToggleBtn = document.getElementById('ai-widget-toggle'); const aiChatWindow = document.getElementById('ai-chat-window'); const closeAiChatBtn = document.getElementById('close-ai-chat'); const chatMessages = document.getElementById('chat-messages'); const typingIndicator = document.getElementById('typing-indicator'); let isChatInitialized = false;
+        
+        aiToggleBtn.addEventListener('click', () => { if(aiChatWindow.classList.contains('hidden')) { aiChatWindow.classList.remove('hidden'); aiChatWindow.classList.add('flex'); const badge = aiToggleBtn.querySelector('.animate-ping'); if(badge) badge.parentElement.remove(); if(!isChatInitialized) { chatMessages.innerHTML = ''; fetchAIResponse("start"); isChatInitialized = true; } } else { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); } });
+        closeAiChatBtn.addEventListener('click', () => { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); });
+        function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
+
+        function appendMessageHTML(htmlContent, isUser = false) { chatMessages.innerHTML += `<div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} bubble-enter relative z-10">${!isUser ? '<div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div>' : ''}<div class="${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] text-sm shadow-md leading-relaxed">${htmlContent}</div></div>`; scrollToBottom(); }
+        document.getElementById('chat-send-btn')?.addEventListener('click', () => { const input = document.getElementById('chat-input'); const msg = input.value.trim(); if(msg) { appendMessageHTML(msg, true); fetchAIResponse(msg); input.value = ''; } });
+        document.getElementById('chat-input')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') document.getElementById('chat-send-btn').click(); });
+
+        function handleOptionClick(selectedOption) {
+            const safeOpt = selectedOption.replace(/\\'/g, "'"); appendMessageHTML(safeOpt, true); 
+            if (safeOpt.includes('Book Appointment')) { window.location.href='booking.html'; return; } 
+            if (safeOpt.includes('Open Skin')) { openGuide('skin'); return; }
+            if (safeOpt.includes('Open Eye')) { openGuide('eye'); return; }
+            if (safeOpt.includes('Open Hair')) { openGuide('hair'); return; }
+            fetchAIResponse(safeOpt); 
+        }
+
+        async function fetchAIResponse(userMessage) { 
+            typingIndicator.classList.remove('hidden'); scrollToBottom(); 
+            try { 
+                const res = await fetch('/api/ai-chat', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ message: userMessage }) }); 
+                let data = await res.json(); typingIndicator.classList.add('hidden'); 
+                if (res.ok) { 
+                    let botResponseHTML = `<span>${data.reply}</span>`; 
+                    if (data.dept) botResponseHTML += `<br><span class="dept-highlight">✅ Recommended: ${data.dept}</span>`; 
+                    if (data.options && data.options.length > 0) { 
+                        botResponseHTML += `<div class="options-container">`; 
+                        data.options.forEach(opt => { const escapedOpt = opt.replace(/'/g, "\\'"); botResponseHTML += `<button class="chat-option-btn" onclick="handleOptionClick('${escapedOpt}')">${opt}</button>`; }); 
+                        botResponseHTML += `</div>`; 
+                    } 
+                    appendMessageHTML(botResponseHTML, false); 
+                    
+                    // 🌟 AUTO-TRIGGER GUIDE IF ML SAYS SO
+                    if (data.triggerGuide) { setTimeout(() => { openGuide(data.triggerGuide); }, 1500); }
+                } 
+            } catch(e) { typingIndicator.classList.add('hidden'); } 
+        }
 
         // 🌟 NEW: REAL-TIME INCOMING CALL POLLING ENGINE
-        let activeCallApptId = null;
-        let activeDoctorName = "";
-        let isCallModalOpen = false;
+        let activeCallApptId = null; let activeDoctorName = ""; let isCallModalOpen = false;
 
         setInterval(async () => {
-            if(isCallModalOpen) return; // Don't interrupt if already in call/ringing
+            if(isCallModalOpen) return; // Ignore if already ringing or in call
             try {
-                const res = await fetch('/api/appointments/me', { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
+                const res = await fetch('/api/appointments/me', { headers: { 'Authorization': `Bearer ${token}` } }); const data = await res.json();
                 const callingAppt = data.find(a => a.status === 'Calling');
-                
                 if (callingAppt) {
-                    activeCallApptId = callingAppt.id;
-                    activeDoctorName = callingAppt.doctor_name || 'Specialist';
+                    activeCallApptId = callingAppt.id; activeDoctorName = callingAppt.doctor_name || 'Specialist';
                     document.getElementById('incomingDocName').innerText = `Dr. ${activeDoctorName}`;
                     document.getElementById('incomingCallModal').classList.remove('hidden');
                     document.getElementById('ringtone').play().catch(e=>console.log("Auto-play blocked"));
                     isCallModalOpen = true;
                 }
             } catch(e) {}
-        }, 3000); // Checks every 3 seconds!
+        }, 3000); // Polling every 3 seconds
 
-        function rejectCall() {
-            document.getElementById('ringtone').pause(); document.getElementById('ringtone').currentTime = 0;
-            document.getElementById('incomingCallModal').classList.add('hidden');
-            isCallModalOpen = false;
-        }
+        function rejectCall() { document.getElementById('ringtone').pause(); document.getElementById('ringtone').currentTime = 0; document.getElementById('incomingCallModal').classList.add('hidden'); isCallModalOpen = false; }
+        function acceptCall() { document.getElementById('ringtone').pause(); document.getElementById('ringtone').currentTime = 0; document.getElementById('incomingCallModal').classList.add('hidden'); joinActiveCall(activeDoctorName, activeCallApptId); }
 
-        function acceptCall() {
-            document.getElementById('ringtone').pause(); document.getElementById('ringtone').currentTime = 0;
-            document.getElementById('incomingCallModal').classList.add('hidden');
-            joinActiveCall(activeDoctorName, activeCallApptId);
-        }
-
-        // JITSI VIDEO ROOM (Triggered manually or via Accept Call)
         function joinActiveCall(doctorName, apptId) {
-            isCallModalOpen = true;
-            document.getElementById('callHeaderName').innerText = `Consulting with Dr. ${doctorName}`;
+            isCallModalOpen = true; document.getElementById('callHeaderName').innerText = `Consulting with Dr. ${doctorName}`;
             const m = document.getElementById('videoCallModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); }, 10);
             const roomName = `SmartCare_Secure_Consultation_Room_${apptId}_${new Date().toISOString().split('T')[0]}`;
             document.getElementById('jitsiContainer').innerHTML = `<iframe allow="camera; microphone; display-capture; autoplay; clipboard-write" src="https://meet.jit.si/${roomName}" style="height: 100%; width: 100%; border: 0px;"></iframe>`;
