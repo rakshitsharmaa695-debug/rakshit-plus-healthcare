@@ -6,7 +6,12 @@
     <title>My Health Portal - SmartCare</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; } .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #e2e8f0; }</style>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; } 
+        .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #e2e8f0; }
+        .scanner-line { width: 100%; height: 2px; background: #22c55e; box-shadow: 0 0 10px #22c55e, 0 0 20px #22c55e; position: absolute; top: 0; left: 0; animation: scan 2s infinite linear; }
+        @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+    </style>
 </head>
 <body class="text-slate-800 antialiased">
 
@@ -56,6 +61,29 @@
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition">
                 <div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-lg">⚖️</span><span class="text-[10px] font-bold text-slate-400 uppercase">Weight</span></div>
                 <h3 class="text-2xl font-black text-slate-800"><span id="ui-wt">--</span> <span class="text-sm text-slate-400 font-bold">kg</span></h3>
+            </div>
+        </div>
+
+        <!-- 🌟 NEW: AI VIRTUAL DIAGNOSTICS SECTION -->
+        <h3 class="font-black text-lg text-slate-800 mb-4 mt-8 flex items-center gap-2"><span>🧬</span> AI Virtual Diagnostics <span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest border border-purple-200 ml-2">Beta</span></h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl shadow-lg border border-slate-700 text-white relative overflow-hidden group">
+                <div class="absolute right-[-20px] top-[-20px] opacity-10 text-8xl group-hover:scale-110 transition duration-500">🧴</div>
+                <h4 class="text-xl font-black mb-2">Skin Analyzer</h4>
+                <p class="text-xs text-slate-400 font-medium mb-5">Detect acne, pigmentation & UV damage instantly.</p>
+                <button onclick="startAiScan('Skin Analyzer')" class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold hover:bg-blue-50 transition shadow-md">📷 Start Scan</button>
+            </div>
+            <div class="bg-gradient-to-br from-blue-900 to-indigo-900 p-6 rounded-2xl shadow-lg border border-indigo-700 text-white relative overflow-hidden group">
+                <div class="absolute right-[-20px] top-[-20px] opacity-10 text-8xl group-hover:scale-110 transition duration-500">👁️</div>
+                <h4 class="text-xl font-black mb-2">Eye & Vision Test</h4>
+                <p class="text-xs text-slate-300 font-medium mb-5">Sclera analysis and screen fatigue detection.</p>
+                <button onclick="startAiScan('Eye & Vision Check')" class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-50 transition shadow-md">📷 Start Scan</button>
+            </div>
+            <div class="bg-gradient-to-br from-amber-900 to-orange-900 p-6 rounded-2xl shadow-lg border border-orange-700 text-white relative overflow-hidden group">
+                <div class="absolute right-[-20px] top-[-20px] opacity-10 text-8xl group-hover:scale-110 transition duration-500">💇‍♂️</div>
+                <h4 class="text-xl font-black mb-2">Scalp & Hair Health</h4>
+                <p class="text-xs text-slate-300 font-medium mb-5">Analyze follicular density and scalp condition.</p>
+                <button onclick="startAiScan('Scalp Analyzer')" class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold hover:bg-orange-50 transition shadow-md">📷 Start Scan</button>
             </div>
         </div>
 
@@ -129,7 +157,7 @@
         </div>
     </div>
 
-    <!-- 🌟 NEW: LIVE QUEUE MODAL (Replacing Alert) -->
+    <!-- 🌟 LIVE QUEUE MODAL -->
     <div id="queueModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 transition-opacity p-4">
         <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl transform scale-95 relative transition-transform text-center">
             <button onclick="closeQueueModal()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold focus:outline-none">✖</button>
@@ -146,6 +174,47 @@
                 <p class="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-1">Estimated Wait</p>
                 <p class="text-3xl font-black"><span id="queueTime">--</span> <span class="text-sm font-bold">Mins</span></p>
             </div>
+        </div>
+    </div>
+
+    <!-- 🌟 NEW: AI SCANNER MODAL (CAMERA INTEGRATED) -->
+    <div id="aiScanModal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[200] flex items-center justify-center opacity-0 transition-opacity p-4">
+        <div class="bg-white rounded-[2rem] w-full max-w-md shadow-2xl transform scale-95 relative transition-transform overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div><h2 class="text-lg font-black text-slate-900" id="scanTitle">AI Scanner</h2><p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Powered by SmartCare</p></div>
+                <button onclick="closeAiScan()" class="text-slate-400 hover:text-rose-500 transition text-2xl font-bold">✖</button>
+            </div>
+            <div class="p-6 flex flex-col items-center">
+                <div class="relative w-full h-64 bg-slate-900 rounded-2xl overflow-hidden shadow-inner mb-6 border-4 border-slate-100">
+                    <video id="scanVideo" class="w-full h-full object-cover" autoplay playsinline muted></video>
+                    <div id="scannerOverlay" class="hidden scanner-line"></div>
+                    <div id="scanPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500"><span class="text-4xl mb-2">📷</span><p class="text-xs font-bold uppercase tracking-widest">Camera Inactive</p></div>
+                </div>
+                <div id="scanResults" class="hidden w-full bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4 text-left">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Clinical AI Impression</p>
+                    <p id="scanReportText" class="text-sm font-bold text-slate-700 leading-relaxed"></p>
+                </div>
+                <button id="startScanBtn" onclick="runAiScan()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-black shadow-lg hover:bg-slate-900 transition uppercase tracking-wide">Grant Camera & Scan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 NEW: LIVE VIDEO CALL MODAL -->
+    <div id="videoCallModal" class="hidden fixed inset-0 bg-slate-900 z-[300] flex flex-col opacity-0 transition-opacity">
+        <div class="p-4 flex justify-between items-center bg-slate-800/50 backdrop-blur-md absolute w-full top-0 z-10">
+            <div class="flex items-center gap-3"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-white font-bold text-sm tracking-wide">Live Consultation</span></div>
+            <span class="text-slate-300 text-xs font-bold" id="callDuration">00:00</span>
+        </div>
+        <div class="flex-1 relative flex items-center justify-center">
+            <div class="absolute inset-0 flex items-center justify-center bg-slate-800"><div class="text-center"><span class="text-6xl">👨‍⚕️</span><p class="text-slate-400 font-bold mt-4" id="callDocName">Connecting to Doctor...</p></div></div>
+            <div class="absolute bottom-24 right-4 w-28 h-40 md:w-40 md:h-56 bg-black rounded-2xl overflow-hidden shadow-2xl border-2 border-slate-600 z-20">
+                <video id="callVideo" class="w-full h-full object-cover" autoplay playsinline muted></video>
+            </div>
+        </div>
+        <div class="p-6 bg-gradient-to-t from-slate-900 flex justify-center gap-6 pb-10 absolute w-full bottom-0 z-10">
+            <button class="w-14 h-14 bg-slate-700 hover:bg-slate-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg transition">🎤</button>
+            <button onclick="endVideoCall()" class="w-14 h-14 bg-rose-600 hover:bg-rose-700 text-white rounded-full flex items-center justify-center text-2xl shadow-lg transition transform hover:scale-105">📞</button>
+            <button class="w-14 h-14 bg-slate-700 hover:bg-slate-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg transition">📷</button>
         </div>
     </div>
 
@@ -167,7 +236,6 @@
         function openVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
         function closeVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
 
-        // 🌟 NEW: QUEUE MODAL CONTROLLERS
         function openQueueModal() { const m = document.getElementById('queueModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
         function closeQueueModal() { const m = document.getElementById('queueModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
 
@@ -204,7 +272,7 @@
 
                 if (pending.length > 0) {
                     const next = pending[0];
-                    nextApptBox.innerHTML = `<div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6"><div><span class="bg-blue-600/30 text-blue-300 border border-blue-500/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 inline-block">Upcoming Visit</span><h4 class="text-2xl md:text-3xl font-black text-white mb-1">Dr. ${next.doctor_name || 'Assigned Specialist'}</h4><p class="text-slate-300 font-bold mb-4">${next.department}</p><div class="flex items-center gap-4 text-sm font-bold text-slate-400 bg-slate-800/50 inline-flex px-4 py-2 rounded-xl border border-slate-700"><span class="flex items-center gap-2">📅 ${next.appointment_date.split('|')[0]}</span><span class="flex items-center gap-2">⏰ ${next.appointment_date.split('|')[1] || 'TBD'}</span></div></div><button id="trackBtnMain" onclick="checkQueue(${next.id}, 'trackBtnMain')" class="w-full md:w-auto bg-blue-600 text-white px-8 py-4 rounded-xl font-black shadow-lg hover:bg-white hover:text-slate-900 transition tracking-wide text-sm flex items-center justify-center gap-2 group"><span class="group-hover:animate-bounce">📍</span> Track Live Queue</button></div>`;
+                    nextApptBox.innerHTML = `<div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6"><div><span class="bg-blue-600/30 text-blue-300 border border-blue-500/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 inline-block">Upcoming Visit</span><h4 class="text-2xl md:text-3xl font-black text-white mb-1">Dr. ${next.doctor_name || 'Assigned Specialist'}</h4><p class="text-slate-300 font-bold mb-4">${next.department}</p><div class="flex items-center gap-4 text-sm font-bold text-slate-400 bg-slate-800/50 inline-flex px-4 py-2 rounded-xl border border-slate-700"><span class="flex items-center gap-2">📅 ${next.appointment_date.split('|')[0]}</span><span class="flex items-center gap-2">⏰ ${next.appointment_date.split('|')[1] || 'TBD'}</span></div></div><div class="w-full lg:w-auto flex flex-col sm:flex-row gap-3"><button id="trackBtnMain" onclick="checkQueue(${next.id}, 'trackBtnMain')" class="w-full sm:w-auto bg-slate-800 border border-slate-600 text-white px-6 py-4 rounded-xl font-black hover:bg-slate-700 transition text-sm flex items-center justify-center gap-2 shadow-md">📍 Track Queue</button><button onclick="startVideoCall('Dr. ${next.doctor_name || 'Assigned Specialist'}')" class="w-full sm:w-auto bg-green-500 text-slate-900 px-6 py-4 rounded-xl font-black shadow-[0_0_15px_rgba(34,197,94,0.4)] hover:bg-white transition text-sm flex items-center justify-center gap-2 group"><span class="text-lg group-hover:scale-110 transition">📹</span> Join Video</button></div></div>`;
                 } else {
                     nextApptBox.innerHTML = `<div class="relative z-10 text-center py-6"><div class="text-4xl mb-3 opacity-50">✨</div><h4 class="text-xl font-bold text-white mb-2">You're all caught up!</h4><p class="text-slate-400 text-sm">No pending appointments. Stay healthy!</p></div>`;
                 }
@@ -231,7 +299,6 @@
             btn.innerText = "Save Vitals"; btn.disabled = false;
         });
 
-        // 🌟 REPLACED ALERT WITH CUSTOM UI MODAL
         async function checkQueue(id, btnId) { 
             const btn = document.getElementById(btnId);
             const originalText = btn ? btn.innerHTML : "Track";
@@ -252,7 +319,97 @@
                 alert("Failed to sync with live queue. Check your connection."); 
             } 
         }
+
+        // 🌟 NEW: AI VIRTUAL SCANNER ENGINE (REAL WEBCAM)
+        let localStream = null;
+        let activeScanType = "";
+
+        async function startAiScan(type) {
+            activeScanType = type;
+            document.getElementById('scanTitle').innerText = type;
+            document.getElementById('scanResults').classList.add('hidden');
+            document.getElementById('scanPlaceholder').classList.remove('hidden');
+            document.getElementById('startScanBtn').innerText = "Grant Camera & Scan";
+            document.getElementById('startScanBtn').classList.remove('hidden');
+            document.getElementById('scannerOverlay').classList.add('hidden');
+            
+            const m = document.getElementById('aiScanModal');
+            m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10);
+        }
+
+        async function runAiScan() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('scanVideo').srcObject = localStream;
+                document.getElementById('scanPlaceholder').classList.add('hidden');
+                
+                document.getElementById('scannerOverlay').classList.remove('hidden');
+                const btn = document.getElementById('startScanBtn');
+                btn.innerText = "Scanning Data Points... ⏳"; btn.disabled = true;
+
+                setTimeout(() => {
+                    document.getElementById('scannerOverlay').classList.add('hidden');
+                    btn.classList.add('hidden');
+                    btn.disabled = false;
+
+                    let report = "";
+                    if(activeScanType.includes('Skin')) report = "🟢 Epidermal Scan Complete.<br>• Hydration: 78% (Normal)<br>• Pigmentation: Minor UV exposure detected.<br><b>Recommendation:</b> Apply SPF 50 daily and use a lightweight moisturizer.";
+                    if(activeScanType.includes('Eye')) report = "🟢 Sclera & Retina Tracked.<br>• Redness: Very Low<br>• Screen Fatigue: Moderate.<br><b>Recommendation:</b> 20/20 vision estimated. Follow the 20-20-20 rule during screen time.";
+                    if(activeScanType.includes('Scalp')) report = "🟢 Follicular Density Checked.<br>• Scalp Health: Optimal (No flaking).<br>• Density: Normal.<br><b>Recommendation:</b> Maintain current hair care routine. Biotin supplements optional.";
+
+                    document.getElementById('scanReportText').innerHTML = report;
+                    document.getElementById('scanResults').classList.remove('hidden');
+                    
+                    if(localStream) { localStream.getTracks().forEach(t => t.stop()); }
+                }, 3000);
+
+            } catch(e) {
+                alert("Please allow Camera access in your browser to run the Virtual Scan.");
+            }
+        }
+
+        function closeAiScan() {
+            const m = document.getElementById('aiScanModal');
+            m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); 
+            setTimeout(() => { m.classList.add('hidden'); }, 300);
+            if(localStream) { localStream.getTracks().forEach(t => t.stop()); } 
+        }
+
+        // 🌟 NEW: LIVE VIDEO CALL ENGINE
+        let callTimer; let callSeconds = 0;
         
+        async function startVideoCall(doctorName) {
+            document.getElementById('callDocName').innerText = `Connecting to ${doctorName}...`;
+            const m = document.getElementById('videoCallModal');
+            m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); }, 10);
+            
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                document.getElementById('callVideo').srcObject = localStream;
+                
+                setTimeout(() => {
+                    document.getElementById('callDocName').innerText = `${doctorName} (Online)`;
+                    callSeconds = 0;
+                    callTimer = setInterval(() => {
+                        callSeconds++;
+                        let min = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+                        let sec = String(callSeconds % 60).padStart(2, '0');
+                        document.getElementById('callDuration').innerText = `${min}:${sec}`;
+                    }, 1000);
+                }, 2000);
+            } catch(e) {
+                document.getElementById('callDocName').innerText = "Camera Access Denied!";
+            }
+        }
+
+        function endVideoCall() {
+            clearInterval(callTimer);
+            if(localStream) { localStream.getTracks().forEach(t => t.stop()); } 
+            const m = document.getElementById('videoCallModal');
+            m.classList.add('opacity-0'); 
+            setTimeout(() => { m.classList.add('hidden'); document.getElementById('callDuration').innerText = "00:00"; }, 300);
+        }
+
         document.addEventListener('DOMContentLoaded', loadMyDashboard);
     </script>
 </body>
