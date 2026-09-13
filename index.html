@@ -16,11 +16,11 @@
         .chat-scroll::-webkit-scrollbar { width: 5px; } .chat-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         .typing-dot { animation: typingBounce 1.4s infinite ease-in-out both; } .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-        .options-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .chat-option-btn { background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 20px; padding: 8px 16px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s ease; }
-        .chat-option-btn:hover { background-color: #2563eb; color: white; border-color: #2563eb; transform: translateY(-1px); }
+        .options-container { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .chat-option-btn { background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 12px; padding: 10px 16px; cursor: pointer; font-size: 13px; font-weight: 600; text-align: left; transition: all 0.2s ease; }
+        .chat-option-btn:hover { background-color: #2563eb; color: white; border-color: #2563eb; transform: translateX(4px); }
         .dept-highlight { display: inline-block; margin-top: 12px; padding: 6px 12px; background-color: #064e3b; color: #34d399; border-radius: 6px; font-weight: 600; font-size: 13px; border: 1px solid #059669; }
-        .remedy-highlight { display: inline-block; margin-top: 12px; padding: 12px 16px; background-color: #fef3c7; color: #92400e; border-radius: 12px; font-weight: 600; font-size: 13px; border: 1px solid #fde68a; width: 100%; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .remedy-highlight { display: inline-block; margin-top: 8px; padding: 16px; background-color: #fef3c7; color: #92400e; border-radius: 12px; font-weight: 500; font-size: 13px; border: 1px solid #fde68a; width: 100%; line-height: 1.6; }
         .report-card { background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
     </style>
 </head>
@@ -69,15 +69,24 @@
         </div>
     </main>
 
-    <!-- 🌟 IN-DASHBOARD AI CHAT WIDGET -->
+    <!-- 🌟 MULTILINGUAL DEEP AI CHAT WIDGET -->
     <div id="ai-chat-window" class="hidden fixed bottom-[110px] right-4 md:right-8 z-[400] w-[92vw] sm:w-[400px] bg-[#0f172a] border border-slate-700 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex-col h-[65vh] sm:h-[550px] transform transition-all">
-        <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 border-b border-blue-500/30 flex justify-between items-center shadow-md z-10"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center text-xl shadow-lg flex-shrink-0">🩺</div><div class="text-left flex flex-col"><h3 class="text-white font-black text-lg leading-tight tracking-wide">Virtual Doctor</h3><span class="text-[11px] text-blue-300 font-semibold mt-0.5">Clinical Protocol Active</span></div></div><button id="close-ai-chat" class="text-slate-400 hover:text-white transition bg-white/10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">✖</button></div>
+        <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-4 border-b border-blue-500/30 flex justify-between items-center shadow-md z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center text-xl shadow-lg flex-shrink-0">🩺</div>
+                <div class="text-left flex flex-col">
+                    <h3 class="text-white font-black text-lg leading-tight tracking-wide">Virtual Doctor</h3>
+                    <select id="chatLangSelect" onchange="changeLanguage()" class="bg-slate-800 text-blue-300 text-[10px] font-bold px-2 py-1 rounded border border-slate-600 outline-none mt-1">
+                        <option value="en">English</option><option value="hi">हिंदी (Hindi)</option><option value="hinglish">Hinglish</option><option value="pa">ਪੰਜਾਬੀ (Punjabi)</option><option value="gu">ગુજરાતી (Gujarati)</option><option value="mr">मराठी (Marathi)</option><option value="bn">বাংলা (Bengali)</option>
+                    </select>
+                </div>
+            </div>
+            <button id="close-ai-chat" class="text-slate-400 hover:text-white transition bg-white/10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">✖</button>
+        </div>
         <div id="chat-messages" class="relative flex-1 p-4 chat-scroll overflow-y-auto bg-[#0f172a] flex flex-col gap-4"></div>
         <div id="typing-indicator" class="hidden p-4 bg-[#0f172a]"><div class="flex gap-2 w-full"><div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div><div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex items-center gap-1 shadow-md"><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-400 rounded-full typing-dot"></div></div></div></div>
-        <div class="p-3 bg-slate-900 border-t border-slate-700 flex flex-col gap-2"><div id="chat-input-container" class="flex gap-2 w-full"><input type="text" id="chat-input" placeholder="Describe symptoms deeply..." class="flex-1 bg-slate-800 text-white border border-slate-600 p-2.5 rounded-xl outline-none focus:border-blue-500 text-sm font-medium"><button id="chat-send-btn" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-blue-500 transition">Send</button></div></div>
     </div>
 
-    <!-- Floating Trigger -->
     <div class="fixed bottom-6 right-4 md:right-8 z-[350] flex flex-col items-center gap-2">
         <button id="ai-widget-toggle" class="relative group focus:outline-none flex flex-col items-center"><div class="absolute inset-0 bg-blue-500 rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div><div class="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-full shadow-[0_8px_30px_rgba(37,99,235,0.4)] flex items-center justify-center text-3xl text-white transform group-hover:scale-105 transition-all duration-300 z-10 border-2 border-white">🩺<span class="absolute top-0 right-0 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border border-white"></span></span></div></button>
         <span class="text-[11px] md:text-xs font-black text-slate-800 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-slate-200 uppercase tracking-wide">Virtual Doctor</span>
@@ -88,7 +97,7 @@
         <div class="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl transform scale-95 relative transition-transform overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50"><div><h2 class="text-xl font-black text-slate-900" id="guideTitle">Visual Assessment Guide</h2><p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Clinical Protocol</p></div><button onclick="closeGuide()" class="text-slate-400 hover:text-rose-500 transition text-2xl font-bold">✖</button></div>
             <div class="p-6 overflow-y-auto" id="guideContent"></div>
-            <div class="p-5 border-t border-slate-100 bg-slate-50 text-center"><button onclick="completeGuide()" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-blue-600 transition">I have completed the check</button></div>
+            <div class="p-5 border-t border-slate-100 bg-slate-50 text-center"><button id="doneGuideBtn" onclick="completeGuide()" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-blue-600 transition">I have completed the check</button></div>
         </div>
     </div>
 
@@ -104,153 +113,364 @@
 
         function checkAuth() {
             try {
-                const token = localStorage.getItem('smartcare_jwt'); const role = localStorage.getItem('smartcare_role');
-                const path = window.location.pathname; const isHomepage = path.endsWith('index.html') || path === '/';
-                if (token && isHomepage) { if (role === 'admin') { window.location.href = 'admin.html'; return; } if (role === 'doctor') { window.location.href = 'doctor-dashboard.html'; return; } }
+                const token = localStorage.getItem('smartcare_jwt'); 
+                const role = localStorage.getItem('smartcare_role');
+                const path = window.location.pathname; 
+                const isHomepage = path.endsWith('index.html') || path === '/';
+                if (token && isHomepage) { 
+                    if (role === 'admin') { window.location.href = 'admin.html'; return; } 
+                    if (role === 'doctor') { window.location.href = 'doctor-dashboard.html'; return; } 
+                }
                 toggleUI('patientDashboardBtn', false); toggleUI('patientDashboardBtnMobile', false);
-                if (token) { toggleUI('authButtons', false); toggleUI('userProfileBtn', true); toggleUI('mobileAuthButtons', false); toggleUI('mobileUserProfileBtn', true); if(role === 'patient') { toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true); } } else { toggleUI('authButtons', true); toggleUI('userProfileBtn', false); toggleUI('mobileAuthButtons', true); toggleUI('mobileUserProfileBtn', false); }
+                if (token) { 
+                    toggleUI('authButtons', false); toggleUI('userProfileBtn', true); toggleUI('mobileAuthButtons', false); toggleUI('mobileUserProfileBtn', true); 
+                    if(role === 'patient') { toggleUI('patientDashboardBtn', true); toggleUI('patientDashboardBtnMobile', true); }
+                } else { 
+                    toggleUI('authButtons', true); toggleUI('userProfileBtn', false); toggleUI('mobileAuthButtons', true); toggleUI('mobileUserProfileBtn', false); 
+                }
             } catch(e) {}
         }
         function logout() { localStorage.removeItem('smartcare_jwt'); localStorage.removeItem('smartcare_role'); window.location.reload(); }
         document.addEventListener('DOMContentLoaded', checkAuth);
 
-        document.getElementById('loginForm')?.addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Verifying..."; btn.disabled = true; try { const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('log-email').value, password: document.getElementById('log-password').value }) }); const msg = document.getElementById('logMsg'); msg.classList.remove('hidden'); const data = await res.json(); if(res.ok) { localStorage.setItem('smartcare_jwt', data.token); localStorage.setItem('smartcare_role', data.role); if(data.role === 'admin') window.location.href = 'admin.html'; else if(data.role === 'doctor') window.location.href = 'doctor-dashboard.html'; else window.location.reload(); } else { msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; } } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; } });
-        document.getElementById('registerForm')?.addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Creating Account..."; btn.disabled = true; try { const res = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value }) }); const msg = document.getElementById('regMsg'); msg.classList.remove('hidden'); if(res.ok) { msg.className = "mt-4 text-green-600 text-center text-sm font-bold"; msg.innerText = "Account Created! Redirecting to login..."; setTimeout(() => switchModal('registerModal', 'loginModal'), 1500); } else { const data = await res.json(); msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error || "Failed to register."; } } catch (error) { } finally { btn.innerText = "Sign Up Now"; btn.disabled = false; } });
+        document.getElementById('loginForm')?.addEventListener('submit', async (e) => { 
+            e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Verifying..."; btn.disabled = true; 
+            try { 
+                const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('log-email').value, password: document.getElementById('log-password').value }) }); 
+                const msg = document.getElementById('logMsg'); msg.classList.remove('hidden'); 
+                const data = await res.json(); 
+                if(res.ok) { 
+                    localStorage.setItem('smartcare_jwt', data.token); localStorage.setItem('smartcare_role', data.role); 
+                    if(data.role === 'admin') window.location.href = 'admin.html'; else if(data.role === 'doctor') window.location.href = 'doctor-dashboard.html'; else window.location.reload(); 
+                } else { 
+                    msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; 
+                } 
+            } catch (error) {} finally { btn.innerText = "Login Securely"; btn.disabled = false; } 
+        });
+        
+        document.getElementById('registerForm')?.addEventListener('submit', async (e) => { 
+            e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = "Creating Account..."; btn.disabled = true; 
+            try { 
+                const res = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value }) }); 
+                const msg = document.getElementById('regMsg'); msg.classList.remove('hidden'); 
+                if(res.ok) { 
+                    msg.className = "mt-4 text-green-600 text-center text-sm font-bold"; msg.innerText = "Account Created! Redirecting to login..."; setTimeout(() => switchModal('registerModal', 'loginModal'), 1500); 
+                } else { 
+                    const data = await res.json(); msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error || "Failed to register."; 
+                } 
+            } catch (error) { } finally { btn.innerText = "Sign Up Now"; btn.disabled = false; } 
+        });
 
-        // 🌟 ADVANCED VISUAL CLINICAL GUIDES WITH MEDICAL IMAGES
+        // 🌟 VISUAL CLINICAL GUIDES WITH MEDICAL IMAGES
         const guideData = {
             'eye': { 
                 title: "Comprehensive Vision & Eye Exam", 
-                html: `<div class="space-y-6">
-                        <div><h4 class="font-black text-slate-800 flex items-center gap-2"><span>1️⃣</span> Distance Acuity (Snellen Test)</h4><p class="text-sm text-slate-600 mt-1 mb-3">Place your device 10 feet away. Cover one eye and try reading the lowest possible line. Repeat with the other eye.</p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Snellen_chart.svg/400px-Snellen_chart.svg.png" class="mx-auto h-48 object-contain bg-white p-2 rounded-xl border border-slate-200 shadow-sm"></div>
-                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>2️⃣</span> Macular Degeneration (Amsler Grid)</h4><p class="text-sm text-slate-600 mt-1 mb-3">Stare at the center dot from 14 inches away. Do any lines appear wavy, blurred, or missing?</p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Amslergrid.svg/400px-Amslergrid.svg.png" class="mx-auto h-48 w-48 object-cover rounded-xl border border-slate-200 shadow-sm"></div>
-                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>3️⃣</span> Color Vision (Ishihara Plate)</h4><p class="text-sm text-slate-600 mt-1 mb-3">What number do you see in the circle below? (Normally, it should clearly be 74).</p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Ishihara_9.svg/400px-Ishihara_9.svg.png" class="mx-auto h-40 w-40 object-cover rounded-full shadow-sm"></div>
-                       </div>` 
+                html: `
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-black text-slate-800 flex items-center gap-2"><span>1️⃣</span> Distance Acuity (Snellen Test)</h4>
+                            <p class="text-sm text-slate-600 mt-1 mb-3">Place your device 10 feet away. Cover one eye and try reading the lowest possible line. Repeat with the other eye.</p>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Snellen_chart.svg/400px-Snellen_chart.svg.png" class="mx-auto h-48 object-contain bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
+                        </div>
+                        <div class="border-t border-slate-100 pt-6">
+                            <h4 class="font-black text-slate-800 flex items-center gap-2"><span>2️⃣</span> Macular Degeneration (Amsler Grid)</h4>
+                            <p class="text-sm text-slate-600 mt-1 mb-3">Stare at the center dot from 14 inches away. Do any lines appear wavy, blurred, or missing?</p>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Amslergrid.svg/400px-Amslergrid.svg.png" class="mx-auto h-48 w-48 object-cover rounded-xl border border-slate-200 shadow-sm">
+                        </div>
+                        <div class="border-t border-slate-100 pt-6">
+                            <h4 class="font-black text-slate-800 flex items-center gap-2"><span>3️⃣</span> Color Vision (Ishihara Plate)</h4>
+                            <p class="text-sm text-slate-600 mt-1 mb-3">What number do you see in the circle below? (Normally, it should clearly be 74).</p>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Ishihara_9.svg/400px-Ishihara_9.svg.png" class="mx-auto h-40 w-40 object-cover rounded-full shadow-sm">
+                        </div>
+                    </div>` 
             },
             'skin': { 
                 title: "Advanced Skin Health Self-Exam", 
-                html: `<div class="space-y-6">
-                        <div><h4 class="font-black text-slate-800 flex items-center gap-2"><span>1️⃣</span> Tissue Paper Test (Oily/Dry Check)</h4><p class="text-sm text-slate-600 mt-1 mb-3">Wash your face, wait 1 hour. Press a dry tissue on your T-Zone and cheeks. If tissue shows oil spots from both, you have <b>Oily</b> skin. If only T-zone, it's <b>Combination</b>.</p><div class="w-full bg-slate-100 p-4 rounded-xl text-center text-3xl">🧻 💧</div></div>
-                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>2️⃣</span> The Pinch Test (Hydration Level)</h4><p class="text-sm text-slate-600 mt-1">Gently pinch the skin on the back of your hand for 3 seconds. If it snaps back instantly, your skin is well hydrated. If it takes a few seconds, you are dehydrated.</p></div>
-                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>3️⃣</span> The ABCDE Rule for Moles</h4><p class="text-sm text-slate-600 mt-1">Check body spots for <b>A</b>symmetry, irregular <b>B</b>orders, uneven <b>C</b>olor, large <b>D</b>iameter (>6mm), and <b>E</b>volution (growing/changing).</p></div>
-                       </div>` 
+                html: `
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-black text-slate-800 flex items-center gap-2"><span>1️⃣</span> Tissue Paper Test (Oily/Dry Check)</h4>
+                            <p class="text-sm text-slate-600 mt-1 mb-3">Wash your face, wait 1 hour. Press a dry tissue on your T-Zone and cheeks. If tissue shows oil spots from both, you have <b>Oily</b> skin. If only T-zone, it's <b>Combination</b>.</p>
+                            <div class="w-full bg-slate-100 p-4 rounded-xl text-center text-3xl">🧻 💧</div>
+                        </div>
+                        <div class="border-t border-slate-100 pt-6">
+                            <h4 class="font-black text-slate-800 flex items-center gap-2"><span>2️⃣</span> The Pinch Test (Hydration Level)</h4>
+                            <p class="text-sm text-slate-600 mt-1">Gently pinch the skin on the back of your hand for 3 seconds. If it snaps back instantly, your skin is well hydrated. If it takes a few seconds, you are dehydrated.</p>
+                        </div>
+                        <div class="border-t border-slate-100 pt-6">
+                            <h4 class="font-black text-slate-800 flex items-center gap-2"><span>3️⃣</span> The ABCDE Rule for Moles</h4>
+                            <p class="text-sm text-slate-600 mt-1">Check body spots for <b>A</b>symmetry, irregular <b>B</b>orders, uneven <b>C</b>olor, large <b>D</b>iameter (>6mm), and <b>E</b>volution (growing/changing).</p>
+                        </div>
+                    </div>` 
             },
             'hair': { 
                 title: "Scalp & Root Diagnostic", 
-                html: `<div class="space-y-6">
-                        <div><h4 class="font-black text-slate-800 flex items-center gap-2"><span>1️⃣</span> The Pull Test (Hairfall Severity)</h4><p class="text-sm text-slate-600 mt-1 mb-3">Grasp a section of about 50 strands near the root and pull gently upward. Losing more than 6 strands indicates active, abnormal shedding.</p><div class="w-full bg-slate-100 p-4 rounded-xl text-center text-3xl">🤏</div></div>
-                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>2️⃣</span> Root Bulb Check</h4><p class="text-sm text-slate-600 mt-1">Look at the end of a fallen hair. If it has a tiny white bulb, it fell naturally from the root (Telogen). If there is no bulb and it's tapered, the hair is breaking due to weakness.</p></div>
-                        <div class="border-t border-slate-100 pt-6"><h4 class="font-black text-slate-800 flex items-center gap-2"><span>3️⃣</span> Water Float Test (Porosity)</h4><p class="text-sm text-slate-600 mt-1">Drop a clean strand of hair in a glass of water. If it floats, it's healthy (Low Porosity). If it sinks rapidly, it absorbs water too fast indicating severe damage/dryness.</p></div>
-                       </div>` 
+                html: `
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-black text-slate-800 flex items-center gap-2"><span>1️⃣</span> The Pull Test (Hairfall Severity)</h4>
+                            <p class="text-sm text-slate-600 mt-1 mb-3">Grasp a section of about 50 strands near the root and pull gently upward. Losing more than 6 strands indicates active, abnormal shedding.</p>
+                            <div class="w-full bg-slate-100 p-4 rounded-xl text-center text-3xl">🤏</div>
+                        </div>
+                        <div class="border-t border-slate-100 pt-6">
+                            <h4 class="font-black text-slate-800 flex items-center gap-2"><span>2️⃣</span> Root Bulb Check</h4>
+                            <p class="text-sm text-slate-600 mt-1">Look at the end of a fallen hair. If it has a tiny white bulb, it fell naturally from the root (Telogen). If there is no bulb and it's tapered, the hair is breaking due to weakness.</p>
+                        </div>
+                        <div class="border-t border-slate-100 pt-6">
+                            <h4 class="font-black text-slate-800 flex items-center gap-2"><span>3️⃣</span> Water Float Test (Porosity)</h4>
+                            <p class="text-sm text-slate-600 mt-1">Drop a clean strand of hair in a glass of water. If it floats, it's healthy (Low Porosity). If it sinks rapidly, it absorbs water too fast indicating severe damage/dryness.</p>
+                        </div>
+                    </div>` 
             }
         };
 
-        function openGuide(type) { document.getElementById('guideTitle').innerText = guideData[type].title; document.getElementById('guideContent').innerHTML = guideData[type].html; const m = document.getElementById('guideModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
-        function closeGuide() { const m = document.getElementById('guideModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
-        function completeGuide() { closeGuide(); processLocalAI("I have completed the visual tests. Please give me my final report."); } 
-
-        // 🌟 DEEP CLINICAL INTERROGATION ENGINE
-        let localChatState = { step: 'INIT', data: {} };
-        const aiToggleBtn = document.getElementById('ai-widget-toggle'); const aiChatWindow = document.getElementById('ai-chat-window'); const closeAiChatBtn = document.getElementById('close-ai-chat'); const chatMessages = document.getElementById('chat-messages'); const typingIndicator = document.getElementById('typing-indicator'); let isChatInitialized = false;
+        function openGuide(type) { 
+            document.getElementById('guideTitle').innerText = guideData[type].title; 
+            document.getElementById('guideContent').innerHTML = guideData[type].html; 
+            const m = document.getElementById('guideModal'); 
+            m.classList.remove('hidden'); 
+            setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); 
+        }
         
-        aiToggleBtn.addEventListener('click', () => { if(aiChatWindow.classList.contains('hidden')) { aiChatWindow.classList.remove('hidden'); aiChatWindow.classList.add('flex'); const badge = aiToggleBtn.querySelector('.animate-ping'); if(badge) badge.parentElement.remove(); if(!isChatInitialized) { chatMessages.innerHTML = ''; processLocalAI("start"); isChatInitialized = true; } } else { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); } });
-        closeAiChatBtn.addEventListener('click', () => { aiChatWindow.classList.add('hidden'); aiChatWindow.classList.remove('flex'); });
-        function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
+        function closeGuide() { 
+            const m = document.getElementById('guideModal'); 
+            m.classList.add('opacity-0'); 
+            m.children[0].classList.add('scale-95'); 
+            setTimeout(() => { m.classList.add('hidden'); }, 300); 
+        }
+        
+        function completeGuide() { 
+            closeGuide(); 
+            submitChatAction(-2, null); 
+        } 
 
-        function appendMessageHTML(htmlContent, isUser = false) { chatMessages.innerHTML += `<div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} bubble-enter relative z-10">${!isUser ? '<div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div>' : ''}<div class="${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] text-sm shadow-md leading-relaxed">${htmlContent}</div></div>`; scrollToBottom(); }
-        document.getElementById('chat-send-btn')?.addEventListener('click', () => { const input = document.getElementById('chat-input'); const msg = input.value.trim(); if(msg) { appendMessageHTML(msg, true); processLocalAI(msg); input.value = ''; } });
-        document.getElementById('chat-input')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') document.getElementById('chat-send-btn').click(); });
+        // 🌟 100% EFFORT: MULTILINGUAL, DEEP CLINICAL ENGINE
+        const i18n = {
+            'en': {
+                greet: "Namaste! 🙏 I am SmartCare's Clinical Protocol. To begin, select your primary concern:",
+                cats: ["Skin / Acne", "Hair fall / Roots", "Eye strain / Vision", "Stomach / Digestion", "Fever / General"],
+                q1: { SKIN: "Is there severe itching, burning, or just painless spots?", HAIR: "Are the hairs falling with a white bulb at the root, or breaking from the middle?", EYE: "Is there sticky discharge, or just dry redness and pain?", STOMACH: "Is the pain sharp and sudden, or a dull continuous ache with bloating?", GEN: "Is the fever continuous, or does it come with severe chills and body ache?" },
+                opt1: { SKIN: ["Severe itching", "Burning sensation", "No pain"], HAIR: ["White root bulb", "Breaking from middle", "Not sure"], EYE: ["Sticky discharge", "Dry and red", "Blurry vision"], STOMACH: ["Sharp sudden pain", "Dull ache & bloating", "Burning acidity"], GEN: ["Continuous high fever", "Chills & body ache", "Mild fatigue"] },
+                q2: { SKIN: "Have you recently changed your soap, diet, or been in intense sun?", HAIR: "Have you changed your shampoo, water source, or been under extreme stress?", EYE: "Do you spend more than 6 hours a day on digital screens?", STOMACH: "Does eating spicy food or dairy make the condition worse?", GEN: "Do you also have a wet cough, dry cough, or sore throat?" },
+                opt2: { SKIN: ["Changed soap/cosmetics", "Intense sun exposure", "No changes"], HAIR: ["High stress recently", "Changed water/shampoo", "No changes"], EYE: ["Yes, 6+ hours daily", "No, less screen time", "Recent injury/dust"], STOMACH: ["Yes, spicy food", "Yes, dairy products", "No specific trigger"], GEN: ["Dry cough", "Wet cough", "Sore throat only"] },
+                q3: { SKIN: "Is the condition spreading rapidly to other body parts?", HAIR: "Are you seeing completely bald circular patches, or just overall thinning?", EYE: "Do straight lines appear wavy, or is it hard to focus far away?", STOMACH: "Have you eaten outside food or traveled in the last 48 hours?", GEN: "Are you currently taking any antibiotics or painkillers?" },
+                opt3: { SKIN: ["Spreading rapidly", "Very slowly", "Localized to one spot"], HAIR: ["Bald circular patches", "Overall thinning", "Receding hairline"], EYE: ["Lines look wavy", "Hard to focus far", "Just painful"], STOMACH: ["Yes, outside food", "No, home food only", "Traveled recently"], GEN: ["Taking Paracetamol", "Taking Antibiotics", "No medication yet"] },
+                guideMsg: "Based on your clinical inputs, a visual assessment is required. Please click below.",
+                guideBtn: "Open Visual Guide",
+                done: "I have completed the visual test.",
+                reportHead: "📋 Deep Clinical Assessment",
+                remedies: {
+                    SKIN: "<b>🌿 Deep Ayurvedic Protocol:</b><br><b>1. Rakta Shodhana:</b> Drink a decoction of Neem & Manjistha daily.<br><b>2. Lepa:</b> Apply a paste of Multani Mitti, organic Turmeric, and Rose water.<br><b>3. Diet:</b> Avoid fermented and extremely sour foods.",
+                    HAIR: "<b>🌿 Deep Ayurvedic Protocol:</b><br><b>1. Root Stimulation:</b> Massage scalp with warm Coconut oil mixed with Bhringraj.<br><b>2. Herbal Infusion:</b> Rinse hair with boiled Amla and Shikakai water.<br><b>3. Nutrition:</b> Consume soaked almonds and walnuts daily.",
+                    EYE: "<b>🌿 Deep Ayurvedic Protocol:</b><br><b>1. Netra Tarpana:</b> Place pure Rose Water soaked cotton pads on closed eyes.<br><b>2. Triphala Wash:</b> Gently wash eyes with overnight soaked Triphala water.<br><b>3. 20-20-20 Rule:</b> Every 20 mins of screen time, look 20 feet away for 20 seconds.",
+                    STOMACH: "<b>🌿 Deep Ayurvedic Protocol:</b><br><b>1. Agni Deepana:</b> Chew a small piece of fresh ginger with rock salt before meals.<br><b>2. CCF Tea:</b> Boil equal parts Cumin, Coriander, and Fennel seeds. Sip warm.<br><b>3. Gut Support:</b> Drink fresh buttermilk (Chaas) with roasted cumin after lunch.",
+                    GEN: "<b>🌿 Deep Ayurvedic Protocol:</b><br><b>1. Ayush Kwath:</b> Boil Tulsi, crushed Ginger, Black Pepper, and Cinnamon.<br><b>2. Golden Milk:</b> Mix turmeric powder in warm milk before bed.<br><b>3. Hydration:</b> Drink only warm water and rest completely."
+                },
+                pdf: "📄 Download Report", book: "📅 Book Clinic Visit", restart: "🔄 Start Over"
+            },
+            'hi': {
+                greet: "नमस्ते! 🙏 मैं स्मार्टकेयर क्लिनिकल असिस्टेंट हूँ। कृपया अपनी मुख्य समस्या चुनें:",
+                cats: ["त्वचा / मुँहासे (Skin)", "बाल झड़ना (Hair)", "आँखों में तनाव (Eye)", "पेट दर्द / गैस (Stomach)", "बुखार / सामान्य (Fever)"],
+                q1: { SKIN: "क्या बहुत खुजली या जलन हो रही है, या सिर्फ दाने हैं?", HAIR: "क्या बाल जड़ (सफ़ेद बल्ब) से गिर रहे हैं, या बीच से टूट रहे हैं?", EYE: "क्या आँखों से पानी आ रहा है, या सिर्फ सूखापन और लालिमा है?", STOMACH: "क्या दर्द बहुत तेज है, या लगातार हल्का दर्द और भारीपन है?", GEN: "क्या बुखार लगातार है, या ठंड और बदन दर्द के साथ आ रहा है?" },
+                opt1: { SKIN: ["तेज खुजली", "जलन", "कोई दर्द नहीं"], HAIR: ["सफ़ेद जड़ से", "बीच से टूट रहे हैं", "पता नहीं"], EYE: ["पानी / चिपचिपा", "सूखा और लाल", "धुंधलापन"], STOMACH: ["तेज और अचानक", "हल्का दर्द और भारीपन", "जलन / एसिडिटी"], GEN: ["लगातार तेज बुखार", "ठंड और बदन दर्द", "हल्की थकान"] },
+                q2: { SKIN: "क्या आपने हाल ही में कोई नया साबुन इस्तेमाल किया है या तेज धूप में गए हैं?", HAIR: "क्या आपने हाल ही में शैम्पू/पानी बदला है, या बहुत ज्यादा तनाव में हैं?", EYE: "क्या आप दिन में 6 घंटे से ज्यादा मोबाइल/लैपटॉप इस्तेमाल करते हैं?", STOMACH: "क्या तीखा या डेयरी (दूध) खाने से समस्या बढ़ जाती है?", GEN: "क्या आपको सूखी खांसी, गीली खांसी या गले में खराश भी है?" },
+                opt2: { SKIN: ["साबुन बदला है", "तेज धूप", "कोई बदलाव नहीं"], HAIR: ["बहुत तनाव है", "पानी/शैम्पू बदला", "कोई बदलाव नहीं"], EYE: ["हाँ, 6+ घंटे", "नहीं, कम समय", "चोट या धूल लगी है"], STOMACH: ["हाँ, तीखा खाने से", "हाँ, दूध से", "कोई विशेष कारण नहीं"], GEN: ["सूखी खांसी", "गीली खांसी", "सिर्फ गले में खराश"] },
+                q3: { SKIN: "क्या यह शरीर के अन्य हिस्सों में तेजी से फैल रहा है?", HAIR: "क्या पूरी तरह से गोल पैच (गंजेपन) बन रहे हैं, या सिर्फ बाल पतले हो रहे हैं?", EYE: "क्या सीधी लाइनें टेढ़ी-मेढ़ी दिख रही हैं, या दूर का देखने में दिक्कत है?", STOMACH: "क्या आपने पिछले 48 घंटों में बाहर का खाना खाया है या सफर किया है?", GEN: "क्या आप अभी कोई एंटीबायोटिक या पेनकिलर ले रहे हैं?" },
+                opt3: { SKIN: ["तेजी से फैल रहा है", "बहुत धीरे-धीरे", "सिर्फ एक जगह पर"], HAIR: ["गोल पैच (गंजेपन)", "बाल पतले हो रहे हैं", "आगे से बाल उड़ रहे"], EYE: ["लाइनें टेढ़ी दिखती हैं", "दूर का धुंधला है", "सिर्फ दर्द है"], STOMACH: ["हाँ, बाहर का खाना", "नहीं, घर का खाना", "सफर किया था"], GEN: ["पैरासिटामोल ले रहा हूँ", "एंटीबायोटिक ले रहा हूँ", "कोई दवा नहीं"] },
+                guideMsg: "आपकी जानकारी के आधार पर, एक विज़ुअल टेस्ट जरूरी है। कृपया नीचे क्लिक करें।",
+                guideBtn: "विज़ुअल गाइड खोलें",
+                done: "मैंने विज़ुअल टेस्ट पूरा कर लिया है।",
+                reportHead: "📋 क्लिनिकल असेसमेंट रिपोर्ट",
+                remedies: {
+                    SKIN: "<b>🌿 आयुर्वेदिक उपाय:</b><br><b>1. रक्त शोधन:</b> नीम और मंजिष्ठा का काढ़ा पिएं।<br><b>2. लेप:</b> मुल्तानी मिट्टी, हल्दी और गुलाब जल का लेप लगाएं।<br><b>3. आहार:</b> बहुत तीखा और खट्टा खाने से बचें।",
+                    HAIR: "<b>🌿 आयुर्वेदिक उपाय:</b><br><b>1. शिरो अभ्यंग:</b> भृंगराज तेल से स्कैल्प की मालिश करें।<br><b>2. हर्बल पानी:</b> आंवला और शिकाकाई के पानी से बाल धोएं।<br><b>3. पोषण:</b> रोजाना भीगे हुए बादाम और अखरोट खाएं।",
+                    EYE: "<b>🌿 आयुर्वेदिक उपाय:</b><br><b>1. नेत्र तर्पण:</b> आँखों पर गुलाब जल के कॉटन पैड रखें।<br><b>2. त्रिफला वॉश:</b> रात भर भीगे त्रिफला के पानी (छानकर) से आँखें धोएं।<br><b>3. नियम:</b> स्क्रीन देखते समय हर 20 मिनट में पलकें झपकाएं।",
+                    STOMACH: "<b>🌿 आयुर्वेदिक उपाय:</b><br><b>1. अग्नि दीपन:</b> खाना खाने से पहले अदरक और सेंधा नमक चबाएं।<br><b>2. सीसीएफ चाय:</b> जीरा, धनिया और सौंफ उबालकर पिएं।<br><b>3. गट सपोर्ट:</b> खाने के बाद भुना जीरा डालकर छाछ पिएं।",
+                    GEN: "<b>🌿 आयुर्वेदिक उपाय:</b><br><b>1. आयुष क्वाथ:</b> तुलसी, अदरक, काली मिर्च और दालचीनी का काढ़ा पिएं।<br><b>2. हल्दी दूध:</b> रात को हल्दी और काली मिर्च वाला गर्म दूध पिएं।<br><b>3. आराम:</b> पूरा आराम करें और सिर्फ गुनगुना पानी पिएं।"
+                },
+                pdf: "📄 रिपोर्ट डाउनलोड करें", book: "📅 अपॉइंटमेंट बुक करें", restart: "🔄 फिर से शुरू करें"
+            },
+            'hinglish': {
+                greet: "Namaste! 🙏 Main SmartCare Clinical Protocol hoon. Apni main problem select karein:",
+                cats: ["Skin / Pimples", "Hair fall / Scalp", "Eyes / Vision", "Stomach / Gas", "Fever / Body ache"],
+                q1: { SKIN: "Bohot itching ya jalan ho rahi hai, ya normal spots hain?", HAIR: "Baal root (white bulb) se gir rahe hain ya beech se toot rahe hain?", EYE: "Aankhon se pani aa raha hai ya sirf redness aur dryness hai?", STOMACH: "Dard bohot tez hai, ya continuous halka dard aur gas hai?", GEN: "Fever continuous hai, ya thand aur body ache ke sath aa raha hai?" },
+                opt1: { SKIN: ["Tez itching", "Burning sensation", "No pain"], HAIR: ["White root se", "Beech se toot rahe", "Pata nahi"], EYE: ["Watery eyes", "Dry aur red", "Blurry vision"], STOMACH: ["Tez aur achanak", "Dull ache & bloating", "Acidity/Jalan"], GEN: ["Continuous fever", "Thand & body ache", "Mild weakness"] },
+                q2: { SKIN: "Haal hi mein koi naya soap use kiya hai ya dhoop mein gaye hain?", HAIR: "Kya aapne pani/shampoo change kiya hai ya stress bohot hai?", EYE: "Kya din mein 6 ghante se zyada screen time hai?", STOMACH: "Spicy khana ya dairy (doodh) lene se problem badhti hai?", GEN: "Sukhi khansi, geeli khansi ya gale mein kharash hai?" },
+                opt2: { SKIN: ["Soap change kiya", "Dhoop mein gaye", "No changes"], HAIR: ["Bohot stress hai", "Water/Shampoo change", "No changes"], EYE: ["Haan, 6+ hours", "Nahi, kam time", "Chot ya dust"], STOMACH: ["Haan, spicy khane se", "Haan, dairy se", "No specific reason"], GEN: ["Dry cough", "Wet cough", "Sore throat"] },
+                q3: { SKIN: "Kya ye body ke baaki parts mein tezi se phail raha hai?", HAIR: "Kya bilkul gol (circular) bald patches ban rahe hain, ya sirf thinning hai?", EYE: "Kya seedhi lines tedhi dikh rahi hain, ya door ka dekhne mein problem hai?", STOMACH: "Pichle 48 hours mein bahar ka khana khaya hai ya travel kiya hai?", GEN: "Kya aap abhi koi antibiotics ya painkiller le rahe hain?" },
+                opt3: { SKIN: ["Tezi se phail raha", "Dheere-dheere", "Sirf ek jagah"], HAIR: ["Gol bald patches", "Overall thinning", "Aage se baal udd rahe"], EYE: ["Lines tedhi hain", "Door ka blurry hai", "Sirf pain hai"], STOMACH: ["Bahar ka khana", "Ghar ka khana", "Travel kiya tha"], GEN: ["Paracetamol li hai", "Antibiotics li hain", "Koi dawa nahi li"] },
+                guideMsg: "Aapki details ke hisaab se ek visual check zaroori hai. Niche click karein.",
+                guideBtn: "Visual Guide Kholein",
+                done: "Maine visual test pura kar liya hai.",
+                reportHead: "📋 Clinical Assessment Report",
+                remedies: {
+                    SKIN: "<b>🌿 Ayurvedic Remedy:</b><br>1. Neem aur Manjistha ka kadha piyein.<br>2. Multani Mitti aur Haldi ka lep lagayein.<br>3. Spicy aur khatti cheezein avoid karein.",
+                    HAIR: "<b>🌿 Ayurvedic Remedy:</b><br>1. Bhringraj oil se scalp massage karein.<br>2. Amla aur Shikakai ke pani se baal dhoyein.<br>3. Bheege hue badam aur akhrot khayein.",
+                    EYE: "<b>🌿 Ayurvedic Remedy:</b><br>1. Aankhon par Gulab Jal ke cotton pads rakhein.<br>2. Raat bhar bheege Triphala ke pani se aankhein dhoyein.<br>3. Screen dekhte waqt har 20 minute mein break lein.",
+                    STOMACH: "<b>🌿 Ayurvedic Remedy:</b><br>1. Khane se pehle adrak aur sendha namak chabayein.<br>2. Jeera, Dhania aur Saunf ka pani ubaal kar piyein.<br>3. Khane ke baad chaas piyein.",
+                    GEN: "<b>🌿 Ayurvedic Remedy:</b><br>1. Tulsi, Adrak aur Kali mirch ka kadha piyein.<br>2. Raat ko Haldi wala doodh piyein.<br>3. Rest karein aur sirf gunguna pani piyein."
+                },
+                pdf: "📄 Report Download Karein", book: "📅 Appointment Book Karein", restart: "🔄 Start Over"
+            },
+            'pa': {
+                greet: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! 🙏 ਆਪਣੀ ਮੁੱਖ ਸਮੱਸਿਆ ਚੁਣੋ:",
+                cats: ["ਚਮੜੀ / ਮੁਹਾਸੇ", "ਵਾਲ ਝੜਨਾ", "ਅੱਖਾਂ ਦੀ ਸਮੱਸਿਆ", "ਢਿੱਡ ਦਰਦ", "ਬੁਖਾਰ / ਆਮ"],
+                q1: { SKIN: "ਕੀ ਬਹੁਤ ਖੁਜਲੀ ਹੈ?", HAIR: "ਕੀ ਵਾਲ ਜੜ੍ਹ ਤੋਂ ਟੁੱਟ ਰਹੇ ਹਨ?", EYE: "ਕੀ ਅੱਖਾਂ ਲਾਲ ਹਨ?", STOMACH: "ਕੀ ਦਰਦ ਬਹੁਤ ਤੇਜ਼ ਹੈ?", GEN: "ਕੀ ਬੁਖਾਰ ਲਗਾਤਾਰ ਹੈ?" },
+                opt1: { SKIN: ["ਹਾਂ, ਖੁਜਲੀ ਹੈ", "ਜਲਨ ਹੈ", "ਕੋਈ ਦਰਦ ਨਹੀਂ"], HAIR: ["ਜੜ੍ਹ ਤੋਂ", "ਵਿਚਕਾਰੋਂ", "ਪਤਾ ਨਹੀਂ"], EYE: ["ਪਾਣੀ ਆਉਂਦਾ ਹੈ", "ਸੁੱਕੀਆਂ", "ਧੁੰਦਲਾਪਣ"], STOMACH: ["ਅਚਾਨਕ ਦਰਦ", "ਹਲਕਾ ਦਰਦ", "ਐਸਿਡਿਟੀ"], GEN: ["ਲਗਾਤਾਰ ਬੁਖਾਰ", "ਠੰਡ ਲੱਗਦੀ ਹੈ", "ਥਕਾਵਟ"] },
+                q2: { SKIN: "ਕੀ ਤੁਸੀਂ ਸਾਬਣ ਬਦਲਿਆ ਹੈ?", HAIR: "ਕੀ ਤੁਸੀਂ ਸ਼ੈਂਪੂ ਬਦਲਿਆ ਹੈ?", EYE: "ਕੀ ਸਕ੍ਰੀਨ ਟਾਈਮ ਜ਼ਿਆਦਾ ਹੈ?", STOMACH: "ਕੀ ਮਸਾਲੇਦਾਰ ਖਾਣਾ ਖਾਧਾ ਹੈ?", GEN: "ਕੀ ਖੰਘ ਵੀ ਹੈ?" },
+                opt2: { SKIN: ["ਸਾਬਣ ਬਦਲਿਆ", "ਧੁੱਪ ਵਿਚ ਗਏ", "ਕੋਈ ਬਦਲਾਅ ਨਹੀਂ"], HAIR: ["ਟੈਂਸ਼ਨ ਹੈ", "ਪਾਣੀ ਬਦਲਿਆ", "ਕੋਈ ਬਦਲਾਅ ਨਹੀਂ"], EYE: ["ਹਾਂ 6 ਘੰਟੇ", "ਨਹੀਂ", "ਸੱਟ ਲੱਗੀ"], STOMACH: ["ਮਸਾਲੇਦਾਰ ਖਾਧਾ", "ਡੇਅਰੀ", "ਨਹੀਂ"], GEN: ["ਸੁੱਕੀ ਖੰਘ", "ਗਿੱਲੀ ਖੰਘ", "ਗਲਾ ਖਰਾਬ"] },
+                q3: { SKIN: "ਕੀ ਇਹ ਫੈਲ ਰਿਹਾ ਹੈ?", HAIR: "ਕੀ ਗੰਜੇਪਨ ਦੇ ਨਿਸ਼ਾਨ ਹਨ?", EYE: "ਕੀ ਲਾਈਨਾਂ ਟੇਢੀਆਂ ਦਿਖਦੀਆਂ ਹਨ?", STOMACH: "ਕੀ ਬਾਹਰੋਂ ਖਾਧਾ ਹੈ?", GEN: "ਕੀ ਦਵਾਈ ਲੈ ਰਹੇ ਹੋ?" },
+                opt3: { SKIN: ["ਤੇਜ਼ੀ ਨਾਲ ਫੈਲ ਰਿਹਾ", "ਹੌਲੀ", "ਇੱਕ ਥਾਂ ਤੇ"], HAIR: ["ਗੋਲ ਨਿਸ਼ਾਨ", "ਵਾਲ ਪਤਲੇ ਹੋਏ", "ਅੱਗੋਂ ਉੱਡ ਰਹੇ"], EYE: ["ਟੇਢੀਆਂ ਲਾਈਨਾਂ", "ਦੂਰ ਦਾ ਧੁੰਦਲਾ", "ਸਿਰਫ਼ ਦਰਦ"], STOMACH: ["ਬਾਹਰੋਂ ਖਾਧਾ", "ਘਰ ਦਾ ਖਾਣਾ", "ਸਫ਼ਰ ਕੀਤਾ"], GEN: ["ਪੈਰਾਸਿਟਾਮੋਲ", "ਐਂਟੀਬਾਇਓਟਿਕ", "ਕੋਈ ਦਵਾਈ ਨਹੀਂ"] },
+                guideMsg: "ਵਿਜ਼ੂਅਲ ਟੈਸਟ ਲਈ ਹੇਠਾਂ ਕਲਿੱਕ ਕਰੋ।", guideBtn: "ਗਾਈਡ ਖੋਲ੍ਹੋ", done: "ਮੈਂ ਟੈਸਟ ਕਰ ਲਿਆ ਹੈ।", reportHead: "📋 ਕਲੀਨਿਕਲ ਰਿਪੋਰਟ",
+                remedies: { SKIN: "🌿 ਆਯੁਰਵੈਦਿਕ ਉਪਾਅ: ਨਿੰਮ ਦਾ ਪਾਣੀ ਪੀਓ।", HAIR: "🌿 ਆਯੁਰਵੈਦਿਕ ਉਪਾਅ: ਭ੍ਰਿੰਗਰਾਜ ਤੇਲ ਲਗਾਓ।", EYE: "🌿 ਆਯੁਰਵੈਦਿਕ ਉਪਾਅ: ਗੁਲਾਬ ਜਲ ਵਰਤੋ।", STOMACH: "🌿 ਆਯੁਰਵੈਦਿਕ ਉਪਾਅ: ਜੀਰਾ ਅਤੇ ਸੌਂਫ ਦਾ ਪਾਣੀ ਪੀਓ।", GEN: "🌿 ਆਯੁਰਵੈਦਿਕ ਉਪਾਅ: ਤੁਲਸੀ ਅਤੇ ਅਦਰਕ ਦਾ ਕਾੜ੍ਹਾ ਪੀਓ।" },
+                pdf: "📄 ਰਿਪੋਰਟ ਡਾਊਨਲੋਡ ਕਰੋ", book: "📅 ਬੁੱਕ ਕਰੋ", restart: "🔄 ਦੁਬਾਰਾ ਸ਼ੁਰੂ ਕਰੋ"
+            },
+            'gu': { greet: "નમસ્તે! 🙏 સ્માર્ટકેર પ્રોટોકોલ. તમારી સમસ્યા પસંદ કરો:", cats: ["ત્વચા (Skin)", "વાળ (Hair)", "આંખ (Eye)", "પેટ (Stomach)", "તાવ (Fever)"], q1: { SKIN:"ખંજવાળ છે?", HAIR:"વાળ મૂળથી ખરે છે?", EYE:"આંખો લાલ છે?", STOMACH:"દુખાવો તીવ્ર છે?", GEN:"તાવ સતત છે?" }, opt1: { SKIN:["ખંજવાળ","બળતરા","ના"], HAIR:["મૂળથી","વચ્ચેથી","ખબર નહિ"], EYE:["પાણી","સૂકી","ઝાખું"], STOMACH:["તીવ્ર","હળવો","ગેસ"], GEN:["સતત","ઠંડી","થાક"] }, q2: { SKIN:"સાબુ બદલ્યો છે?", HAIR:"શેમ્પૂ બદલ્યું?", EYE:"સ્ક્રીન ટાઇમ?", STOMACH:"તીખું ખાધું છે?", GEN:"ઉધરસ છે?" }, opt2: { SKIN:["હા","તડકો","ના"], HAIR:["તણાવ","હા","ના"], EYE:["હા","ના","ઇજા"], STOMACH:["તીખું","ડેરી","ના"], GEN:["સૂકી","ભીની","ગળું"] }, q3: { SKIN:"ફેલાય છે?", HAIR:"ટાલ પડે છે?", EYE:"દૂરનું ઝાખું છે?", STOMACH:"બહારનું ખાધું?", GEN:"દવા લો છો?" }, opt3: { SKIN:["હા","ધીમે","એક જગ્યાએ"], HAIR:["ટાલ","પાતળા","આગળથી"], EYE:["ત્રાંસુ","દૂરનું ઝાખું","દુખાવો"], STOMACH:["બહારનું","ઘરનું","પ્રવાસ"], GEN:["તાવની","એન્ટિબાયોટિક","ના"] }, guideMsg: "વિઝ્યુઅલ ટેસ્ટ માટે નીચે ક્લિક કરો.", guideBtn: "ગાઈડ ખોલો", done: "મેં ટેસ્ટ કરી લીધો છે.", reportHead: "📋 ક્લિનિકલ રિપોર્ટ", remedies: { SKIN: "🌿 લીમડાનું પાણી પીવો.", HAIR: "🌿 ભૃંગરાજ તેલ લગાવો.", EYE: "🌿 ગુલાબ જળ વાપરો.", STOMACH: "🌿 જીરું અને વરિયાળીનું પાણી.", GEN: "🌿 તુલસીનો ઉકાળો." }, pdf: "📄 રિપોર્ટ ડાઉનલોડ કરો", book: "📅 બુક કરો", restart: "🔄 ફરી શરૂ કરો" },
+            'mr': { greet: "नमस्कार! 🙏 स्मार्टकेअर प्रोटोकॉल. तुमची समस्या निवडा:", cats: ["त्वचा (Skin)", "केस (Hair)", "डोळे (Eye)", "पोट (Stomach)", "ताप (Fever)"], q1: { SKIN:"खाज आहे का?", HAIR:"केस मुळापासून गळत आहेत का?", EYE:"डोळे लाल आहेत का?", STOMACH:"वेदना तीव्र आहेत का?", GEN:"ताप सतत आहे का?" }, opt1: { SKIN:["खाज","जळजळ","नाही"], HAIR:["मुळापासून","मध्यापासून","माहित नाही"], EYE:["पाणी","कोरडे","अस्पष्ट"], STOMACH:["तीव्र","सौम्य","गॅस"], GEN:["सतत","थंडी","थकवा"] }, q2: { SKIN:"साबण बदलला का?", HAIR:"शॅम्पू बदलला?", EYE:"स्क्रीन टाईम?", STOMACH:"तिखट खाल्ले का?", GEN:"खोकला आहे का?" }, opt2: { SKIN:["हो","ऊन","नाही"], HAIR:["तणाव","हो","नाही"], EYE:["हो","नाही","दुखापत"], STOMACH:["तिखट","डेअरी","नाही"], GEN:["कोरडा","ओला","घसा"] }, q3: { SKIN:"पसरत आहे का?", HAIR:"टक्कल पडत आहे का?", EYE:"दूरचे अस्पष्ट आहे का?", STOMACH:"बाहेरचे खाल्ले?", GEN:"औषध घेत आहात?" }, opt3: { SKIN:["हो","हळू","एका जागी"], HAIR:["टक्कल","विरळ","पुढून"], EYE:["वाकडे","दूरचे अस्पष्ट","वेदना"], STOMACH:["बाहेरचे","घरचे","प्रवास"], GEN:["तापाची","अँटीबायोटिक","नाही"] }, guideMsg: "व्हिज्युअल टेस्टसाठी खाली क्लिक करा.", guideBtn: "गाईड उघडा", done: "मी टेस्ट पूर्ण केली आहे.", reportHead: "📋 क्लिनिकल रिपोर्ट", remedies: { SKIN: "🌿 कडुलिंबाचे पाणी प्या.", HAIR: "🌿 भृंगराज तेल लावा.", EYE: "🌿 गुलाब जल वापरा.", STOMACH: "🌿 जिरे आणि बडीशेप पाणी.", GEN: "🌿 तुळशीचा काढा." }, pdf: "📄 रिपोर्ट डाउनलोड करा", book: "📅 बुक करा", restart: "🔄 पुन्हा सुरू करा" },
+            'bn': { greet: "নমস্কার! 🙏 স্মার্টকেয়ার। আপনার সমস্যা নির্বাচন করুন:", cats: ["ত্বক (Skin)", "চুল (Hair)", "চোখ (Eye)", "পেট (Stomach)", "জ্বর (Fever)"], q1: { SKIN:"চুলকানি আছে?", HAIR:"চুল গোড়া থেকে পড়ছে?", EYE:"চোখ লাল?", STOMACH:"ব্যথা তীব্র?", GEN:"জ্বর একটানা?" }, opt1: { SKIN:["চুলকানি","জ্বালা","না"], HAIR:["গোড়া থেকে","মাঝখান থেকে","জানি না"], EYE:["জল","শুকনো","ঝাপসা"], STOMACH:["তীব্র","হালকা","গ্যাস"], GEN:["একটানা","ঠান্ডা","ক্লান্তি"] }, q2: { SKIN:"সাবান বদলেছেন?", HAIR:"শ্যাম্পু বদলেছেন?", EYE:"স্ক্রিন টাইম?", STOMACH:"ঝাল খেয়েছেন?", GEN:"কাশি আছে?" }, opt2: { SKIN:["হ্যাঁ","রোদ","না"], HAIR:["মানসিক চাপ","হ্যাঁ","না"], EYE:["হ্যাঁ","না","আঘাত"], STOMACH:["ঝাল","দুগ্ধ","না"], GEN:["শুকনো","ভেজা","গলা"] }, q3: { SKIN:"ছড়াচ্ছে?", HAIR:"টাক পড়ছে?", EYE:"দূরের জিনিস ঝাপসা?", STOMACH:"বাইরের খাবার খেয়েছেন?", GEN:"ওষুধ খাচ্ছেন?" }, opt3: { SKIN:["হ্যাঁ","ধীরে","এক জায়গায়"], HAIR:["টাক","পাতলা","সামনে থেকে"], EYE:["আঁকাবাঁকা","দূরের ঝাপসা","ব্যথা"], STOMACH:["বাইরের","ঘরের","ভ্রমণ"], GEN:["প্যারাসিটামল","অ্যান্টিবায়োটিক","না"] }, guideMsg: "ভিজ্যুয়াল টেস্টের জন্য নিচে ক্লিক করুন।", guideBtn: "গাইড খুলুন", done: "আমি টেস্ট সম্পন্ন করেছি।", reportHead: "📋 ক্লিনিক্যাল রিপোর্ট", remedies: { SKIN: "🌿 নিম পাতা ব্যবহার করুন।", HAIR: "🌿 ভৃঙ্গরাজ তেল মাখুন।", EYE: "🌿 গোলাপ জল দিন।", STOMACH: "🌿 জিরে ও মৌরি জল খান।", GEN: "🌿 তুলসীর ক্বাথ পান করুন।" }, pdf: "📄 রিপোর্ট ডাউনলোড করুন", book: "📅 বুক করুন", restart: "🔄 আবার শুরু করুন" }
+        };
 
-        function handleOptionClick(selectedOption) {
-            const safeOpt = selectedOption.replace(/\\'/g, "'"); 
-            if (safeOpt === '📄 Download Diagnostic Report') { generatePDFReport(); return; }
-            appendMessageHTML(safeOpt, true); 
-            if (safeOpt.includes('Book Appointment')) { window.location.href='booking.html'; return; } 
-            if (safeOpt.includes('Open Skin')) { openGuide('skin'); return; }
-            if (safeOpt.includes('Open Eye')) { openGuide('eye'); return; }
-            if (safeOpt.includes('Open Hair')) { openGuide('hair'); return; }
-            processLocalAI(safeOpt); 
+        const stateCategories = ['SKIN', 'HAIR', 'EYE', 'STOMACH', 'GEN'];
+        let chatState = { step: 'INIT', lang: 'en', cat: '', ans: [] };
+
+        const aiToggleBtn = document.getElementById('ai-widget-toggle'); 
+        const aiChatWindow = document.getElementById('ai-chat-window'); 
+        const closeAiChatBtn = document.getElementById('close-ai-chat'); 
+        const chatMessages = document.getElementById('chat-messages'); 
+        const typingIndicator = document.getElementById('typing-indicator'); 
+        let isChatInitialized = false;
+        
+        function changeLanguage() { 
+            chatState.lang = document.getElementById('chatLangSelect').value; 
+            chatMessages.innerHTML = ''; 
+            processLocalChat(-1); 
         }
 
-        function processLocalAI(msg) {
-            typingIndicator.classList.remove('hidden'); scrollToBottom(); msg = msg.toLowerCase();
+        aiToggleBtn.addEventListener('click', () => { 
+            if(aiChatWindow.classList.contains('hidden')) { 
+                aiChatWindow.classList.remove('hidden'); 
+                aiChatWindow.classList.add('flex'); 
+                const badge = aiToggleBtn.querySelector('.animate-ping'); 
+                if(badge) badge.parentElement.remove(); 
+                if(!isChatInitialized) { processLocalChat(-1); isChatInitialized = true; } 
+            } else { 
+                aiChatWindow.classList.add('hidden'); 
+                aiChatWindow.classList.remove('flex'); 
+            } 
+        });
+
+        closeAiChatBtn.addEventListener('click', () => { 
+            aiChatWindow.classList.add('hidden'); 
+            aiChatWindow.classList.remove('flex'); 
+        });
+
+        function scrollToBottom() { 
+            chatMessages.scrollTop = chatMessages.scrollHeight; 
+        }
+
+        function appendMsg(html, isUser = false) { 
+            chatMessages.innerHTML += `<div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} bubble-enter relative z-10">${!isUser ? '<div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm shadow-md border border-blue-200 flex-shrink-0">🩺</div>' : ''}<div class="${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'} p-3 rounded-2xl max-w-[85%] text-sm shadow-md leading-relaxed">${html}</div></div>`; 
+            scrollToBottom(); 
+        }
+        
+        document.getElementById('chat-send-btn')?.addEventListener('click', () => { 
+            const input = document.getElementById('chat-input'); 
+            const msg = input.value.trim(); 
+            if(msg) { 
+                appendMsg(msg, true); 
+                setTimeout(()=>appendMsg("Please use the buttons provided to ensure accurate diagnosis.", false), 500); 
+                input.value = ''; 
+            } 
+        });
+        document.getElementById('chat-input')?.addEventListener('keypress', (e) => { 
+            if(e.key === 'Enter') document.getElementById('chat-send-btn').click(); 
+        });
+
+        function submitChatAction(actionId, userText) {
+            if(userText) appendMsg(userText, true);
+            typingIndicator.classList.remove('hidden'); 
+            scrollToBottom();
+            
             setTimeout(() => {
-                typingIndicator.classList.add('hidden'); let response = {};
-
-                if (msg.includes('start') || msg.includes('hi') || msg.includes('🔄')) {
-                    localChatState = { step: 'ASK_PRIMARY', data: {} };
-                    response = { reply: "Namaste! 🙏 I am the SmartCare Clinical Assistant.<br><br>Before we generate a diagnosis, I need to ask you a few deep questions to understand your condition perfectly.<br><br><b>What is the primary symptom you are experiencing today?</b>", options: ["Skin issues / Acne", "Hair fall / Weak roots", "Eye strain / Redness", "Stomach Ache / Acidity", "Fever / Cold"] };
-                } 
-                else if (localChatState.step === 'ASK_PRIMARY') {
-                    localChatState.data.primary = msg;
-                    if(msg.includes('skin')||msg.includes('acne')) localChatState.data.cat = 'Dermatology';
-                    else if(msg.includes('hair')||msg.includes('root')) localChatState.data.cat = 'Trichology';
-                    else if(msg.includes('eye')||msg.includes('strain')) localChatState.data.cat = 'Ophthalmology';
-                    else if(msg.includes('stomach')||msg.includes('acid')) localChatState.data.cat = 'Gastroenterology';
-                    else localChatState.data.cat = 'General Medicine';
-                    localChatState.step = 'ASK_DURATION';
-                    response = { reply: `I understand. You are experiencing issues related to <b>${localChatState.data.cat}</b>.<br><br>To get to the root of this, <b>exactly how long have you been experiencing these symptoms?</b> Did they appear suddenly or gradually?`, options: ["Started suddenly today", "Gradually over a few days", "It's been weeks/months"] };
-                }
-                else if (localChatState.step === 'ASK_DURATION') {
-                    localChatState.data.duration = msg;
-                    localChatState.step = 'ASK_SEVERITY';
-                    response = { reply: `Noted. It's important to gauge the intensity.<br><br>On a scale of 1 to 10 (where 10 is unbearable), <b>how severe is the discomfort right now?</b>`, options: ["Mild annoyance (1-3)", "Moderate impact (4-7)", "Severe, completely stopping work (8-10)"] };
-                }
-                else if (localChatState.step === 'ASK_SEVERITY') {
-                    localChatState.data.severity = msg;
-                    localChatState.step = 'ASK_DETAILS';
-                    response = { reply: `Thank you. Sometimes conditions are linked to other body systems.<br><br><b>Are there any other accompanying symptoms?</b> (For example: fever, nausea, radiating pain, fatigue, or changes in sleep patterns?)`, options: ["No other symptoms", "Yes, slight fever/fatigue", "Feeling dizzy/nauseous"] };
-                }
-                else if (localChatState.step === 'ASK_DETAILS') {
-                    localChatState.data.details = msg;
-                    localChatState.step = 'ASK_LIFESTYLE';
-                    response = { reply: `One final question before I compile your assessment:<br><br><b>Have there been any recent drastic changes in your diet, stress levels, or daily routine?</b>`, options: ["No changes", "High stress recently", "Poor diet / Junk food"] };
-                }
-                else if (localChatState.step === 'ASK_LIFESTYLE') {
-                    localChatState.data.lifestyle = msg;
-                    localChatState.step = 'FINAL_TRIAGE';
-                    
-                    if (localChatState.data.cat === 'Dermatology') {
-                        response = { reply: `I have compiled your data. For a complete dermatological assessment, a visual self-check is required.<br><br>Please use our Advanced Skin Evaluation to check for hydration and oil levels. Click below to open the guide.`, options: ["🧴 Open Skin Assessment Guide", "Skip to Report"], triggerGuide: 'skin' };
-                    } else if (localChatState.data.cat === 'Ophthalmology') {
-                        response = { reply: `Your symptom history suggests optical strain or macular issues. 👁️<br><br>Please follow our interactive Eye Guide to perform the Snellen and Amsler tests.`, options: ["👁️ Open Eye Assessment Guide", "Skip to Report"], triggerGuide: 'eye' };
-                    } else if (localChatState.data.cat === 'Trichology') {
-                        response = { reply: `We need to verify your follicular strength and hair porosity based on your stress/diet inputs. 💇‍♂️<br><br>Please run the Scalp Assessment Guide.`, options: ["💇‍♂️ Open Hair Assessment Guide", "Skip to Report"], triggerGuide: 'hair' };
-                    } else {
-                        response = { reply: `Processing your comprehensive medical profile... Please wait.`, options: ["Show Final Report"] };
-                    }
-                }
-                else if (localChatState.step === 'FINAL_TRIAGE') {
-                    let remedies = "";
-                    if(localChatState.data.cat === 'Dermatology') remedies = "<b>Home Remedy:</b> Apply a paste of Neem and Multani Mitti with Rose water to soothe inflammation. Hydrate well if skin feels dry post-pinch test.";
-                    else if(localChatState.data.cat === 'Trichology') remedies = "<b>Home Remedy:</b> Massage scalp with warm Bhringraj or Amla oil. If hair sinks in water (high porosity), use protein-rich aloe vera masks.";
-                    else if(localChatState.data.cat === 'Ophthalmology') remedies = "<b>Home Remedy:</b> Place cool cucumber slices on closed eyelids. Wash eyes gently with filtered Triphala water to reduce digital strain.";
-                    else if(localChatState.data.cat === 'Gastroenterology') remedies = "<b>Home Remedy:</b> Boil Jeera (Cumin) and Saunf (Fennel) in water. Drink it lukewarm after meals to balance digestion.";
-                    else remedies = "<b>Home Remedy:</b> Drink hot Tulsi-Ginger Kadha. A warm glass of Haldi Doodh (Turmeric Milk) before bed aids systemic immunity.";
-
-                    let report = `<div class="report-card"><h4 style="color:#0f172a; font-weight:900; border-bottom:1px solid #e2e8f0; padding-bottom:8px; margin-bottom:8px;">📋 Clinical Assessment Summary</h4><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>Primary Issue:</b> ${localChatState.data.primary}</p><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>Duration:</b> ${localChatState.data.duration}</p><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>Severity:</b> ${localChatState.data.severity}</p><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>Other Symptoms:</b> ${localChatState.data.details}</p><p style="font-size:12px; color:#475569; margin-bottom:8px;"><b>Lifestyle Factors:</b> ${localChatState.data.lifestyle}</p>`;
-                    
-                    if (localChatState.data.severity.includes('severe') || localChatState.data.severity.includes('8') || localChatState.data.severity.includes('10')) {
-                        report += `<div style="background:#fef2f2; color:#b91c1c; padding:8px; border-radius:6px; font-size:11px; font-weight:bold; margin-bottom:8px;">🚨 CRITICAL: High Probability Match. Immediate physical evaluation recommended.</div>`;
-                    } else {
-                        report += `<div style="background:#ecfdf5; color:#047857; padding:8px; border-radius:6px; font-size:11px; font-weight:bold; margin-bottom:8px;">ℹ️ STABLE: Routine Match. Monitor for 48 hours.</div>`;
-                    }
-                    report += `<div class="remedy-highlight">🌿 ${remedies}</div></div>`;
-                    
-                    localChatState.step = 'INIT';
-                    response = { reply: report, dept: localChatState.data.cat, options: ["📄 Download Diagnostic Report", "📅 Book Appointment", "🔄 Start Over"] };
-                }
-
-                let botHTML = `<span>${response.reply}</span>`; 
-                if (response.dept) botHTML += `<br><span class="dept-highlight">✅ Recommended Department: ${response.dept}</span>`; 
-                if (response.options) { botHTML += `<div class="options-container">`; response.options.forEach(opt => { botHTML += `<button class="chat-option-btn" onclick="handleOptionClick('${opt.replace(/'/g, "\\'")}')">${opt}</button>`; }); botHTML += `</div>`; } 
-                appendMessageHTML(botHTML, false); 
-                if (response.triggerGuide) { setTimeout(() => { openGuide(response.triggerGuide); }, 2000); }
-
-            }, 1000);
+                typingIndicator.classList.add('hidden');
+                processLocalChat(actionId);
+            }, 800);
         }
 
-        // 🌟 ENTERPRISE PDF GENERATOR (NO AI MENTION, PREMIUM UI)
+        // 🌟 DEEP STATE MACHINE (No Loop Bugs, No Scale)
+        function processLocalChat(actionId) {
+            const db = i18n[chatState.lang];
+            let botHTML = "";
+
+            if (actionId === -1 || actionId === -100) { 
+                chatState = { step: 'Q1', lang: chatState.lang, cat: '', ans: [] };
+                botHTML = `<span>${db.greet}</span><div class="options-container">`;
+                db.cats.forEach((catName, idx) => { 
+                    const safeOpt = catName.replace(/'/g, "\\'");
+                    botHTML += `<button class="chat-option-btn" onclick="submitChatAction(${idx}, '${safeOpt}')">${catName}</button>`; 
+                });
+                botHTML += `</div>`;
+            } 
+            else if (chatState.step === 'Q1') {
+                chatState.cat = stateCategories[actionId];
+                chatState.step = 'Q2';
+                botHTML = `<span>${db.q1[chatState.cat]}</span><div class="options-container">`;
+                db.opt1[chatState.cat].forEach((opt, idx) => { 
+                    const safeOpt = opt.replace(/'/g, "\\'");
+                    botHTML += `<button class="chat-option-btn" onclick="submitChatAction(${idx}, '${safeOpt}')">${opt}</button>`; 
+                });
+                botHTML += `</div>`;
+            }
+            else if (chatState.step === 'Q2') {
+                chatState.ans.push(db.opt1[chatState.cat][actionId]);
+                chatState.step = 'Q3';
+                botHTML = `<span>${db.q2[chatState.cat]}</span><div class="options-container">`;
+                db.opt2[chatState.cat].forEach((opt, idx) => { 
+                    const safeOpt = opt.replace(/'/g, "\\'");
+                    botHTML += `<button class="chat-option-btn" onclick="submitChatAction(${idx}, '${safeOpt}')">${opt}</button>`; 
+                });
+                botHTML += `</div>`;
+            }
+            else if (chatState.step === 'Q3') {
+                chatState.ans.push(db.opt2[chatState.cat][actionId]);
+                chatState.step = 'TRIGGER_GUIDE';
+                botHTML = `<span>${db.q3[chatState.cat]}</span><div class="options-container">`;
+                db.opt3[chatState.cat].forEach((opt, idx) => { 
+                    const safeOpt = opt.replace(/'/g, "\\'");
+                    botHTML += `<button class="chat-option-btn" onclick="submitChatAction(${idx}, '${safeOpt}')">${opt}</button>`; 
+                });
+                botHTML += `</div>`;
+            }
+            else if (chatState.step === 'TRIGGER_GUIDE') {
+                chatState.ans.push(db.opt3[chatState.cat][actionId]);
+                chatState.step = 'FINAL';
+                
+                if (['SKIN', 'HAIR', 'EYE'].includes(chatState.cat)) {
+                    botHTML = `<span>${db.guideMsg}</span><div class="options-container">`;
+                    botHTML += `<button class="chat-option-btn" style="background:#2563eb; color:white; border-color:#2563eb;" onclick="openGuide('${chatState.cat.toLowerCase()}');">${db.guideBtn}</button></div>`;
+                } else {
+                    processLocalChat(-2); // Skip guide for Stomach/Fever
+                    return;
+                }
+            }
+            else if (actionId === -2) { 
+                if(chatState.step === 'FINAL' && ['SKIN', 'HAIR', 'EYE'].includes(chatState.cat)) {
+                    appendMsg(db.done, true);
+                }
+                setTimeout(() => {
+                    typingIndicator.classList.add('hidden');
+                    let report = `<div class="report-card" id="finalAIReportNode"><h4 style="color:#0f172a; font-weight:900; border-bottom:1px solid #e2e8f0; padding-bottom:8px; margin-bottom:8px;">${db.reportHead}</h4><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>Category:</b> ${chatState.cat}</p><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>A1:</b> ${chatState.ans[0]}</p><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>A2:</b> ${chatState.ans[1]}</p><p style="font-size:12px; color:#475569; margin-bottom:4px;"><b>A3:</b> ${chatState.ans[2]}</p>`;
+                    report += `<div class="remedy-highlight">${db.remedies[chatState.cat]}</div></div>`;
+                    
+                    let finalHTML = `<span>${report}</span><div class="options-container"><button class="chat-option-btn" onclick="generatePDFReport()">${db.pdf}</button><button class="chat-option-btn" onclick="window.location.href='booking.html'">${db.book}</button><button class="chat-option-btn" onclick="submitChatAction(-100, null)">${db.restart}</button></div>`;
+                    appendMsg(finalHTML, false);
+                }, 800);
+                return;
+            }
+            appendMsg(botHTML, false);
+        }
+
+        // 🌟 ENTERPRISE PDF GENERATOR (Multi-language Support, No "AI")
         function generatePDFReport() {
             const patientName = document.getElementById('profileCardName') ? document.getElementById('profileCardName').innerText : 'Guest Patient';
             const patientId = document.getElementById('profileCardId') ? document.getElementById('profileCardId').innerText : 'SC-UNREGISTERED';
@@ -258,30 +478,25 @@
             
             const chatBubbles = document.querySelectorAll('#chat-messages .report-card');
             let rawHtml = "<p>No recent diagnosis data found.</p>";
-            if(chatBubbles.length > 0) {
-                rawHtml = chatBubbles[chatBubbles.length - 1].innerHTML;
+            if(chatBubbles.length > 0) { 
+                rawHtml = chatBubbles[chatBubbles.length - 1].innerHTML; 
             }
 
             const printWindow = window.open('', '_blank');
             const template = `
-                <html>
-                <head>
-                    <title>SmartCare Diagnostic Report</title>
+                <html><head><title>SmartCare Diagnostic Report</title>
                     <style>
                         body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; padding: 50px; max-width: 850px; margin: 0 auto; background: #ffffff; }
                         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; padding-bottom: 20px; margin-bottom: 40px; }
                         .logo-area h1 { margin: 0; color: #2563eb; font-size: 32px; font-weight: 900; letter-spacing: -1px; }
                         .logo-area p { margin: 4px 0 0 0; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
-                        .doc-meta { text-align: right; font-size: 13px; color: #475569; }
-                        .doc-meta strong { color: #0f172a; }
+                        .doc-meta { text-align: right; font-size: 13px; color: #475569; } .doc-meta strong { color: #0f172a; }
                         .patient-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-                        .p-row { font-size: 14px; }
-                        .p-row span:first-child { font-weight: bold; color: #64748b; display: inline-block; width: 130px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;}
+                        .p-row { font-size: 14px; } .p-row span:first-child { font-weight: bold; color: #64748b; display: inline-block; width: 130px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;}
                         .p-row span:last-child { font-weight: 700; color: #0f172a; font-size: 15px; }
                         .report-section { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
                         .report-section h4 { font-size: 20px; color: #0f172a; margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
                         .report-section p { font-size: 15px; line-height: 1.8; color: #334155; margin-bottom: 12px; }
-                        .report-section b { color: #0f172a; }
                         .remedy-highlight { margin-top: 25px; padding: 20px; background-color: #fef3c7; color: #92400e; border-left: 5px solid #f59e0b; border-radius: 4px 12px 12px 4px; font-weight: 600; font-size: 14px; }
                         .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 120px; font-weight: 900; color: rgba(37, 99, 235, 0.03); z-index: -1; pointer-events: none; white-space: nowrap; }
                         .footer { margin-top: 60px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 30px; }
@@ -291,37 +506,22 @@
                 <body>
                     <div class="watermark">SMARTCARE</div>
                     <div class="header">
-                        <div class="logo-area">
-                            <h1>SC SmartCare</h1>
-                            <p>Automated Clinical Protocol</p>
-                        </div>
-                        <div class="doc-meta">
-                            <div>Date: <strong>${date}</strong></div>
-                            <div style="margin-top:5px;">Report ID: <strong>SC-REP-${Math.floor(Math.random()*90000) + 10000}</strong></div>
-                        </div>
+                        <div class="logo-area"><h1>SC SmartCare</h1><p>Automated Clinical Protocol</p></div>
+                        <div class="doc-meta"><div>Date: <strong>${date}</strong></div><div style="margin-top:5px;">Report ID: <strong>SC-REP-${Math.floor(Math.random()*90000) + 10000}</strong></div></div>
                     </div>
                     <div class="patient-box">
-                        <div class="p-row"><span>Patient Name:</span> <span>${patientName}</span></div>
-                        <div class="p-row"><span>Patient ID:</span> <span>${patientId}</span></div>
-                        <div class="p-row"><span>Generated By:</span> <span>SmartCare Digital Protocol</span></div>
-                        <div class="p-row"><span>Status:</span> <span style="color:#2563eb;">Verified Assessment</span></div>
+                        <div class="p-row"><span>Patient Name:</span> <span>${patientName}</span></div><div class="p-row"><span>Patient ID:</span> <span>${patientId}</span></div>
+                        <div class="p-row"><span>Generated By:</span> <span>SmartCare Digital Protocol</span></div><div class="p-row"><span>Status:</span> <span style="color:#2563eb;">Verified Assessment</span></div>
                     </div>
-                    <div class="report-section">
-                        ${rawHtml}
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="stamp">VALIDATED VIA SMARTCARE</div>
-                    </div>
-                    <div class="footer">
-                        <p><b>Important Medical Disclaimer:</b> This document is generated through the SmartCare Automated Clinical Protocol based on self-reported patient symptoms and includes traditional wellness practices. It is for informational triage purposes and does NOT substitute professional medical diagnosis, prescription, or in-person treatment.</p>
-                        <p style="margin-top: 10px;">Powered By SmartCare Health Technologies © 2026. All rights reserved.</p>
-                    </div>
-                </body>
-                </html>
+                    <div class="report-section">${rawHtml}</div>
+                    <div style="text-align: right;"><div class="stamp">VALIDATED VIA SMARTCARE</div></div>
+                    <div class="footer"><p><b>Important Medical Disclaimer:</b> This document is generated through the SmartCare Automated Clinical Protocol based on self-reported patient symptoms and includes traditional wellness practices. It is for informational triage purposes and does NOT substitute professional medical diagnosis, prescription, or in-person treatment.</p><p style="margin-top: 10px;">Powered By SmartCare Health Technologies © 2026. All rights reserved.</p></div>
+                </body></html>
             `;
             printWindow.document.write(template); printWindow.document.close(); printWindow.focus();
             setTimeout(() => { printWindow.print(); printWindow.close(); }, 750);
         }
+
     </script>
 </body>
 </html>
