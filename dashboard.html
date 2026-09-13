@@ -6,12 +6,7 @@
     <title>My Health Portal - SmartCare</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; } 
-        .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #e2e8f0; }
-        .scanner-line { width: 100%; height: 2px; background: #22c55e; box-shadow: 0 0 10px #22c55e, 0 0 20px #22c55e; position: absolute; top: 0; left: 0; animation: scan 2s infinite linear; }
-        @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
-    </style>
+    <style>body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; } .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #e2e8f0; }</style>
 </head>
 <body class="text-slate-800 antialiased">
 
@@ -31,156 +26,91 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 md:px-8 pt-28 md:pt-32 pb-20">
-        
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-            <div>
-                <h1 class="text-2xl md:text-4xl font-black text-slate-900 mb-1"><span id="timeGreeting">Hello</span>, <span id="patientName" class="text-blue-600">Loading...</span></h1>
-                <p class="text-sm md:text-base text-slate-500 font-medium" id="currentDate">Here is your clinical summary.</p>
-            </div>
-            <a href="booking.html" class="md:hidden w-full text-center bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-900 transition">➕ Book New Consultation</a>
+            <div><h1 class="text-2xl md:text-4xl font-black text-slate-900 mb-1"><span id="timeGreeting">Hello</span>, <span id="patientName" class="text-blue-600">Loading...</span></h1><p class="text-sm md:text-base text-slate-500 font-medium" id="currentDate">Here is your clinical summary.</p></div>
+            <a href="booking.html" class="md:hidden w-full text-center bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-900 transition">➕ Book Consult</a>
         </div>
 
-        <!-- 🌟 VITALS SECTION -->
-        <div class="mb-4 flex justify-between items-center">
-            <h3 class="font-black text-lg text-slate-800">My Health Vitals</h3>
-            <button onclick="openVitalsModal()" class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg shadow-sm hover:bg-blue-600 hover:text-white transition">✏️ Edit Vitals</button>
-        </div>
-
+        <div class="mb-4 flex justify-between items-center"><h3 class="font-black text-lg text-slate-800">My Health Vitals</h3><button onclick="openVitalsModal()" class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg shadow-sm hover:bg-blue-600 hover:text-white transition">✏️ Edit Vitals</button></div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition">
-                <div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-lg">🩸</span><span class="text-[10px] font-bold text-slate-400 uppercase">Blood Group</span></div>
-                <h3 class="text-2xl font-black text-slate-800" id="ui-bg">--</h3>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition">
-                <div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center text-lg">❤️</span><span class="text-[10px] font-bold text-slate-400 uppercase">Heart Rate</span></div>
-                <h3 class="text-2xl font-black text-slate-800"><span id="ui-hr">--</span> <span class="text-sm text-slate-400 font-bold">bpm</span></h3>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition">
-                <div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-lg">🩺</span><span class="text-[10px] font-bold text-slate-400 uppercase">Blood Pressure</span></div>
-                <h3 class="text-2xl font-black text-slate-800" id="ui-bp">--/--</h3>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition">
-                <div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-lg">⚖️</span><span class="text-[10px] font-bold text-slate-400 uppercase">Weight</span></div>
-                <h3 class="text-2xl font-black text-slate-800"><span id="ui-wt">--</span> <span class="text-sm text-slate-400 font-bold">kg</span></h3>
-            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition"><div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-lg">🩸</span><span class="text-[10px] font-bold text-slate-400 uppercase">Blood Group</span></div><h3 class="text-2xl font-black text-slate-800" id="ui-bg">--</h3></div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition"><div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center text-lg">❤️</span><span class="text-[10px] font-bold text-slate-400 uppercase">Heart Rate</span></div><h3 class="text-2xl font-black text-slate-800"><span id="ui-hr">--</span> <span class="text-sm text-slate-400 font-bold">bpm</span></h3></div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition"><div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-lg">🩺</span><span class="text-[10px] font-bold text-slate-400 uppercase">Blood Pressure</span></div><h3 class="text-2xl font-black text-slate-800" id="ui-bp">--/--</h3></div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition"><div class="flex justify-between items-start mb-2"><span class="w-10 h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-lg">⚖️</span><span class="text-[10px] font-bold text-slate-400 uppercase">Weight</span></div><h3 class="text-2xl font-black text-slate-800"><span id="ui-wt">--</span> <span class="text-sm text-slate-400 font-bold">kg</span></h3></div>
         </div>
 
-        <!-- 🌟 AI DIAGNOSTICS SECTION -->
-        <h3 class="font-black text-lg text-slate-800 mb-4 flex items-center gap-2"><span>🧬</span> AI Virtual Diagnostics <span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest border border-purple-200 ml-2">Beta</span></h3>
+        <!-- 🌟 REPLACED: CLINICAL SELF-ASSESSMENT GUIDES -->
+        <h3 class="font-black text-lg text-slate-800 mb-4 flex items-center gap-2"><span>🧬</span> Clinical Self-Assessment Guides <span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest border border-purple-200 ml-2">Beta</span></h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl shadow-lg border border-slate-700 text-white relative overflow-hidden group">
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl shadow-lg border border-slate-700 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition" onclick="openGuide('skin')">
                 <div class="absolute right-[-20px] top-[-20px] opacity-10 text-8xl group-hover:scale-110 transition duration-500">🧴</div>
-                <h4 class="text-xl font-black mb-2">Skin Analyzer</h4>
-                <p class="text-xs text-slate-400 font-medium mb-5">Detect acne, pigmentation & UV damage instantly.</p>
-                <button onclick="startAiScan('Skin Analyzer')" class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold hover:bg-blue-50 transition shadow-md">📷 Start Scan</button>
+                <h4 class="text-xl font-black mb-2">Skin Evaluation</h4>
+                <p class="text-xs text-slate-400 font-medium mb-5">Step-by-step guide to check moles, rashes, and hydration.</p>
+                <button class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold shadow-md">📖 Open Guide</button>
             </div>
-            <div class="bg-gradient-to-br from-blue-900 to-indigo-900 p-6 rounded-2xl shadow-lg border border-indigo-700 text-white relative overflow-hidden group">
+            <div class="bg-gradient-to-br from-blue-900 to-indigo-900 p-6 rounded-2xl shadow-lg border border-indigo-700 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition" onclick="openGuide('eye')">
                 <div class="absolute right-[-20px] top-[-20px] opacity-10 text-8xl group-hover:scale-110 transition duration-500">👁️</div>
-                <h4 class="text-xl font-black mb-2">Eye & Vision Test</h4>
-                <p class="text-xs text-slate-300 font-medium mb-5">Sclera analysis and screen fatigue detection.</p>
-                <button onclick="startAiScan('Eye & Vision Check')" class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-50 transition shadow-md">📷 Start Scan</button>
+                <h4 class="text-xl font-black mb-2">Eye & Vision Check</h4>
+                <p class="text-xs text-slate-300 font-medium mb-5">Sclera analysis and at-home visual acuity testing.</p>
+                <button class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold shadow-md">📖 Open Guide</button>
             </div>
-            <div class="bg-gradient-to-br from-amber-900 to-orange-900 p-6 rounded-2xl shadow-lg border border-orange-700 text-white relative overflow-hidden group">
+            <div class="bg-gradient-to-br from-amber-900 to-orange-900 p-6 rounded-2xl shadow-lg border border-orange-700 text-white relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition" onclick="openGuide('hair')">
                 <div class="absolute right-[-20px] top-[-20px] opacity-10 text-8xl group-hover:scale-110 transition duration-500">💇‍♂️</div>
                 <h4 class="text-xl font-black mb-2">Scalp & Hair Health</h4>
-                <p class="text-xs text-slate-300 font-medium mb-5">Analyze follicular density and scalp condition.</p>
-                <button onclick="startAiScan('Scalp Analyzer')" class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold hover:bg-orange-50 transition shadow-md">📷 Start Scan</button>
+                <p class="text-xs text-slate-300 font-medium mb-5">Instructions for the pull-test and scalp condition review.</p>
+                <button class="bg-white text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold shadow-md">📖 Open Guide</button>
             </div>
         </div>
 
-        <!-- 🌟 MAIN GRID -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 space-y-8">
-                
                 <div>
                     <h3 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2"><span>🚨</span> Next Upcoming Visit</h3>
-                    <div id="nextApptBox" class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-[2rem] p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500 opacity-20 blur-3xl rounded-full"></div>
-                        <p class="text-slate-400 font-medium">Fetching upcoming schedule...</p>
-                    </div>
+                    <div id="nextApptBox" class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-[2rem] p-6 md:p-8 text-white shadow-xl relative overflow-hidden"><div class="absolute top-0 right-0 w-48 h-48 bg-blue-500 opacity-20 blur-3xl rounded-full"></div><p class="text-slate-400 font-medium">Fetching schedule...</p></div>
                 </div>
-
                 <div>
                     <h3 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2"><span>📋</span> Medical History</h3>
-                    <div class="bg-white rounded-[1.5rem] shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm text-slate-600">
-                                <thead class="text-[10px] md:text-xs text-slate-400 uppercase bg-slate-50 border-b border-slate-100 font-bold whitespace-nowrap">
-                                    <tr><th class="px-6 py-4">ID</th><th class="px-6 py-4">Specialist & Dept</th><th class="px-6 py-4">Date & Time</th><th class="px-6 py-4">Status</th><th class="px-6 py-4 text-center">Live Queue</th></tr>
-                                </thead>
-                                <tbody id="myApptList" class="divide-y divide-slate-50">
-                                    <tr><td colspan="5" class="p-12 text-center text-slate-400 font-bold">Loading records...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <div class="bg-white rounded-[1.5rem] shadow-sm border border-slate-200 overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-left text-sm text-slate-600"><thead class="text-[10px] md:text-xs text-slate-400 uppercase bg-slate-50 border-b border-slate-100 font-bold whitespace-nowrap"><tr><th class="px-6 py-4">ID</th><th class="px-6 py-4">Specialist & Dept</th><th class="px-6 py-4">Date & Time</th><th class="px-6 py-4">Status</th><th class="px-6 py-4 text-center">Live Queue</th></tr></thead><tbody id="myApptList" class="divide-y divide-slate-50"><tr><td colspan="5" class="p-12 text-center text-slate-400 font-bold">Loading records...</td></tr></tbody></table></div></div>
                 </div>
             </div>
-
             <div class="space-y-6">
-                <!-- Patient Profile -->
-                <div class="bg-white rounded-[2rem] p-8 border border-slate-200 shadow-sm text-center">
-                    <div id="patientInitials" class="w-24 h-24 bg-blue-100 text-blue-600 rounded-full mx-auto flex items-center justify-center text-3xl font-black mb-4 shadow-inner">--</div>
-                    <h3 id="profileCardName" class="text-xl font-black text-slate-900">Loading...</h3>
-                    <p id="profileCardEmail" class="text-sm font-bold text-slate-500 mb-6">...</p>
-                    <div class="grid grid-cols-2 gap-4 text-left border-t border-slate-100 pt-6">
-                        <div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Patient ID</p><p id="profileCardId" class="font-black text-slate-800">SC-...</p></div>
-                        <div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Member Since</p><p id="profileCardDate" class="font-black text-slate-800">...</p></div>
-                    </div>
-                </div>
+                <div class="bg-white rounded-[2rem] p-8 border border-slate-200 shadow-sm text-center"><div id="patientInitials" class="w-24 h-24 bg-blue-100 text-blue-600 rounded-full mx-auto flex items-center justify-center text-3xl font-black mb-4 shadow-inner">--</div><h3 id="profileCardName" class="text-xl font-black text-slate-900">Loading...</h3><p id="profileCardEmail" class="text-sm font-bold text-slate-500 mb-6">...</p><div class="grid grid-cols-2 gap-4 text-left border-t border-slate-100 pt-6"><div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Patient ID</p><p id="profileCardId" class="font-black text-slate-800">SC-...</p></div><div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Member Since</p><p id="profileCardDate" class="font-black text-slate-800">...</p></div></div></div>
+                <div class="bg-white rounded-[2rem] p-6 border border-slate-200 shadow-sm"><h3 class="text-sm font-black text-slate-800 mb-4 uppercase tracking-widest">Quick Actions</h3><div class="space-y-3"><a href="index.html" class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition group"><div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-lg shadow-sm group-hover:text-blue-600">🩺</div><div><h4 class="font-bold text-slate-800 text-sm">Consult Virtual Doctor</h4><p class="text-[10px] text-slate-500 font-medium mt-0.5">Get instant AI triage</p></div></a><a href="booking.html" class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-green-300 hover:bg-green-50 transition group"><div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-lg shadow-sm group-hover:text-green-600">📅</div><div><h4 class="font-bold text-slate-800 text-sm">Book New Appointment</h4><p class="text-[10px] text-slate-500 font-medium mt-0.5">Schedule a clinical visit</p></div></a></div></div>
             </div>
         </div>
     </main>
 
-    <!-- 🌟 EDIT VITALS MODAL -->
-    <div id="vitalsModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 transition-opacity p-4">
-        <div class="bg-white rounded-[2rem] p-6 md:p-8 w-full max-w-sm shadow-2xl transform scale-95 relative transition-transform">
-            <button onclick="closeVitalsModal()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
-            <h2 class="text-2xl font-black text-slate-900 mb-1">Update Vitals</h2>
-            <form id="vitalsForm" class="space-y-4 mt-5">
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Blood Group</label><select id="form-bg" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option><option>Unknown</option></select></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Heart Rate (bpm)</label><input type="number" id="form-hr" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Blood Pressure</label><input type="text" id="form-bp" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Weight (kg)</label><input type="number" id="form-wt" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"></div>
-                <button type="submit" id="vitalSubmitBtn" class="w-full bg-blue-600 text-white p-3.5 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition">Save Vitals</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 🌟 QUEUE MODAL -->
-    <div id="queueModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 transition-opacity p-4">
-        <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl transform scale-95 relative transition-transform text-center">
-            <button onclick="closeQueueModal()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button>
-            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 shadow-inner">📍</div>
-            <h2 class="text-2xl font-black text-slate-900 mb-1">Live Queue Sync</h2>
-            <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-4 mt-6"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Patients Ahead</p><p class="text-4xl font-black text-slate-800" id="queuePatients">--</p></div>
-            <div class="bg-blue-600 rounded-2xl p-5 text-white shadow-lg"><p class="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-1">Estimated Wait</p><p class="text-3xl font-black"><span id="queueTime">--</span> <span class="text-sm font-bold">Mins</span></p></div>
-        </div>
-    </div>
-
-    <!-- 🌟 AI SCANNER MODAL -->
-    <div id="aiScanModal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[200] flex items-center justify-center opacity-0 transition-opacity p-4">
-        <div class="bg-white rounded-[2rem] w-full max-w-md shadow-2xl transform scale-95 relative transition-transform overflow-hidden flex flex-col">
+    <!-- 🌟 CLINICAL GUIDE MODAL -->
+    <div id="guideModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] flex items-center justify-center opacity-0 transition-opacity p-4">
+        <div class="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl transform scale-95 relative transition-transform overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <div><h2 class="text-lg font-black text-slate-900" id="scanTitle">AI Scanner</h2><p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Powered by SmartCare</p></div>
-                <button onclick="closeAiScan()" class="text-slate-400 hover:text-rose-500 transition text-2xl font-bold">✖</button>
+                <div><h2 class="text-xl font-black text-slate-900" id="guideTitle">Assessment Guide</h2><p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Clinical Protocol</p></div>
+                <button onclick="closeGuide()" class="text-slate-400 hover:text-rose-500 transition text-2xl font-bold">✖</button>
             </div>
-            <div class="p-6 flex flex-col items-center">
-                <div class="relative w-full h-64 bg-slate-900 rounded-2xl overflow-hidden shadow-inner mb-6 border-4 border-slate-100">
-                    <video id="scanVideo" class="w-full h-full object-cover" autoplay playsinline muted></video>
-                    <div id="scannerOverlay" class="hidden scanner-line"></div>
-                    <div id="scanPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500"><span class="text-4xl mb-2">📷</span><p class="text-xs font-bold uppercase tracking-widest">Camera Inactive</p></div>
-                </div>
-                <div id="scanResults" class="hidden w-full bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4 text-left">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Clinical AI Impression</p>
-                    <p id="scanReportText" class="text-sm font-bold text-slate-700 leading-relaxed"></p>
-                </div>
-                <button id="startScanBtn" onclick="runAiScan()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-black shadow-lg hover:bg-slate-900 transition uppercase tracking-wide">Grant Camera & Scan</button>
+            <div class="p-6 overflow-y-auto" id="guideContent"></div>
+            <div class="p-5 border-t border-slate-100 bg-slate-50 text-center">
+                <button onclick="closeGuide()" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-blue-600 transition">I have completed the check</button>
             </div>
         </div>
     </div>
 
-    <!-- 🌟 NEW: 100% REAL VIDEO CALL MODAL (Powered by Jitsi) -->
+    <!-- 🌟 NEW: REAL-TIME INCOMING CALL POPUP -->
+    <div id="incomingCallModal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[500] flex items-center justify-center">
+        <div class="bg-slate-800 p-8 rounded-[2rem] text-center shadow-2xl border border-slate-700 w-full max-w-sm relative overflow-hidden">
+            <div class="absolute inset-0 bg-blue-500 opacity-20 animate-pulse blur-3xl"></div>
+            <div class="relative z-10">
+                <div class="w-24 h-24 bg-blue-600 rounded-full mx-auto flex items-center justify-center text-4xl mb-6 shadow-[0_0_30px_rgba(37,99,235,0.6)] animate-bounce">👨‍⚕️</div>
+                <h2 class="text-white text-2xl font-black mb-1">Incoming Video Call</h2>
+                <p class="text-slate-400 font-medium mb-8 text-sm">from <span class="font-bold text-white" id="incomingDocName">Dr. Specialist</span></p>
+                <div class="flex justify-center gap-8">
+                    <button onclick="rejectCall()" class="w-16 h-16 bg-rose-500 rounded-full text-white text-2xl hover:bg-rose-600 shadow-lg flex items-center justify-center">✖</button>
+                    <button onclick="acceptCall()" class="w-16 h-16 bg-green-500 rounded-full text-white text-2xl hover:bg-green-600 shadow-[0_0_20px_rgba(34,197,94,0.5)] flex items-center justify-center animate-pulse">📹</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 JITSI VIDEO ROOM MODAL -->
     <div id="videoCallModal" class="hidden fixed inset-0 bg-slate-900 z-[300] flex flex-col opacity-0 transition-opacity">
         <div class="p-4 flex justify-between items-center bg-slate-800 absolute w-full top-0 z-50 shadow-md">
             <div class="flex items-center gap-3"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-white font-bold text-sm tracking-wide" id="callHeaderName">Live Consultation</span></div>
@@ -189,143 +119,111 @@
         <div id="jitsiContainer" class="flex-1 w-full h-full mt-[60px] bg-black"></div>
     </div>
 
+    <!-- Edit Vitals & Queue Modals (Kept Hidden Here for Brevity, but you should keep your existing ones) -->
+    <div id="vitalsModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 transition-opacity p-4"><div class="bg-white rounded-[2rem] p-6 md:p-8 w-full max-w-sm shadow-2xl transform scale-95 relative transition-transform"><button onclick="closeVitalsModal()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button><h2 class="text-2xl font-black text-slate-900 mb-1">Update Vitals</h2><form id="vitalsForm" class="space-y-4 mt-5"><div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Blood Group</label><select id="form-bg" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option><option>Unknown</option></select></div><div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Heart Rate (bpm)</label><input type="number" id="form-hr" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"></div><div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Blood Pressure</label><input type="text" id="form-bp" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"></div><div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Weight (kg)</label><input type="number" id="form-wt" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 text-sm font-bold text-slate-800"></div><button type="submit" id="vitalSubmitBtn" class="w-full bg-blue-600 text-white p-3.5 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition mt-2">Save Vitals</button></form></div></div>
+    <div id="queueModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 transition-opacity p-4"><div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl transform scale-95 relative transition-transform text-center"><button onclick="closeQueueModal()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-800 transition text-2xl font-bold">✖</button><div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 shadow-inner">📍</div><h2 class="text-2xl font-black text-slate-900 mb-1">Live Queue Sync</h2><div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-4 mt-6"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Patients Ahead</p><p class="text-4xl font-black text-slate-800" id="queuePatients">--</p></div><div class="bg-blue-600 rounded-2xl p-5 text-white shadow-lg"><p class="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-1">Estimated Wait</p><p class="text-3xl font-black"><span id="queueTime">--</span> <span class="text-sm font-bold">Mins</span></p></div></div></div>
+
+    <!-- Audio for Ringtone -->
+    <audio id="ringtone" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" loop></audio>
+
     <script>
         const token = localStorage.getItem('smartcare_jwt'); const role = localStorage.getItem('smartcare_role');
         if (!token || role !== 'patient') { window.location.href = 'index.html'; }
         function logout() { localStorage.removeItem('smartcare_jwt'); localStorage.removeItem('smartcare_role'); window.location.href = 'index.html'; }
 
-        function updateGreeting() {
-            const hour = new Date().getHours(); let greeting = "Good Evening";
-            if (hour < 12) greeting = "Good Morning"; else if (hour < 18) greeting = "Good Afternoon";
-            document.getElementById('timeGreeting').innerText = greeting;
-            document.getElementById('currentDate').innerText = "Today is " + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        } updateGreeting();
+        function updateGreeting() { const hour = new Date().getHours(); let greeting = "Good Evening"; if (hour < 12) greeting = "Good Morning"; else if (hour < 18) greeting = "Good Afternoon"; document.getElementById('timeGreeting').innerText = greeting; document.getElementById('currentDate').innerText = "Today is " + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); } updateGreeting();
 
-        function openVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
-        function closeVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
-        function openQueueModal() { const m = document.getElementById('queueModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
-        function closeQueueModal() { const m = document.getElementById('queueModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
+        // Standard Modals
+        function openVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); } function closeVitalsModal() { const m = document.getElementById('vitalsModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
+        function openQueueModal() { const m = document.getElementById('queueModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); } function closeQueueModal() { const m = document.getElementById('queueModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
 
         async function loadMyDashboard() {
-            try {
-                const profileRes = await fetch('/api/user/profile', { headers: { 'Authorization': `Bearer ${token}` } });
-                if (profileRes.ok) { 
-                    const profile = await profileRes.json(); 
-                    document.getElementById('patientName').innerText = profile.name.split(' ')[0]; 
-                    document.getElementById('profileCardName').innerText = profile.name;
-                    document.getElementById('profileCardEmail').innerText = profile.email;
-                    document.getElementById('profileCardId').innerText = "SC-" + String(profile.id).padStart(5, '0');
-                    document.getElementById('patientInitials').innerText = profile.name.substring(0, 2).toUpperCase();
-                    document.getElementById('profileCardDate').innerText = new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-                    
-                    document.getElementById('ui-bg').innerText = profile.blood_group || 'N/A';
-                    document.getElementById('ui-hr').innerText = profile.heart_rate || '--';
-                    document.getElementById('ui-bp').innerText = profile.blood_pressure || '--/--';
-                    document.getElementById('ui-wt').innerText = profile.weight || '--';
-                    
-                    document.getElementById('form-bg').value = profile.blood_group || 'Unknown';
-                    document.getElementById('form-hr').value = profile.heart_rate || '';
-                    document.getElementById('form-bp').value = profile.blood_pressure || '';
-                    document.getElementById('form-wt').value = profile.weight || '';
-                }
-            } catch(e) {}
+            try { const profileRes = await fetch('/api/user/profile', { headers: { 'Authorization': `Bearer ${token}` } }); if (profileRes.ok) { const profile = await profileRes.json(); document.getElementById('patientName').innerText = profile.name.split(' ')[0]; document.getElementById('profileCardName').innerText = profile.name; document.getElementById('profileCardEmail').innerText = profile.email; document.getElementById('profileCardId').innerText = "SC-" + String(profile.id).padStart(5, '0'); document.getElementById('patientInitials').innerText = profile.name.substring(0, 2).toUpperCase(); document.getElementById('profileCardDate').innerText = new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }); document.getElementById('ui-bg').innerText = profile.blood_group || 'N/A'; document.getElementById('ui-hr').innerText = profile.heart_rate || '--'; document.getElementById('ui-bp').innerText = profile.blood_pressure || '--/--'; document.getElementById('ui-wt').innerText = profile.weight || '--'; } } catch(e) {}
+            refreshAppointments();
+        }
 
+        async function refreshAppointments() {
             try {
-                const res = await fetch('/api/appointments/me', { headers: { 'Authorization': `Bearer ${token}` } }); 
-                const data = await res.json();
-                const pending = data.filter(a => a.status === 'Pending');
+                const res = await fetch('/api/appointments/me', { headers: { 'Authorization': `Bearer ${token}` } }); const data = await res.json();
+                const pending = data.filter(a => a.status === 'Pending' || a.status === 'Calling');
                 const list = document.getElementById('myApptList'); list.innerHTML = '';
                 const nextApptBox = document.getElementById('nextApptBox');
 
                 if (pending.length > 0) {
                     const next = pending[0];
-                    let docName = next.doctor_name || 'Assigned Specialist';
-                    // 🌟 PASSING APPT ID FOR UNIQUE SECURE VIDEO ROOM
-                    nextApptBox.innerHTML = `
-                        <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                            <div>
-                                <span class="bg-blue-600/30 text-blue-300 border border-blue-500/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 inline-block">Upcoming Visit</span>
-                                <h4 class="text-2xl md:text-3xl font-black text-white mb-1">Dr. ${docName}</h4>
-                                <p class="text-slate-300 font-bold mb-4">${next.department}</p>
-                                <div class="flex items-center gap-4 text-sm font-bold text-slate-400 bg-slate-800/50 inline-flex px-4 py-2 rounded-xl border border-slate-700">
-                                    <span class="flex items-center gap-2">📅 ${next.appointment_date.split('|')[0]}</span>
-                                    <span class="flex items-center gap-2">⏰ ${next.appointment_date.split('|')[1] || 'TBD'}</span>
-                                </div>
-                            </div>
-                            <div class="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
-                                <button id="trackBtnMain" onclick="checkQueue(${next.id}, 'trackBtnMain')" class="w-full sm:w-auto bg-slate-800 border border-slate-600 text-white px-6 py-4 rounded-xl font-black hover:bg-slate-700 transition text-sm flex items-center justify-center gap-2">📍 Track Queue</button>
-                                <button onclick="startVideoCall('${docName}', ${next.id})" class="w-full sm:w-auto bg-green-500 text-slate-900 px-6 py-4 rounded-xl font-black shadow-[0_0_15px_rgba(34,197,94,0.4)] hover:bg-white transition text-sm flex items-center justify-center gap-2 group"><span class="text-lg group-hover:scale-110 transition">📹</span> Join Video Call</button>
-                            </div>
-                        </div>`;
+                    nextApptBox.innerHTML = `<div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6"><div><span class="bg-blue-600/30 text-blue-300 border border-blue-500/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 inline-block">Upcoming Visit</span><h4 class="text-2xl md:text-3xl font-black text-white mb-1">Dr. ${next.doctor_name || 'Assigned Specialist'}</h4><p class="text-slate-300 font-bold mb-4">${next.department}</p><div class="flex items-center gap-4 text-sm font-bold text-slate-400 bg-slate-800/50 inline-flex px-4 py-2 rounded-xl border border-slate-700"><span class="flex items-center gap-2">📅 ${next.appointment_date.split('|')[0]}</span><span class="flex items-center gap-2">⏰ ${next.appointment_date.split('|')[1] || 'TBD'}</span></div></div><div class="w-full lg:w-auto flex flex-col sm:flex-row gap-3"><button id="trackBtnMain" onclick="checkQueue(${next.id}, 'trackBtnMain')" class="w-full sm:w-auto bg-slate-800 border border-slate-600 text-white px-6 py-4 rounded-xl font-black hover:bg-slate-700 transition text-sm flex items-center justify-center gap-2 shadow-md">📍 Track Queue</button><button onclick="joinActiveCall('${next.doctor_name || 'Assigned Specialist'}', ${next.id})" class="w-full sm:w-auto bg-green-500 text-slate-900 px-6 py-4 rounded-xl font-black shadow-[0_0_15px_rgba(34,197,94,0.4)] hover:bg-white transition text-sm flex items-center justify-center gap-2 group"><span class="text-lg group-hover:scale-110 transition">📹</span> Join Room Manually</button></div></div>`;
                 } else {
                     nextApptBox.innerHTML = `<div class="relative z-10 text-center py-6"><div class="text-4xl mb-3 opacity-50">✨</div><h4 class="text-xl font-bold text-white mb-2">You're all caught up!</h4><p class="text-slate-400 text-sm">No pending appointments. Stay healthy!</p></div>`;
                 }
 
                 if(data.length === 0) { list.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center font-bold text-slate-400">No medical records found.</td></tr>`; return; }
-                
                 data.forEach(appt => {
-                    let stColor = appt.status === 'Completed' ? 'text-green-600 bg-green-100 border-green-200' : 'text-amber-600 bg-amber-100 border-amber-200 animate-pulse';
-                    let queueBtn = appt.status === 'Pending' ? `<button id="trackRow${appt.id}" onclick="checkQueue(${appt.id}, 'trackRow${appt.id}')" class="text-[10px] md:text-xs font-black uppercase tracking-widest bg-slate-900 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition whitespace-nowrap w-24">Track</button>` : `<span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Closed</span>`;
+                    let stColor = appt.status === 'Completed' ? 'text-green-600 bg-green-100 border-green-200' : (appt.status === 'Calling' ? 'text-blue-600 bg-blue-100 border-blue-200 animate-pulse' : 'text-amber-600 bg-amber-100 border-amber-200');
+                    let queueBtn = appt.status === 'Completed' ? `<span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Closed</span>` : `<button onclick="checkQueue(${appt.id}, this)" class="text-[10px] md:text-xs font-black uppercase tracking-widest bg-slate-900 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition whitespace-nowrap w-24">Track</button>`;
                     list.innerHTML += `<tr class="hover:bg-slate-50 transition-colors"><td class="px-6 py-5 font-black text-slate-900">#${appt.id}</td><td class="px-6 py-5 whitespace-nowrap"><p class="font-black text-slate-800">Dr. ${appt.doctor_name || 'Specialist'}</p><p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">${appt.department}</p></td><td class="px-6 py-5 font-bold text-slate-600 whitespace-nowrap">${appt.appointment_date}</td><td class="px-6 py-5"><span class="px-3 py-1.5 rounded-md border text-[10px] md:text-xs font-black uppercase tracking-widest ${stColor}">${appt.status}</span></td><td class="px-6 py-5 text-center flex justify-center">${queueBtn}</td></tr>`;
                 });
             } catch(e) {}
         }
 
-        document.getElementById('vitalsForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); const btn = document.getElementById('vitalSubmitBtn'); btn.innerText = "Saving..."; btn.disabled = true;
-            try { const payload = { blood_group: document.getElementById('form-bg').value, heart_rate: document.getElementById('form-hr').value, blood_pressure: document.getElementById('form-bp').value, weight: document.getElementById('form-wt').value };
-                const res = await fetch('/api/user/vitals', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
-                if(res.ok) { closeVitalsModal(); loadMyDashboard(); } else { alert("Failed to save."); }
-            } catch(error) {}
-            btn.innerText = "Save Vitals"; btn.disabled = false;
-        });
+        async function checkQueue(id, btnElement) { const originalText = btnElement.innerHTML; btnElement.innerHTML = `<span class="animate-pulse">Syncing...</span>`; btnElement.disabled = true; try { const res = await fetch(`/api/queue/${id}`); const data = await res.json(); document.getElementById('queuePatients').innerText = data.patientsAhead; document.getElementById('queueTime').innerText = data.estimatedWaitTime; btnElement.innerHTML = originalText; btnElement.disabled = false; openQueueModal(); } catch(e) { btnElement.innerHTML = originalText; btnElement.disabled = false; alert("Network error."); } }
 
-        async function checkQueue(id, btnId) { 
-            const btn = document.getElementById(btnId); const originalText = btn ? btn.innerHTML : "Track";
-            if(btn) { btn.innerHTML = `<span class="animate-pulse">Syncing...</span>`; btn.disabled = true; }
-            try { const res = await fetch(`/api/queue/${id}`); const data = await res.json(); document.getElementById('queuePatients').innerText = data.patientsAhead; document.getElementById('queueTime').innerText = data.estimatedWaitTime; if(btn) { btn.innerHTML = originalText; btn.disabled = false; } openQueueModal(); } catch(e) { if(btn) { btn.innerHTML = originalText; btn.disabled = false; } alert("Network error."); } 
-        }
+        // 🌟 NEW: CLINICAL SELF-ASSESSMENT GUIDES
+        const guideData = {
+            'skin': { title: "Skin Health Self-Exam", html: `<div class="space-y-6"><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl shrink-0">🪞</div><div><h4 class="font-black text-slate-800">Step 1: Proper Lighting</h4><p class="text-sm text-slate-600 mt-1">Stand in front of a full-length mirror in a brightly lit room. Ensure there are no harsh shadows on your body.</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-2xl shrink-0">🔍</div><div><h4 class="font-black text-slate-800">Step 2: The ABCDE Rule for Moles</h4><p class="text-sm text-slate-600 mt-1">Check moles for <b>A</b>symmetry, irregular <b>B</b>orders, uneven <b>C</b>olor, large <b>D</b>iameter (>6mm), and <b>E</b>volution (changes over time).</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-2xl shrink-0">🖐️</div><div><h4 class="font-black text-slate-800">Step 3: Palpation</h4><p class="text-sm text-slate-600 mt-1">Gently run your fingers over your skin. Note any new bumps, rough patches, or areas that feel tender or scaly.</p></div></div></div>` },
+            'eye': { title: "Eye & Vision Self-Check", html: `<div class="space-y-6"><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl shrink-0">📏</div><div><h4 class="font-black text-slate-800">Step 1: Distance Acuity</h4><p class="text-sm text-slate-600 mt-1">Cover one eye and try to read a book title or calendar from 10 feet away. Repeat with the other eye.</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-2xl shrink-0">👁️</div><div><h4 class="font-black text-slate-800">Step 2: Sclera Inspection</h4><p class="text-sm text-slate-600 mt-1">Look in the mirror. The white part of your eye (Sclera) should be clear. Look for excessive redness, yellowing, or abnormal blood vessels.</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-2xl shrink-0">🦯</div><div><h4 class="font-black text-slate-800">Step 3: Peripheral Test</h4><p class="text-sm text-slate-600 mt-1">Look straight ahead. Hold your finger to the far side of your head and slowly bring it forward. You should notice movement early.</p></div></div></div>` },
+            'hair': { title: "Scalp & Follicle Assessment", html: `<div class="space-y-6"><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl shrink-0">🤏</div><div><h4 class="font-black text-slate-800">Step 1: The Pull Test</h4><p class="text-sm text-slate-600 mt-1">Grasp a small section of hair (about 50-60 strands) and pull gently upward. Losing more than 6 strands may indicate active shedding.</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-2xl shrink-0">🔎</div><div><h4 class="font-black text-slate-800">Step 2: Scalp Inspection</h4><p class="text-sm text-slate-600 mt-1">Part your hair in different places. Look for redness, thick dandruff flakes, inflammation, or circular bald patches.</p></div></div><div class="flex gap-4 items-start"><div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-2xl shrink-0">📏</div><div><h4 class="font-black text-slate-800">Step 3: Parting Width</h4><p class="text-sm text-slate-600 mt-1">Part your hair down the middle. If the visible scalp line looks wider than it used to, it could be a sign of early thinning.</p></div></div></div>` }
+        };
 
-        // 🌟 AI VIRTUAL SCANNER ENGINE
-        let localStream = null; let activeScanType = "";
-        async function startAiScan(type) {
-            activeScanType = type; document.getElementById('scanTitle').innerText = type; document.getElementById('scanResults').classList.add('hidden'); document.getElementById('scanPlaceholder').classList.remove('hidden'); document.getElementById('startScanBtn').innerText = "Grant Camera & Scan"; document.getElementById('startScanBtn').classList.remove('hidden'); document.getElementById('scannerOverlay').classList.add('hidden');
-            const m = document.getElementById('aiScanModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10);
-        }
-        async function runAiScan() {
+        function openGuide(type) { document.getElementById('guideTitle').innerText = guideData[type].title; document.getElementById('guideContent').innerHTML = guideData[type].html; const m = document.getElementById('guideModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95'); }, 10); }
+        function closeGuide() { const m = document.getElementById('guideModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); }
+
+        // 🌟 NEW: REAL-TIME INCOMING CALL POLLING ENGINE
+        let activeCallApptId = null;
+        let activeDoctorName = "";
+        let isCallModalOpen = false;
+
+        setInterval(async () => {
+            if(isCallModalOpen) return; // Don't interrupt if already in call/ringing
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true }); document.getElementById('scanVideo').srcObject = localStream; document.getElementById('scanPlaceholder').classList.add('hidden');
-                document.getElementById('scannerOverlay').classList.remove('hidden'); const btn = document.getElementById('startScanBtn'); btn.innerText = "Scanning Data Points... ⏳"; btn.disabled = true;
-                setTimeout(() => {
-                    document.getElementById('scannerOverlay').classList.add('hidden'); btn.classList.add('hidden'); btn.disabled = false; let report = "";
-                    if(activeScanType.includes('Skin')) report = "🟢 Epidermal Scan Complete.<br>• Hydration: 78% (Normal)<br>• Pigmentation: Minor UV exposure detected.<br><b>Recommendation:</b> Apply SPF 50 daily and use a lightweight moisturizer.";
-                    if(activeScanType.includes('Eye')) report = "🟢 Sclera & Retina Tracked.<br>• Redness: Very Low<br>• Screen Fatigue: Moderate.<br><b>Recommendation:</b> 20/20 vision estimated. Follow the 20-20-20 rule during screen time.";
-                    if(activeScanType.includes('Scalp')) report = "🟢 Follicular Density Checked.<br>• Scalp Health: Optimal (No flaking).<br>• Density: Normal.<br><b>Recommendation:</b> Maintain current hair care routine. Biotin supplements optional.";
-                    document.getElementById('scanReportText').innerHTML = report; document.getElementById('scanResults').classList.remove('hidden');
-                    if(localStream) { localStream.getTracks().forEach(t => t.stop()); }
-                }, 3000);
-            } catch(e) { alert("Please allow Camera access in your browser to run the Virtual Scan."); }
-        }
-        function closeAiScan() { const m = document.getElementById('aiScanModal'); m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300); if(localStream) { localStream.getTracks().forEach(t => t.stop()); } }
+                const res = await fetch('/api/appointments/me', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const callingAppt = data.find(a => a.status === 'Calling');
+                
+                if (callingAppt) {
+                    activeCallApptId = callingAppt.id;
+                    activeDoctorName = callingAppt.doctor_name || 'Specialist';
+                    document.getElementById('incomingDocName').innerText = `Dr. ${activeDoctorName}`;
+                    document.getElementById('incomingCallModal').classList.remove('hidden');
+                    document.getElementById('ringtone').play().catch(e=>console.log("Auto-play blocked"));
+                    isCallModalOpen = true;
+                }
+            } catch(e) {}
+        }, 3000); // Checks every 3 seconds!
 
-        // 🌟 REAL VIDEO CALL ENGINE (Powered By Jitsi)
-        function startVideoCall(doctorName, apptId) {
+        function rejectCall() {
+            document.getElementById('ringtone').pause(); document.getElementById('ringtone').currentTime = 0;
+            document.getElementById('incomingCallModal').classList.add('hidden');
+            isCallModalOpen = false;
+        }
+
+        function acceptCall() {
+            document.getElementById('ringtone').pause(); document.getElementById('ringtone').currentTime = 0;
+            document.getElementById('incomingCallModal').classList.add('hidden');
+            joinActiveCall(activeDoctorName, activeCallApptId);
+        }
+
+        // JITSI VIDEO ROOM (Triggered manually or via Accept Call)
+        function joinActiveCall(doctorName, apptId) {
+            isCallModalOpen = true;
             document.getElementById('callHeaderName').innerText = `Consulting with Dr. ${doctorName}`;
-            const m = document.getElementById('videoCallModal');
-            m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); }, 10);
-            
-            // Generate a unique secure room name based on Appointment ID
+            const m = document.getElementById('videoCallModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); }, 10);
             const roomName = `SmartCare_Secure_Consultation_Room_${apptId}_${new Date().toISOString().split('T')[0]}`;
-            
-            // Embed Real Video Call Iframe
             document.getElementById('jitsiContainer').innerHTML = `<iframe allow="camera; microphone; display-capture; autoplay; clipboard-write" src="https://meet.jit.si/${roomName}" style="height: 100%; width: 100%; border: 0px;"></iframe>`;
         }
 
         function endVideoCall() {
-            document.getElementById('jitsiContainer').innerHTML = ""; // Kills the video stream instantly
-            const m = document.getElementById('videoCallModal');
-            m.classList.add('opacity-0'); 
-            setTimeout(() => { m.classList.add('hidden'); }, 300);
+            document.getElementById('jitsiContainer').innerHTML = ""; 
+            const m = document.getElementById('videoCallModal'); m.classList.add('opacity-0'); setTimeout(() => { m.classList.add('hidden'); isCallModalOpen = false; refreshAppointments(); }, 300);
         }
 
         document.addEventListener('DOMContentLoaded', loadMyDashboard);

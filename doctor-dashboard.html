@@ -76,7 +76,7 @@
         </div>
     </main>
 
-    <!-- 🌟 NEW: REAL LIVE VIDEO CALL MODAL (Powered by Jitsi) -->
+    <!-- 🌟 JITSI VIDEO ROOM MODAL -->
     <div id="videoCallModal" class="hidden fixed inset-0 bg-slate-900 z-[300] flex flex-col opacity-0 transition-opacity">
         <div class="p-4 flex justify-between items-center bg-slate-800 absolute w-full top-0 z-50 shadow-md">
             <div class="flex items-center gap-3"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-white font-bold text-sm tracking-wide" id="callPatName">Live Patient Consultation</span></div>
@@ -88,17 +88,10 @@
     <script>
         const token = localStorage.getItem('smartcare_jwt');
         const role = localStorage.getItem('smartcare_role');
+        let activeCallApptId = null;
 
-        if (!token || (role !== 'doctor' && role !== 'admin')) {
-            alert("Security Alert: Unauthorized access. Please login as a Doctor.");
-            window.location.href = 'index.html';
-        }
-
-        function logout() { 
-            localStorage.removeItem('smartcare_jwt'); 
-            localStorage.removeItem('smartcare_role'); 
-            window.location.href = "index.html"; 
-        }
+        if (!token || (role !== 'doctor' && role !== 'admin')) { window.location.href = 'index.html'; }
+        function logout() { localStorage.removeItem('smartcare_jwt'); localStorage.removeItem('smartcare_role'); window.location.href = "index.html"; }
 
         async function loadAppointments() {
             const listEl = document.getElementById('appointmentList');
@@ -122,56 +115,61 @@
                 if (data.length === 0) { listEl.innerHTML = "<tr><td colspan='5' class='p-12 text-center text-slate-400 font-bold'>No appointments in the queue.</td></tr>"; return; }
 
                 document.getElementById('stat-total').innerText = data.length;
-                document.getElementById('stat-pending').innerText = data.filter(a => a.status === 'Pending').length;
+                document.getElementById('stat-pending').innerText = data.filter(a => a.status === 'Pending' || a.status === 'Calling').length;
                 document.getElementById('stat-completed').innerText = data.filter(a => a.status === 'Completed').length;
 
                 listEl.innerHTML = '';
                 data.forEach(appt => {
                     let isCompleted = appt.status === 'Completed';
-                    let statusColor = isCompleted ? 'bg-green-100 text-green-700 border-green-200' : 'bg-amber-100 text-amber-700 border-amber-200';
-                    let statusDot = isCompleted ? 'bg-green-500' : 'bg-amber-500 animate-pulse';
+                    let statusColor = isCompleted ? 'bg-green-100 text-green-700 border-green-200' : (appt.status === 'Calling' ? 'bg-blue-100 text-blue-700 border-blue-200 animate-pulse' : 'bg-amber-100 text-amber-700 border-amber-200');
+                    let statusDot = isCompleted ? 'bg-green-500' : (appt.status === 'Calling' ? 'bg-blue-500' : 'bg-amber-500 animate-pulse');
                     
-                    // 🌟 PASSING APPT ID FOR UNIQUE SECURE VIDEO ROOM
                     let actionButton = isCompleted 
                         ? `<span class="inline-flex items-center gap-1.5 text-[10px] md:text-xs font-black text-slate-400 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 uppercase tracking-widest">✔️ Cleared</span>`
                         : `<div class="flex gap-2 justify-center">
-                                <button onclick="startVideoCall('${appt.patient_name}', ${appt.id})" class="bg-slate-800 text-white px-3 py-2 rounded-lg text-lg hover:bg-green-500 transition shadow-md" title="Start Video Call">📹</button>
-                                <button onclick="updateStatus(${appt.id})" class="bg-blue-600 text-white hover:bg-slate-900 px-4 py-2.5 rounded-xl text-xs font-black shadow-md transition uppercase tracking-wide">Complete</button>
+                                <button onclick="startVideoCall('${appt.patient_name}', ${appt.id})" class="${appt.status === 'Calling' ? 'bg-green-500' : 'bg-slate-800'} text-white px-3 py-2 rounded-lg text-lg hover:bg-green-500 transition shadow-md" title="Ring Patient & Join Call">📹</button>
+                                <button onclick="updateStatus(${appt.id}, 'Completed')" class="bg-blue-600 text-white hover:bg-slate-900 px-4 py-2.5 rounded-xl text-xs font-black shadow-md transition uppercase tracking-wide">Complete</button>
                            </div>`;
 
                     let rowClass = isCompleted ? 'opacity-60 bg-slate-50/50' : 'hover:bg-blue-50/30 transition-colors bg-white';
 
                     listEl.insertAdjacentHTML('beforeend', `<tr class="${rowClass}"><td class="px-6 py-5 whitespace-nowrap"><div class="font-black text-slate-900 text-sm md:text-base">#${appt.id}</div><div class="text-[10px] font-bold text-slate-400 mt-1">${appt.appointment_date}</div></td><td class="px-6 py-5 whitespace-nowrap"><div class="font-black text-slate-800 text-sm">${appt.patient_name}</div><div class="text-[10px] md:text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">${appt.age} yrs • ${appt.gender} • ${appt.contact}</div></td><td class="px-6 py-5"><div class="text-xs font-medium text-slate-600 bg-slate-100 p-2.5 rounded-xl border border-slate-200 line-clamp-2" title="${appt.symptoms}">${appt.symptoms}</div></td><td class="px-6 py-5 whitespace-nowrap"><span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black border uppercase tracking-widest ${statusColor}"><span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>${appt.status}</span></td><td class="px-6 py-5 text-center">${actionButton}</td></tr>`);
                 });
-            } catch (error) { listEl.innerHTML = `<tr><td colspan='5' class="p-12 text-center text-rose-500 font-bold">Error loading data. Please refresh.</td></tr>`; }
+            } catch (error) {}
         }
 
-        async function updateStatus(appointmentId) {
-            if(!confirm("Mark this patient visit as completed?")) return;
+        async function updateStatus(appointmentId, newStatus) {
             try {
-                const response = await fetch(`/api/doctor/appointment/${appointmentId}/status`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ status: 'Completed' }) });
-                if (response.ok) { loadAppointments(); } else { alert("Failed to update status."); }
-            } catch(e) { alert("Network error."); }
+                await fetch(`/api/doctor/appointment/${appointmentId}/status`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ status: newStatus }) });
+                loadAppointments();
+            } catch(e) { console.log("Failed to update status"); }
         }
 
-        // 🌟 REAL VIDEO CALL ENGINE (Powered By Jitsi)
-        function startVideoCall(patientName, apptId) {
+        // 🌟 NEW: INITIATES RINGING ON PATIENT DASHBOARD!
+        async function startVideoCall(patientName, apptId) {
+            // Update Backend to 'Calling' to trigger Patient's interval popup
+            activeCallApptId = apptId;
+            await updateStatus(apptId, 'Calling');
+
             document.getElementById('callPatName').innerText = `Consulting with ${patientName}`;
             const m = document.getElementById('videoCallModal');
             m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); }, 10);
             
-            // Connect to the exact same room generated by the Patient
             const roomName = `SmartCare_Secure_Consultation_Room_${apptId}_${new Date().toISOString().split('T')[0]}`;
-            
-            // Embed Real Video Call Iframe
             document.getElementById('jitsiContainer').innerHTML = `<iframe allow="camera; microphone; display-capture; autoplay; clipboard-write" src="https://meet.jit.si/${roomName}" style="height: 100%; width: 100%; border: 0px;"></iframe>`;
         }
 
-        function endVideoCall() {
-            document.getElementById('jitsiContainer').innerHTML = ""; // Kills the stream
+        async function endVideoCall() {
+            document.getElementById('jitsiContainer').innerHTML = ""; 
             const m = document.getElementById('videoCallModal');
             m.classList.add('opacity-0'); 
             setTimeout(() => { m.classList.add('hidden'); }, 300);
+
+            // Change status back to Pending so it stops ringing for patient
+            if(activeCallApptId) {
+                await updateStatus(activeCallApptId, 'Pending');
+                activeCallApptId = null;
+            }
         }
 
         document.addEventListener('DOMContentLoaded', loadAppointments);
