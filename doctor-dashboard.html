@@ -10,13 +10,11 @@
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800">
 
-    <!-- 📱 Mobile Header -->
     <div class="md:hidden fixed top-0 w-full bg-white border-b border-slate-200 p-4 flex justify-between items-center z-50 shadow-sm">
         <div class="flex items-center gap-2"><div class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-black">SC</div><span class="font-black text-lg text-slate-900">Workspace</span></div>
         <button onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')" class="text-slate-600 focus:outline-none"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
     </div>
 
-    <!-- 🖥️ Sidebar -->
     <aside id="sidebar" class="bg-slate-900 text-slate-300 w-64 shrink-0 h-full flex flex-col transition-transform duration-300 absolute md:relative z-40 -translate-x-full md:translate-x-0">
         <div class="p-6 border-b border-slate-800 flex items-center gap-3">
             <div class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center font-black text-xl shadow-lg">SC</div>
@@ -35,7 +33,6 @@
         </div>
     </aside>
 
-    <!-- 📊 Main Content Area -->
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 pt-16 md:pt-0">
         <header class="hidden md:flex bg-white border-b border-slate-200 p-6 justify-between items-center shrink-0">
             <h2 class="text-2xl font-black text-slate-800">Clinical Dashboard</h2>
@@ -79,25 +76,13 @@
         </div>
     </main>
 
-    <!-- 🌟 NEW: LIVE VIDEO CALL MODAL FOR DOCTOR -->
+    <!-- 🌟 NEW: REAL LIVE VIDEO CALL MODAL (Powered by Jitsi) -->
     <div id="videoCallModal" class="hidden fixed inset-0 bg-slate-900 z-[300] flex flex-col opacity-0 transition-opacity">
-        <div class="p-4 flex justify-between items-center bg-slate-800/50 backdrop-blur-md absolute w-full top-0 z-10">
-            <div class="flex items-center gap-3"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-white font-bold text-sm tracking-wide">Live Patient Consultation</span></div>
-            <span class="text-slate-300 text-xs font-bold" id="callDuration">00:00</span>
+        <div class="p-4 flex justify-between items-center bg-slate-800 absolute w-full top-0 z-50 shadow-md">
+            <div class="flex items-center gap-3"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-white font-bold text-sm tracking-wide" id="callPatName">Live Patient Consultation</span></div>
+            <button onclick="endVideoCall()" class="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2 rounded-lg text-xs font-bold shadow-md transition">End Call 📞</button>
         </div>
-        
-        <div class="flex-1 relative flex items-center justify-center">
-            <div class="absolute inset-0 flex items-center justify-center bg-slate-800"><div class="text-center"><span class="text-6xl">🤕</span><p class="text-slate-400 font-bold mt-4" id="callPatName">Waiting for Patient to Join...</p></div></div>
-            <div class="absolute bottom-24 right-4 w-28 h-40 md:w-40 md:h-56 bg-black rounded-2xl overflow-hidden shadow-2xl border-2 border-slate-600 z-20">
-                <video id="callVideo" class="w-full h-full object-cover" autoplay playsinline muted></video>
-            </div>
-        </div>
-
-        <div class="p-6 bg-gradient-to-t from-slate-900 flex justify-center gap-6 pb-10 absolute w-full bottom-0 z-10">
-            <button class="w-14 h-14 bg-slate-700 hover:bg-slate-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg transition">🎤</button>
-            <button onclick="endVideoCall()" class="w-14 h-14 bg-rose-600 hover:bg-rose-700 text-white rounded-full flex items-center justify-center text-2xl shadow-lg transition transform hover:scale-105">📞</button>
-            <button class="w-14 h-14 bg-slate-700 hover:bg-slate-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg transition">📷</button>
-        </div>
+        <div id="jitsiContainer" class="flex-1 w-full h-full mt-[60px] bg-black"></div>
     </div>
 
     <script>
@@ -125,24 +110,16 @@
                     const profile = await profileRes.json();
                     document.getElementById('profileName').innerText = "Dr. " + profile.name;
                     document.getElementById('profileSpec').innerText = profile.specialization || "General Specialist";
-                    if(profile.image_url) {
-                        document.getElementById('doctorPhoto').innerHTML = `<img src="${profile.image_url}" class="w-full h-full object-cover">`;
-                    }
+                    if(profile.image_url) { document.getElementById('doctorPhoto').innerHTML = `<img src="${profile.image_url}" class="w-full h-full object-cover">`; }
                 }
             } catch(e) {}
 
             try {
-                const response = await fetch('/api/doctor/appointments', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
+                const response = await fetch('/api/doctor/appointments', { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!response.ok) throw new Error("Auth Failed");
                 const data = await response.json();
 
-                if (data.length === 0) {
-                    listEl.innerHTML = "<tr><td colspan='5' class='p-12 text-center text-slate-400 font-bold'>No appointments in the queue.</td></tr>";
-                    return;
-                }
+                if (data.length === 0) { listEl.innerHTML = "<tr><td colspan='5' class='p-12 text-center text-slate-400 font-bold'>No appointments in the queue.</td></tr>"; return; }
 
                 document.getElementById('stat-total').innerText = data.length;
                 document.getElementById('stat-pending').innerText = data.filter(a => a.status === 'Pending').length;
@@ -154,90 +131,47 @@
                     let statusColor = isCompleted ? 'bg-green-100 text-green-700 border-green-200' : 'bg-amber-100 text-amber-700 border-amber-200';
                     let statusDot = isCompleted ? 'bg-green-500' : 'bg-amber-500 animate-pulse';
                     
-                    // 🌟 ADDED VIDEO CALL BUTTON FOR DOCTOR
+                    // 🌟 PASSING APPT ID FOR UNIQUE SECURE VIDEO ROOM
                     let actionButton = isCompleted 
                         ? `<span class="inline-flex items-center gap-1.5 text-[10px] md:text-xs font-black text-slate-400 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 uppercase tracking-widest">✔️ Cleared</span>`
                         : `<div class="flex gap-2 justify-center">
-                                <button onclick="startVideoCall('${appt.patient_name}')" class="bg-slate-800 text-white px-3 py-2 rounded-lg text-lg hover:bg-green-500 transition shadow-md" title="Start Video Call">📹</button>
+                                <button onclick="startVideoCall('${appt.patient_name}', ${appt.id})" class="bg-slate-800 text-white px-3 py-2 rounded-lg text-lg hover:bg-green-500 transition shadow-md" title="Start Video Call">📹</button>
                                 <button onclick="updateStatus(${appt.id})" class="bg-blue-600 text-white hover:bg-slate-900 px-4 py-2.5 rounded-xl text-xs font-black shadow-md transition uppercase tracking-wide">Complete</button>
                            </div>`;
 
                     let rowClass = isCompleted ? 'opacity-60 bg-slate-50/50' : 'hover:bg-blue-50/30 transition-colors bg-white';
 
-                    let row = `
-                        <tr class="${rowClass}">
-                            <td class="px-6 py-5 whitespace-nowrap">
-                                <div class="font-black text-slate-900 text-sm md:text-base">#${appt.id}</div>
-                                <div class="text-[10px] font-bold text-slate-400 mt-1">${appt.appointment_date}</div>
-                            </td>
-                            <td class="px-6 py-5 whitespace-nowrap">
-                                <div class="font-black text-slate-800 text-sm">${appt.patient_name}</div>
-                                <div class="text-[10px] md:text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">${appt.age} yrs • ${appt.gender} • ${appt.contact}</div>
-                            </td>
-                            <td class="px-6 py-5">
-                                <div class="text-xs font-medium text-slate-600 bg-slate-100 p-2.5 rounded-xl border border-slate-200 line-clamp-2" title="${appt.symptoms}">${appt.symptoms}</div>
-                            </td>
-                            <td class="px-6 py-5 whitespace-nowrap">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black border uppercase tracking-widest ${statusColor}">
-                                    <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
-                                    ${appt.status}
-                                </span>
-                            </td>
-                            <td class="px-6 py-5 text-center">
-                                ${actionButton}
-                            </td>
-                        </tr>
-                    `;
-                    listEl.insertAdjacentHTML('beforeend', row);
+                    listEl.insertAdjacentHTML('beforeend', `<tr class="${rowClass}"><td class="px-6 py-5 whitespace-nowrap"><div class="font-black text-slate-900 text-sm md:text-base">#${appt.id}</div><div class="text-[10px] font-bold text-slate-400 mt-1">${appt.appointment_date}</div></td><td class="px-6 py-5 whitespace-nowrap"><div class="font-black text-slate-800 text-sm">${appt.patient_name}</div><div class="text-[10px] md:text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">${appt.age} yrs • ${appt.gender} • ${appt.contact}</div></td><td class="px-6 py-5"><div class="text-xs font-medium text-slate-600 bg-slate-100 p-2.5 rounded-xl border border-slate-200 line-clamp-2" title="${appt.symptoms}">${appt.symptoms}</div></td><td class="px-6 py-5 whitespace-nowrap"><span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black border uppercase tracking-widest ${statusColor}"><span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>${appt.status}</span></td><td class="px-6 py-5 text-center">${actionButton}</td></tr>`);
                 });
-            } catch (error) {
-                listEl.innerHTML = `<tr><td colspan='5' class="p-12 text-center text-rose-500 font-bold">Error loading data. Please refresh.</td></tr>`;
-            }
+            } catch (error) { listEl.innerHTML = `<tr><td colspan='5' class="p-12 text-center text-rose-500 font-bold">Error loading data. Please refresh.</td></tr>`; }
         }
 
         async function updateStatus(appointmentId) {
             if(!confirm("Mark this patient visit as completed?")) return;
             try {
-                const response = await fetch(`/api/doctor/appointment/${appointmentId}/status`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ status: 'Completed' })
-                });
+                const response = await fetch(`/api/doctor/appointment/${appointmentId}/status`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ status: 'Completed' }) });
                 if (response.ok) { loadAppointments(); } else { alert("Failed to update status."); }
             } catch(e) { alert("Network error."); }
         }
 
-        // 🌟 NEW: LIVE VIDEO CALL ENGINE (DOCTOR SIDE)
-        let localStream = null; let callTimer; let callSeconds = 0;
-        
-        async function startVideoCall(patientName) {
-            document.getElementById('callPatName').innerText = `Connecting to ${patientName}...`;
+        // 🌟 REAL VIDEO CALL ENGINE (Powered By Jitsi)
+        function startVideoCall(patientName, apptId) {
+            document.getElementById('callPatName').innerText = `Consulting with ${patientName}`;
             const m = document.getElementById('videoCallModal');
             m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); }, 10);
             
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                document.getElementById('callVideo').srcObject = localStream;
-                
-                setTimeout(() => {
-                    document.getElementById('callPatName').innerText = `${patientName} (Connected)`;
-                    callSeconds = 0;
-                    callTimer = setInterval(() => {
-                        callSeconds++;
-                        let min = String(Math.floor(callSeconds / 60)).padStart(2, '0');
-                        let sec = String(callSeconds % 60).padStart(2, '0');
-                        document.getElementById('callDuration').innerText = `${min}:${sec}`;
-                    }, 1000);
-                }, 2000);
-            } catch(e) { document.getElementById('callPatName').innerText = "Camera Access Denied by Browser!"; }
+            // Connect to the exact same room generated by the Patient
+            const roomName = `SmartCare_Secure_Consultation_Room_${apptId}_${new Date().toISOString().split('T')[0]}`;
+            
+            // Embed Real Video Call Iframe
+            document.getElementById('jitsiContainer').innerHTML = `<iframe allow="camera; microphone; display-capture; autoplay; clipboard-write" src="https://meet.jit.si/${roomName}" style="height: 100%; width: 100%; border: 0px;"></iframe>`;
         }
 
         function endVideoCall() {
-            clearInterval(callTimer);
-            if(localStream) { localStream.getTracks().forEach(t => t.stop()); } 
+            document.getElementById('jitsiContainer').innerHTML = ""; // Kills the stream
             const m = document.getElementById('videoCallModal');
             m.classList.add('opacity-0'); 
-            setTimeout(() => { m.classList.add('hidden'); document.getElementById('callDuration').innerText = "00:00"; }, 300);
+            setTimeout(() => { m.classList.add('hidden'); }, 300);
         }
 
         document.addEventListener('DOMContentLoaded', loadAppointments);

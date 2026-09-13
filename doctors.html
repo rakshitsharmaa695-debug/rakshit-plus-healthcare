@@ -10,7 +10,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
 
-    <!-- 🌟 NAVBAR -->
     <nav class="flex justify-between items-center px-4 md:px-8 py-3 md:py-4 max-w-7xl mx-auto bg-white fixed w-full top-0 z-50 border-b border-slate-100 shadow-sm left-0 right-0">
         <a href="index.html" class="flex items-center gap-2 z-50 group">
             <div class="bg-blue-600 text-white w-9 h-9 md:w-11 md:h-11 flex items-center justify-center rounded-xl font-black text-lg md:text-xl shadow-lg group-hover:bg-slate-900 transition">SC</div>
@@ -23,7 +22,6 @@
 
     <div id="mobileMenu" class="fixed inset-0 bg-white z-40 hidden flex-col pt-24 px-6 overflow-y-auto"><a href="index.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 hover:text-blue-600">Home</a><a href="doctors.html" class="text-2xl font-bold text-blue-600 border-b border-slate-100 py-4">Find Doctors</a><a href="about.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 hover:text-blue-600">About Us</a><a href="contact.html" class="text-2xl font-bold text-slate-900 border-b border-slate-100 py-4 hover:text-blue-600">Contact Us</a><div id="authButtonsMobile" class="mt-8 flex flex-col gap-4 pb-10"><button onclick="openModal('loginModal'); toggleMobileMenu()" class="w-full font-bold text-blue-600 border-2 border-blue-600 px-5 py-4 rounded-xl text-lg">Login to Account</button><a href="booking.html" class="w-full text-center bg-blue-600 text-white px-5 py-4 rounded-xl font-bold shadow-lg text-lg">Book Appointment Now</a></div><div id="userProfileBtnMobile" class="hidden mt-8 flex flex-col gap-4 pb-10"><a href="dashboard.html" id="patientDashboardBtnMobile" class="hidden text-center bg-slate-900 text-white px-5 py-4 rounded-xl font-bold shadow-lg text-lg">🏥 My Dashboard</a><button onclick="logout()" class="w-full font-bold text-rose-500 border-2 border-rose-500 px-5 py-4 rounded-xl text-lg">Logout Securely</button></div></div>
 
-    <!-- 🌟 ADDED pt-24 FOR MOBILE OVERLAP FIX -->
     <div class="hero-bg border-b border-slate-200 px-4 pt-24 md:pt-28">
         <div class="max-w-7xl mx-auto py-10 md:py-16 text-center">
             <span class="bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border border-blue-200">Expert Panel</span>
@@ -44,18 +42,14 @@
     <script>
         function toggleMobileMenu() { const m = document.getElementById('mobileMenu'); m.classList.contains('hidden') ? (m.classList.remove('hidden'), m.classList.add('flex')) : (m.classList.add('hidden'), m.classList.remove('flex')); } function openModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.remove('hidden'); setTimeout(()=>{m.classList.remove('opacity-0'); m.children[0].classList.remove('scale-95');},10); } function closeModal(id) { const m = document.getElementById(id); if(!m) return; m.classList.add('opacity-0'); m.children[0].classList.add('scale-95'); setTimeout(()=>{m.classList.add('hidden');},300); } function switchModal(c, o) { closeModal(c); setTimeout(()=>openModal(o), 300); } const toggleUI = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
         
-        // 🌟 SAAS AUTO-REDIRECT LOGIC ADDED HERE
         function checkAuth() {
             try {
                 const token = localStorage.getItem('smartcare_jwt'); 
                 const role = localStorage.getItem('smartcare_role');
-                
-                // If Doctor or Admin accesses patient page, redirect them!
                 if (token && (role === 'admin' || role === 'doctor')) {
                     if (role === 'admin') { window.location.href = 'admin.html'; return; }
                     if (role === 'doctor') { window.location.href = 'doctor-dashboard.html'; return; }
                 }
-
                 toggleUI('patientDashboardBtn', false); toggleUI('patientDashboardBtnMobile', false);
                 if (token) { 
                     toggleUI('authButtons', false); toggleUI('userProfileBtn', true); toggleUI('authButtonsMobile', false); toggleUI('userProfileBtnMobile', true); 
@@ -75,10 +69,7 @@
                 const data = await res.json(); const msg = document.getElementById('logMsg'); msg.classList.remove('hidden'); 
                 if(res.ok) { 
                     localStorage.setItem('smartcare_jwt', data.token); localStorage.setItem('smartcare_role', data.role); 
-                    // Redirect Admins/Doctors instantly
-                    if(data.role === 'admin') window.location.href = 'admin.html';
-                    else if(data.role === 'doctor') window.location.href = 'doctor-dashboard.html';
-                    else window.location.reload(); 
+                    if(data.role === 'admin') window.location.href = 'admin.html'; else if(data.role === 'doctor') window.location.href = 'doctor-dashboard.html'; else window.location.reload(); 
                 } else { msg.className = "mt-4 text-rose-500 text-center text-sm font-bold"; msg.innerText = data.error; } 
             } catch (error) {} finally { btn.innerText = "Login"; btn.disabled = false; } 
         });
@@ -87,7 +78,41 @@
         
         let allDoctors = []; async function fetchDoctors() { try { const res = await fetch('/api/doctors'); allDoctors = await res.json(); renderDoctors(allDoctors); } catch (err) { document.getElementById('doctorsGrid').innerHTML = `<div class="col-span-full text-center py-20 text-red-500 font-bold">Failed to load doctors. Is backend running?</div>`; } }
         function filterDoctors() { const query = document.getElementById('searchInput').value.toLowerCase(); const filtered = allDoctors.filter(doc => doc.name.toLowerCase().includes(query) || doc.specialization.toLowerCase().includes(query)); renderDoctors(filtered); }
-        function renderDoctors(docs) { const grid = document.getElementById('doctorsGrid'); document.getElementById('docCount').innerText = `${docs.length} Doctors Found`; if (docs.length === 0) { grid.innerHTML = `<div class="col-span-full bg-white rounded-3xl border border-slate-200 p-16 text-center shadow-sm"><div class="text-5xl mb-4">🩺</div><h3 class="text-xl font-extrabold text-slate-900 mb-2">No Doctors Found</h3></div>`; return; } grid.innerHTML = docs.map(doc => `<div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"><div class="flex items-start gap-4 mb-5"><div class="relative shrink-0"><img src="${doc.image_url}" class="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover shadow-md border border-slate-100"><span class="absolute bottom-0 right-0 w-3 h-3 md:w-4 md:h-4 bg-green-500 border-2 border-white rounded-full"></span></div><div><h3 class="text-lg md:text-xl font-extrabold text-slate-900 leading-tight mb-1">${doc.name}</h3><span class="inline-block bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md text-[10px] md:text-xs font-bold border border-blue-100">${doc.specialization}</span><p class="text-xs font-bold text-slate-500 mt-2 line-clamp-1">🎓 ${doc.qualification || 'MBBS, MD'}</p></div></div><div class="grid grid-cols-2 gap-3 mb-5 bg-slate-50 rounded-2xl p-4 border border-slate-100"><div><p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wide">Experience</p><p class="font-extrabold text-slate-800 text-sm">⭐ ${doc.experience || '5+ Years'}</p></div><div class="border-l border-slate-200 pl-3"><p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wide">Fee</p><p class="font-extrabold text-green-600 text-sm">₹${doc.fees || '500'}</p></div></div><div class="mb-6 flex-1"><p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide mb-1">About</p><p class="text-xs md:text-sm text-slate-600 font-medium line-clamp-2">"${doc.about || 'Specialized in providing comprehensive healthcare.'}"</p></div><div class="mt-auto pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-2"><a href="doctor-profile.html?id=${doc.id}" class="w-full sm:w-1/2 flex justify-center items-center bg-white border-2 border-slate-200 text-slate-700 py-3 rounded-xl text-sm font-bold hover:border-blue-600 hover:text-blue-600 transition">👀 Profile</a><a href="booking.html?docId=${doc.id}" class="w-full sm:w-1/2 flex justify-center items-center bg-slate-900 text-white py-3 rounded-xl text-sm font-bold shadow-md hover:bg-blue-600 transition">📅 Book Now</a></div></div>`).join(''); }
+        
+        function renderDoctors(docs) { 
+            const grid = document.getElementById('doctorsGrid'); 
+            document.getElementById('docCount').innerText = `${docs.length} Doctors Found`; 
+            if (docs.length === 0) { grid.innerHTML = `<div class="col-span-full bg-white rounded-3xl border border-slate-200 p-16 text-center shadow-sm"><div class="text-5xl mb-4">🩺</div><h3 class="text-xl font-extrabold text-slate-900 mb-2">No Doctors Found</h3></div>`; return; } 
+            
+            grid.innerHTML = docs.map(doc => `
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    <div class="flex items-start gap-4 mb-5">
+                        <div class="relative shrink-0"><img src="${doc.image_url}" class="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover shadow-md border border-slate-100"><span class="absolute bottom-0 right-0 w-3 h-3 md:w-4 md:h-4 bg-green-500 border-2 border-white rounded-full"></span></div>
+                        <div>
+                            <h3 class="text-lg md:text-xl font-extrabold text-slate-900 leading-tight mb-1">${doc.name}</h3>
+                            <span class="inline-block bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md text-[10px] md:text-xs font-bold border border-blue-100">${doc.specialization}</span>
+                            <p class="text-xs font-bold text-slate-500 mt-2 line-clamp-1">🎓 ${doc.qualification || 'MBBS, MD'}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-5 bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                        <div><p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wide">Experience</p><p class="font-extrabold text-slate-800 text-sm">⭐ ${doc.experience || '5+ Years'}</p></div>
+                        <div class="border-l border-slate-200 pl-3"><p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wide">Fee</p><p class="font-extrabold text-green-600 text-sm">₹${doc.fees || '500'}</p></div>
+                    </div>
+                    <div class="mb-4 flex-1">
+                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide mb-1">About</p>
+                        <p class="text-xs md:text-sm text-slate-600 font-medium line-clamp-2">"${doc.about || 'Specialized in providing comprehensive healthcare.'}"</p>
+                    </div>
+                    
+                    <!-- 🌟 3 DIRECT ACTIONS ADDED HERE -->
+                    <div class="mt-auto pt-4 border-t border-slate-100 flex flex-col gap-2.5">
+                        <div class="flex gap-2 w-full">
+                            <a href="booking.html?docId=${doc.id}&type=clinic" class="w-1/2 flex justify-center items-center bg-slate-900 text-white py-2.5 rounded-xl text-[11px] md:text-xs font-bold shadow-md hover:bg-blue-600 transition">🏥 Clinic Visit</a>
+                            <a href="booking.html?docId=${doc.id}&type=video" class="w-1/2 flex justify-center items-center bg-green-500 text-white py-2.5 rounded-xl text-[11px] md:text-xs font-bold shadow-md hover:bg-green-600 transition">📹 Video Consult</a>
+                        </div>
+                        <a href="doctor-profile.html?id=${doc.id}" class="w-full flex justify-center items-center bg-white border-2 border-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold hover:border-blue-600 hover:text-blue-600 transition">👀 View Full Profile</a>
+                    </div>
+                </div>`).join(''); 
+        }
         fetchDoctors();
     </script>
 </body>
